@@ -10,7 +10,7 @@ public class MainView extends VerticalLayout {
 
     public MainView() {
         add(
-                new H1("¡Hola desde Vaadin + Spring Boot!"),
+                new H1("¡Hola soy Quique y molo un huevo!"),
                 new Button("Haz clic", e -> e.getSource().setText("¡Hecho!"))
         );
     }
