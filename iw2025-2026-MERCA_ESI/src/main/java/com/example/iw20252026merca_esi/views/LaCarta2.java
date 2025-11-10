@@ -68,5 +68,7 @@ public class LaCarta2 extends VerticalLayout {
         );
 
 setSpacing(false);
+Button button = new Button("Button");
+add(button);
     }
 }
