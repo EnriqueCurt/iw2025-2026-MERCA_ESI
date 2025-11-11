@@ -43,7 +43,11 @@ public class Producto {
     
     @OneToMany(mappedBy = "producto")
     private Set<DetallePedido> detallePedidos;
+        
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
+    private Set<ProductoIngrediente> productoIngredientes;
     
+
     // Constructores
     public Producto() {
     }
@@ -141,5 +145,12 @@ public class Producto {
     
     public void setDetallePedidos(Set<DetallePedido> detallePedidos) {
         this.detallePedidos = detallePedidos;
+    }
+    public Set<ProductoIngrediente> getProductoIngredientes() {
+        return productoIngredientes;
+    }
+    
+    public void setProductoIngredientes(Set<ProductoIngrediente> productoIngredientes) {
+        this.productoIngredientes = productoIngredientes;
     }
 }
