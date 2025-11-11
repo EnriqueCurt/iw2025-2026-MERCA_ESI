@@ -95,13 +95,31 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.getStyle()
                 .set("color", "white")
                 .set("border-radius","50px")
-                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)");
+                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                .set("transition", "background-color 0.3s")
+                .set("cursor", "pointer");
+
+        // Efecto similar a los botones del menú: cambio sutil de fondo al pasar el ratón
+        cartButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+        cartButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+
+
+
+
 
         Button loginButton = new Button("ACCESO", new Icon(VaadinIcon.USER));
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         loginButton.getStyle()
                 .set("color", "white")
-                .set("border-radius","50px");
+                .set("border-radius","50px")
+                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.3)")
+                .set("transition", "background-color 0.3s")
+                .set("cursor", "pointer");
+
+        // Efecto similar a los botones del menú: cambio sutil de fondo al pasar el ratón
+        loginButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+        loginButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+
 
         rightSection.add(cartButton, loginButton);
         header.add(logoDiv, spacer, rightSection);
@@ -119,7 +137,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("gap", "6px")
                 .set("background-color", "white")
                 .set("border-radius", "50px")
-                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.15)")
+                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.35)")
                 .set("margin", "0")
                 .set("padding", "8px clamp(10px, 2vw, 20px)");
 
@@ -133,7 +151,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                     .set("font-weight", "500")
                     .set("padding", "10px 15px")
                     .set("border-radius", "25px")
-                    .set("transition", "background-color 0.3s");
+                    .set("transition", "background-color 0.3s")
+                    .set("cursor", "pointer");
             menuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(item.toLowerCase())));
             menuBar.add(menuButton);
         }
