@@ -30,5 +30,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+# Vaadin generated files
+src/main/frontend/generated/
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+webpack.generated.js
+tsconfig.json
+types.d.ts
+
 ### VS Code ###
 .vscode/
