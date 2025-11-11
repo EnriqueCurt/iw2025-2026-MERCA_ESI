@@ -1,0 +1,88 @@
+@startuml
+
+class Producto {
+    - id_producto : int
+    - nombre : string
+    - descripcion : string
+    - precio : float
+    - es_oferta : bool
+    - estado : bool
+    - puntos : bool
+}
+
+class Categoria {
+    - id_categoria : int
+    - nombre : string
+}
+
+class Menu {
+    - id_menu : int
+    - nombre : string
+    - descripcion : string
+    - precio : float
+    - es_oferta : bool
+    - estado : bool
+    - puntos : bool
+    + calcularPrecio() : float
+}
+
+class Empleado {
+    - id_empleado : int
+    - nombre : string
+    - email : string
+    - telefono : string
+}
+
+class Rol {
+    - id_rol : int
+    - nombre : string
+}
+
+class Cliente {
+    - id_cliente : int
+    - nombre : string
+    - email : string
+    - telefono : string
+    - puntos : int
+}
+
+class Pedido {
+    - id_pedido : int
+    - fecha : datetime
+    - total : float
+    - estado : string
+}
+
+class DetallePedido {
+    - id_pedido : int {not null}
+    - id_producto : int {not null}
+    - cantidad : int
+    - precio_unitario : float
+    + calcularSubtotal() : float
+}
+
+class Ingrediente {
+    - id_ingrediente : int
+    - nombre : string
+    - descripcion : string
+    - unidad : string
+    - estado : bool
+}
+
+class ProductoIngrediente {
+    - id_producto : int {not null}
+    - id_ingrediente : int {not null}
+    - cantidad : float
+}
+
+Producto "1" *-- "1..*" Categoria : pertenece
+Menu "1" *-- "1..*" Producto : contiene
+Empleado "1" *-- "1..*" Rol : tiene
+Cliente "1" *-- "0..*" Pedido : realiza
+Pedido "1" *-- "1..*" DetallePedido : contiene
+DetallePedido "1" *-- "1" Producto : incluye
+Empleado "1" *-- "0..*" Pedido : asignado_a
+Producto "1" *-- "0..*" ProductoIngrediente : compuesto_por
+ProductoIngrediente "1" *-- "1" Ingrediente : referencia
+
+@enduml
