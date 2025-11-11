@@ -79,6 +79,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("font-weight", "bold")
                 .set("color", "white")
                 .set("cursor", "pointer");
+        logo.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+        logo.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+
         logo.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("")));
         logoDiv.add(logo);
 
