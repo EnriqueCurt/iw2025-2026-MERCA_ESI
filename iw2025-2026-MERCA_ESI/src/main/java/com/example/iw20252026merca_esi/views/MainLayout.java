@@ -68,7 +68,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         header.setSpacing(true);
         header.getStyle()
                 .set("background-color", "#e30613")
-                .set("color", "white");
+                .set("color", "white")
+                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)");
         header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         Div logoDiv = new Div();
@@ -93,7 +94,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
         cartButton.getStyle()
                 .set("color", "white")
-                .set("border-radius","50px");
+                .set("border-radius","50px")
+                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)");
 
         Button loginButton = new Button("ACCESO", new Icon(VaadinIcon.USER));
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
