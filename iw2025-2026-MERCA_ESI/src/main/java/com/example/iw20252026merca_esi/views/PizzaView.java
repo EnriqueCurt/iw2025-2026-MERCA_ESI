@@ -17,7 +17,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @PageTitle("Pizzas")
 @AnonymousAllowed
-@Route(value = "pizzas")
+@Route(value = "pizzas", layout = MainLayout.class)
 @Menu(title = "Pizzas")
 public class PizzaView extends VerticalLayout {
 

@@ -90,6 +90,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
 
         Button cartButton = new Button("CESTA", new Icon(VaadinIcon.CART));
         cartButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
         cartButton.getStyle().set("color", "white");
 
         Button loginButton = new Button("ACCESO", new Icon(VaadinIcon.USER));

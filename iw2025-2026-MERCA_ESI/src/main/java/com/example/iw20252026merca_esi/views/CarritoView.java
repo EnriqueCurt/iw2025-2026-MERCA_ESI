@@ -15,14 +15,15 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
-@PageTitle("Burgers")
+@PageTitle("Carrito")
 @AnonymousAllowed
-@Route(value = "burgers", layout = MainLayout.class)
-@Menu(title = "Burgers")
-public class BurgersView extends VerticalLayout {
+@Route(value = "carrito", layout = MainLayout.class)
+@Menu(title = "Carrito")
+public class CarritoView extends VerticalLayout {
 
-    public BurgersView(){
-        H1 titulo = new H1("Hamburguesas");
+    public CarritoView(){
+
+        H1 titulo = new H1("Tu Carrito");
 
         add(titulo);
     }
