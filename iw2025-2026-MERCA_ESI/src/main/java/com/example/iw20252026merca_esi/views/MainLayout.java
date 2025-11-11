@@ -140,7 +140,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("gap", "6px")
                 .set("background-color", "white")
                 .set("border-radius", "50px")
-                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.35)")
+                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.55)")
                 .set("margin", "0")
                 .set("padding", "8px clamp(10px, 2vw, 20px)");
 
@@ -157,6 +157,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                     .set("transition", "background-color 0.3s")
                     .set("cursor", "pointer");
             menuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(item.toLowerCase())));
+            menuButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
+            menuButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
             menuBar.add(menuButton);
         }
         return menuBar;
