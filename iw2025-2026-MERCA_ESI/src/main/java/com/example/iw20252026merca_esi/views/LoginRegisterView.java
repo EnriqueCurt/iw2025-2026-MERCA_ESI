@@ -74,7 +74,8 @@ public class LoginRegisterView extends VerticalLayout {
         wrapper.setWidthFull();
         wrapper.setPadding(false);
         wrapper.setSpacing(true);
-        wrapper.getStyle().set("padding-top", "0");
+    // Añadimos padding superior para que el header no solape el contenido
+    wrapper.getStyle().set("padding-top", "80px");
         
         // Contenedor con ancho máximo
         VerticalLayout container = new VerticalLayout();
