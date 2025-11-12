@@ -114,4 +114,45 @@ public class Empleado {
     public void setPedidos(Set<Pedido> pedidos) {
         this.pedidos = pedidos;
     }
+    
+    // Métodos helper para verificar roles
+    
+    /**
+     * Verifica si el empleado tiene un rol específico
+     */
+    public boolean tieneRol(String nombreRol) {
+        if (roles == null) {
+            return false;
+        }
+        return roles.stream()
+                .anyMatch(rol -> rol.getNombre().equalsIgnoreCase(nombreRol));
+    }
+    
+    /**
+     * Verifica si el empleado es administrador
+     */
+    public boolean esAdministrador() {
+        return tieneRol("ADMINISTRADOR");
+    }
+    
+    /**
+     * Verifica si el empleado es manager
+     */
+    public boolean esManager() {
+        return tieneRol("MANAGER");
+    }
+    
+    /**
+     * Verifica si el empleado es propietario
+     */
+    public boolean esPropietario() {
+        return tieneRol("PROPIETARIO");
+    }
+    
+    /**
+     * Verifica si el empleado es repartidor
+     */
+    public boolean esRepartidor() {
+        return tieneRol("REPARTIDOR");
+    }
 }
