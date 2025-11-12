@@ -15,6 +15,12 @@ public class Empleado {
     @Column(nullable = false, length = 100)
     private String nombre;
     
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
+    
+    @Column(nullable = false, length = 60)
+    private String contrasena;
+    
     @Column(nullable = false, unique = true, length = 100)
     private String email;
     
@@ -36,8 +42,10 @@ public class Empleado {
     public Empleado() {
     }
     
-    public Empleado(String nombre, String email, String telefono) {
+    public Empleado(String nombre, String username, String contrasena, String email, String telefono) {
         this.nombre = nombre;
+        this.username = username;
+        this.contrasena = contrasena;
         this.email = email;
         this.telefono = telefono;
     }
@@ -57,6 +65,22 @@ public class Empleado {
     
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    public String getContrasena() {
+        return contrasena;
+    }
+    
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
     
     public String getEmail() {

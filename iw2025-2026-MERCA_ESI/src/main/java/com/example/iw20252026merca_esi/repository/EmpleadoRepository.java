@@ -11,6 +11,12 @@ import java.util.Optional;
 @Repository
 public interface EmpleadoRepository extends JpaRepository<Empleado, Integer> {
     
+    // Buscar empleado por username
+    Optional<Empleado> findByUsername(String username);
+    
+    // Verificar si existe un empleado con ese username
+    boolean existsByUsername(String username);
+    
     // Buscar empleado por email
     Optional<Empleado> findByEmail(String email);
     
