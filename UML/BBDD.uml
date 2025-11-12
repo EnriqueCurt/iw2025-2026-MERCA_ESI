@@ -31,6 +31,8 @@ class Empleado {
     - nombre : string
     - email : string
     - telefono : string
+    - username : string
+    - contrasena : string
 }
 
 class Rol {
