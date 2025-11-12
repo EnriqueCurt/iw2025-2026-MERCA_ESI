@@ -11,17 +11,23 @@ import java.util.Optional;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     
+    // Buscar cliente por username
+    Optional<Cliente> findByUsername(String username);
+    
     // Buscar cliente por email
     Optional<Cliente> findByEmail(String email);
     
     // Buscar cliente por teléfono
     Optional<Cliente> findByTelefono(String telefono);
     
-    // Buscar clientes por nombre (búsqueda parcial, case insensitive)
-    List<Cliente> findByNombreContainingIgnoreCase(String nombre);
+    // Verificar si existe un cliente con ese username
+    boolean existsByUsername(String username);
     
     // Verificar si existe un cliente con ese email
     boolean existsByEmail(String email);
+    
+    // Buscar clientes por nombre (búsqueda parcial, case insensitive)
+    List<Cliente> findByNombreContainingIgnoreCase(String nombre);
     
     // Buscar clientes con más de X puntos
     List<Cliente> findByPuntosGreaterThanEqual(Integer puntos);

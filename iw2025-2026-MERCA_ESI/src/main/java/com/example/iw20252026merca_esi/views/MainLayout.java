@@ -112,6 +112,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
 
         Button loginButton = new Button("ACCESO", new Icon(VaadinIcon.USER));
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        loginButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("acceso")));
         loginButton.getStyle()
                 .set("color", "white")
                 .set("border-radius","50px")
