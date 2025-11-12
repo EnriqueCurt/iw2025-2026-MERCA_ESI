@@ -27,7 +27,7 @@ public class Empleado {
     @Column(length = 20)
     private String telefono;
     
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "empleado_rol",
         joinColumns = @JoinColumn(name = "id_empleado"),

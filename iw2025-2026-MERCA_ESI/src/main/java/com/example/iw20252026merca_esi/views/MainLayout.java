@@ -1,5 +1,6 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,13 +13,17 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.router.RouterLayout;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Layout
 public class MainLayout extends VerticalLayout implements RouterLayout {
 
     private final Div contentContainer;
+    private final SessionService sessionService;
+    private Button loginButton;
 
-    public MainLayout() {
+    public MainLayout(@Autowired SessionService sessionService) {
+        this.sessionService = sessionService;
         setPadding(false);
         setSpacing(false);
         setSizeFull();
@@ -106,13 +111,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
         cartButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
 
-
-
-
-
-        Button loginButton = new Button("ACCESO", new Icon(VaadinIcon.USER));
+        // Botón dinámico: ACCESO o PERFIL según el estado de sesión
+        boolean isLoggedIn = sessionService.isLoggedIn();
+        String buttonText = isLoggedIn ? "PERFIL" : "ACCESO";
+        String navigationTarget = isLoggedIn ? "perfil" : "acceso";
+        
+        loginButton = new Button(buttonText, new Icon(VaadinIcon.USER));
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        loginButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("acceso")));
+        loginButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(navigationTarget)));
         loginButton.getStyle()
                 .set("color", "white")
                 .set("border-radius","50px")

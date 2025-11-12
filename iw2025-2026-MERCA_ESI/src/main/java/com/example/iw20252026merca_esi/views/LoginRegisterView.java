@@ -1,7 +1,10 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.model.Cliente;
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.service.ClienteService;
+import com.example.iw20252026merca_esi.service.EmpleadoService;
+import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -25,13 +28,17 @@ import java.util.Optional;
 public class LoginRegisterView extends VerticalLayout {
 
     private final ClienteService clienteService;
+    private final EmpleadoService empleadoService;
+    private final SessionService sessionService;
     
     private VerticalLayout loginPanel;
     private VerticalLayout registerPanel;
 
     @Autowired
-    public LoginRegisterView(ClienteService clienteService) {
+    public LoginRegisterView(ClienteService clienteService, EmpleadoService empleadoService, SessionService sessionService) {
         this.clienteService = clienteService;
+        this.empleadoService = empleadoService;
+        this.sessionService = sessionService;
         
         setSizeFull();
         setAlignItems(Alignment.CENTER);
@@ -130,14 +137,36 @@ public class LoginRegisterView extends VerticalLayout {
                 return;
             }
             
+            // Intentar autenticar primero como cliente
             Optional<Cliente> clienteOpt = clienteService.autenticar(username, password);
             
             if (clienteOpt.isPresent()) {
                 Cliente cliente = clienteOpt.get();
+                
+                // Guardar el cliente en la sesión
+                sessionService.setCliente(cliente);
+                
                 Notification.show("¡Bienvenido, " + cliente.getNombre() + "!")
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 
-                // Redirigir a la página principal o dashboard
+                // Redirigir a la página principal
+                UI.getCurrent().navigate("");
+                return;
+            }
+            
+            // Si no es cliente, intentar autenticar como empleado
+            Optional<Empleado> empleadoOpt = empleadoService.autenticar(username, password);
+            
+            if (empleadoOpt.isPresent()) {
+                Empleado empleado = empleadoOpt.get();
+                
+                // Guardar el empleado en la sesión
+                sessionService.setEmpleado(empleado);
+                
+                Notification.show("¡Bienvenido, " + empleado.getNombre() + "!")
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                
+                // Redirigir a la página principal
                 UI.getCurrent().navigate("");
             } else {
                 Notification.show("Usuario o contraseña incorrectos")
