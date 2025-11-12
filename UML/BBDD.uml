@@ -41,6 +41,8 @@ class Rol {
 class Cliente {
     - id_cliente : int
     - nombre : string
+    - username : string
+    - contrasena : string
     - email : string
     - telefono : string
     - puntos : int
