@@ -57,8 +57,12 @@ public class CrearProductoView extends VerticalLayout {
         this.ingredienteService = ingredienteService;
         this.productoIngredienteService = productoIngredienteService;
 
-        // Título principal
+        // Título principal con espacio arriba
         H1 titulo = new H1("Crear Producto");
+        titulo.getStyle()
+                .set("margin-top", "0")
+                .set("margin-bottom", "20px")
+                .set("color", "#D32F2F");
 
         // Contenido principal
         HorizontalLayout mainContent = createMainContent();
@@ -66,9 +70,19 @@ public class CrearProductoView extends VerticalLayout {
         // Centrar el contenido
         setSizeFull();
         setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);
-
-        add(titulo, mainContent);
+        setPadding(false);
+        setSpacing(false);
+        
+        // Crear un contenedor con padding controlado
+        VerticalLayout wrapper = new VerticalLayout();
+        wrapper.setAlignItems(Alignment.CENTER);
+        wrapper.setWidthFull();
+        wrapper.setPadding(false);
+        wrapper.setSpacing(true);
+        wrapper.getStyle().set("padding-top", "0");
+        
+        wrapper.add(titulo, mainContent);
+        add(wrapper);
     }
 
     private HorizontalLayout createMainContent() {
