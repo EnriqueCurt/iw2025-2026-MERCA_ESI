@@ -8,12 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class EmpleadoService {
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
+
+    @Autowired
+    private com.example.iw20252026merca_esi.repository.RolRepository rolRepository;
 
     /**
      * Obtiene todos los empleados
@@ -41,6 +46,66 @@ public class EmpleadoService {
      */
     public Optional<Empleado> buscarEmpleadoPorEmail(String email) {
         return empleadoRepository.findByEmail(email);
+    }
+
+    /**
+     * Asigna un rol (por nombre) a un empleado
+     */
+    @Transactional
+    public Empleado asignarRolAEmpleado(Integer idEmpleado, String nombreRol) {
+        Empleado empleado = empleadoRepository.findById(idEmpleado)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+
+        com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombreRol)
+                .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+
+        Set<com.example.iw20252026merca_esi.model.Rol> roles = empleado.getRoles();
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        roles.add(rol);
+        empleado.setRoles(roles);
+
+        return empleadoRepository.save(empleado);
+    }
+
+    /**
+     * Quita un rol a un empleado
+     */
+    @Transactional
+    public Empleado quitarRolAEmpleado(Integer idEmpleado, String nombreRol) {
+        Empleado empleado = empleadoRepository.findById(idEmpleado)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+
+        com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombreRol)
+                .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+
+        Set<com.example.iw20252026merca_esi.model.Rol> roles = empleado.getRoles();
+        if (roles != null) {
+            roles.remove(rol);
+            empleado.setRoles(roles);
+        }
+
+        return empleadoRepository.save(empleado);
+    }
+
+    /**
+     * Reemplaza los roles de un empleado por los nombres indicados (crea conjunto nuevo)
+     */
+    @Transactional
+    public Empleado establecerRolesDeEmpleado(Integer idEmpleado, Set<String> nombresRol) {
+        Empleado empleado = empleadoRepository.findById(idEmpleado)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+
+        Set<com.example.iw20252026merca_esi.model.Rol> roles = new HashSet<>();
+        for (String nombre : nombresRol) {
+            com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombre)
+                    .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombre));
+            roles.add(rol);
+        }
+
+        empleado.setRoles(roles);
+        return empleadoRepository.save(empleado);
     }
 
     /**
@@ -117,6 +182,7 @@ public class EmpleadoService {
      * Verifica las credenciales de un empleado
      * @return Optional con el empleado si las credenciales son correctas
      */
+    @Transactional(readOnly = true)
     public Optional<Empleado> autenticar(String username, String contrasenaPlana) {
         Optional<Empleado> empleadoOpt = empleadoRepository.findByUsername(username);
         
@@ -125,6 +191,7 @@ public class EmpleadoService {
             // Comparar contraseñas directamente (sin hash por ahora)
             // TODO: Implementar BCrypt en producción
             if (contrasenaPlana.equals(empleado.getContrasena())) {
+                // Los roles se cargan EAGER automáticamente ahora
                 return Optional.of(empleado);
             }
         }
