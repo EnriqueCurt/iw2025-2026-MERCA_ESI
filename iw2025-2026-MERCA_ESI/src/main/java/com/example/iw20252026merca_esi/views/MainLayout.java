@@ -1,14 +1,18 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Layout;
@@ -151,7 +155,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("margin", "0")
                 .set("padding", "8px clamp(10px, 2vw, 20px)");
 
-        String[] menuItems = {"OFERTAS", "MENÚS", "PIZZAS", "BURGERS", "ENTRANTES", "BEBIDAS", "POSTRES"};
+        // Menú principal (visible para todos)
+        String[] menuItems = {"OFERTAS", "MENÚS", "CARTA"};
 
         for (String item : menuItems) {
             Button menuButton = new Button(item);
@@ -168,7 +173,50 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             menuButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
             menuBar.add(menuButton);
         }
+
+        // Menú de Gestión (solo para administradores)
+        if (esAdministrador()) {
+            MenuBar gestionMenuBar = new MenuBar();
+            gestionMenuBar.getStyle()
+                    .set("background", "transparent");
+            
+            MenuItem gestionItem = gestionMenuBar.addItem("GESTIÓN");
+            gestionItem.getElement().getStyle()
+                    .set("color", "#333")
+                    .set("font-weight", "500")
+                    .set("padding", "10px 15px")
+                    .set("border-radius", "25px")
+                    .set("cursor", "pointer")
+                    .set("background", "transparent");
+            
+            // Efecto hover
+            gestionItem.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
+            gestionItem.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            
+            SubMenu gestionSubMenu = gestionItem.getSubMenu();
+            
+            // Subopciones del menú Gestión
+            MenuItem productosItem = gestionSubMenu.addItem("Gestión de Productos");
+            productosItem.addClickListener(e -> 
+                getUI().ifPresent(ui -> ui.navigate("productos"))
+            );
+            
+            // Aquí puedes agregar más subopciones en el futuro
+            // gestionSubMenu.addItem("Gestión de Ingredientes").addClickListener(...);
+            // gestionSubMenu.addItem("Gestión de Empleados").addClickListener(...);
+            
+            menuBar.add(gestionMenuBar);
+        }
+        
         return menuBar;
+    }
+
+    /**
+     * Verifica si el usuario actual es administrador
+     */
+    private boolean esAdministrador() {
+        com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
+        return empleado != null && empleado.esAdministrador();
     }
 
     private Footer createFooter() {
