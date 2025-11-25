@@ -29,6 +29,11 @@ public class Producto {
     
     @Column(nullable = false)
     private Boolean puntos = false;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "imagen", columnDefinition = "LONGBLOB")
+    private byte[] imagen;
     
     @ManyToMany
     @JoinTable(
@@ -152,5 +157,13 @@ public class Producto {
     
     public void setProductoIngredientes(Set<ProductoIngrediente> productoIngredientes) {
         this.productoIngredientes = productoIngredientes;
+    }
+
+    public byte[] getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
     }
 }

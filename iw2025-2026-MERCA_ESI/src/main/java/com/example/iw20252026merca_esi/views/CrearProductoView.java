@@ -13,6 +13,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -20,11 +21,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,12 +47,17 @@ public class CrearProductoView extends VerticalLayout {
     private Checkbox esOfertaCheckbox = new Checkbox("Es oferta");
     private Checkbox puntosCheckbox = new Checkbox("Puntos");
     private Checkbox estadoCheckbox = new Checkbox("Activo");
+    private Upload uploadImagen;
+    private Image imagenPreview = new Image();
+    private byte[] imagenBytes;
+    private ByteArrayOutputStream imageBuffer;
     
     // Componentes para ingredientes
     private ComboBox<Ingrediente> ingredienteComboBox = new ComboBox<>("Seleccionar Ingrediente");
     private NumberField cantidadField = new NumberField("Cantidad");
     private Grid<IngredienteProductoDTO> gridIngredientes = new Grid<>(IngredienteProductoDTO.class, false);
     private List<IngredienteProductoDTO> ingredientesSeleccionados = new ArrayList<>();
+
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
                             ProductoIngredienteService productoIngredienteService) {
@@ -108,6 +116,14 @@ public class CrearProductoView extends VerticalLayout {
                 estadoCheckbox
         );
 
+        // Sección de imagen
+        VerticalLayout seccionImagen = new VerticalLayout();
+        seccionImagen.setWidth("100%");
+        seccionImagen.setPadding(false);
+        H3 tituloImagen = new H3("Imagen del Producto");
+        tituloImagen.getStyle().set("color", "#D32F2F");
+        seccionImagen.add(tituloImagen, uploadImagen, imagenPreview);
+
         // Sección de ingredientes
         VerticalLayout seccionIngredientes = createSeccionIngredientes();
 
@@ -122,10 +138,11 @@ public class CrearProductoView extends VerticalLayout {
         limpiarButton.getStyle().set("color", "white");
         limpiarButton.setWidthFull();
 
-        mainLayout.add(formLayout, seccionIngredientes, guardarButton, limpiarButton);
+        mainLayout.add(formLayout, seccionImagen, seccionIngredientes, guardarButton, limpiarButton);
         content.add(mainLayout);
         return content;
     }
+
 
     private VerticalLayout createSeccionIngredientes() {
         VerticalLayout seccion = new VerticalLayout();
@@ -244,20 +261,23 @@ public class CrearProductoView extends VerticalLayout {
                 .set("--vaadin-input-field-label-color", "#D32F2F")
                 .set("--vaadin-input-field-focused-label-color", "#D32F2F");
 
-        estadoCheckbox.setValue(true);
+        estadoCheckbox.setValue(Boolean.valueOf(true));
         estadoCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
 
-        esOfertaCheckbox.setValue(false);
+        esOfertaCheckbox.setValue(Boolean.valueOf(false));
         esOfertaCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
 
-        puntosCheckbox.setValue(false);
+        puntosCheckbox.setValue(Boolean.valueOf(false));
         puntosCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
+
+        // Configurar upload de imagen
+        configurarUploadImagen();
     }
 
 
@@ -269,26 +289,29 @@ public class CrearProductoView extends VerticalLayout {
             Producto producto = new Producto();
             producto.setNombre(nombreField.getValue());
             producto.setDescripcion(descripcionField.getValue());
-            producto.setPrecio(precioField.getValue().floatValue());
+            producto.setPrecio(Float.valueOf(precioField.getValue().floatValue()));
             producto.setEsOferta(esOfertaCheckbox.getValue());
             producto.setPuntos(puntosCheckbox.getValue());
             producto.setEstado(estadoCheckbox.getValue());
 
+            // Agregar la imagen si existe
+            if (imagenBytes != null) {
+                producto.setImagen(imagenBytes);
+            }
+
             try {
-                // Guardar el producto primero
                 Producto productoGuardado = productoService.guardarProducto(producto);
-                
-                // Luego guardar los ingredientes asociados
+
                 for (IngredienteProductoDTO dto : ingredientesSeleccionados) {
                     productoIngredienteService.agregarIngredienteAProducto(
-                        productoGuardado, 
-                        dto.ingrediente, 
-                        dto.cantidad
+                            productoGuardado,
+                            dto.ingrediente,
+                            dto.cantidad
                     );
                 }
-                
+
                 Notification notification = Notification.show(
-                    "Producto creado correctamente con " + ingredientesSeleccionados.size() + " ingrediente(s)"
+                        "Producto creado correctamente con " + ingredientesSeleccionados.size() + " ingrediente(s)"
                 );
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 limpiarFormulario();
@@ -315,13 +338,20 @@ public class CrearProductoView extends VerticalLayout {
         nombreField.clear();
         descripcionField.clear();
         precioField.clear();
-        esOfertaCheckbox.setValue(false);
-        puntosCheckbox.setValue(false);
-        estadoCheckbox.setValue(true);
+        esOfertaCheckbox.setValue(Boolean.valueOf(false));
+        puntosCheckbox.setValue(Boolean.valueOf(false));
+        estadoCheckbox.setValue(Boolean.valueOf(true));
         ingredienteComboBox.clear();
         cantidadField.clear();
         ingredientesSeleccionados.clear();
         gridIngredientes.setItems(ingredientesSeleccionados);
+
+        if (uploadImagen != null) {
+            uploadImagen.clearFileList();
+        }
+        imagenPreview.setSrc("");
+        imagenBytes = null;
+        imageBuffer = null;
     }
     
     // Clase interna para manejar ingredientes seleccionados
@@ -329,9 +359,9 @@ public class CrearProductoView extends VerticalLayout {
         private final Ingrediente ingrediente;
         private final Float cantidad;
         
-        public IngredienteProductoDTO(Ingrediente ingrediente, Float cantidad) {
+        public IngredienteProductoDTO(Ingrediente ingrediente, float cantidad) {
             this.ingrediente = ingrediente;
-            this.cantidad = cantidad;
+            this.cantidad = (Float) cantidad;
         }
         
         public Ingrediente getIngrediente() {
@@ -342,4 +372,59 @@ public class CrearProductoView extends VerticalLayout {
             return cantidad;
         }
     }
+
+    private void configurarUploadImagen() {
+        // Configuración de preview
+        imagenPreview.setAlt("Vista previa de la imagen");
+        imagenPreview.setWidth("200px");
+        imagenPreview.setHeight("200px");
+        imagenPreview.getStyle().set("object-fit", "cover");
+        imagenPreview.getStyle().set("border-radius", "8px");
+
+        // Configuración del componente Upload
+        uploadImagen = new Upload();
+        uploadImagen.setAcceptedFileTypes("image/jpeg", "image/png", "image/jpg");
+        uploadImagen.setMaxFiles(1);
+        uploadImagen.setMaxFileSize(5 * 1024 * 1024); // 5MB
+        uploadImagen.setDropLabel(new com.vaadin.flow.component.html.Span("Arrastra la imagen aquí"));
+        uploadImagen.setWidthFull();
+
+        // Usar Receiver (InputStream -> OutputStream)
+        uploadImagen.setReceiver((fileName, mimeType) -> {
+            imageBuffer = new ByteArrayOutputStream();
+            return imageBuffer;
+        });
+
+        uploadImagen.addSucceededListener(event -> {
+            try {
+                imagenBytes = imageBuffer.toByteArray();
+
+                String finalMimeType = (event.getMIMEType() != null && !event.getMIMEType().isEmpty())
+                        ? event.getMIMEType()
+                        : "image/jpeg";
+
+                String base64 = java.util.Base64.getEncoder().encodeToString(imagenBytes);
+                imagenPreview.setSrc("data:" + finalMimeType + ";base64," + base64);
+
+                Notification.show("Imagen cargada correctamente")
+                        .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } catch (Exception e) {
+                Notification.show("Error al procesar la imagen: " + e.getMessage())
+                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+
+        uploadImagen.addFileRejectedListener(event -> {
+            Notification.show("Archivo rechazado: " + event.getErrorMessage())
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+
+        uploadImagen.addFailedListener(event -> {
+            String reason = event.getReason() != null ? event.getReason().getMessage() : "desconocida";
+            Notification.show("Error al subir la imagen: " + reason)
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+    }
+
+
 }
