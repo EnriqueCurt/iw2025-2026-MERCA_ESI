@@ -18,4 +18,6 @@ public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     
     // Verificar si existe una categoría con ese nombre
     boolean existsByNombre(String nombre);
+
+
 }

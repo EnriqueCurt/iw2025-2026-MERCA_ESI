@@ -1,4 +1,4 @@
-// java
+
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.model.Producto;
@@ -60,7 +60,7 @@ public class CrearMenuView extends VerticalLayout {
 
         HorizontalLayout mainContent = createMainContent();
 
-        // Centrar el contenido (mismo comportamiento que CrearProductoView)
+        // Centrar el contenido
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setPadding(false);
@@ -91,7 +91,7 @@ public class CrearMenuView extends VerticalLayout {
 
         configurarCampos();
 
-        // Sección imagen (similar a CrearProductoView)
+        // Sección imagen
         VerticalLayout seccionImagen = new VerticalLayout();
         seccionImagen.setWidth("100%");
         seccionImagen.setPadding(false);
@@ -180,6 +180,50 @@ public class CrearMenuView extends VerticalLayout {
         configurarUploadImagen();
     }
 
+    private void configurarUploadImagen() {
+        // Preview
+        imagenPreview.setAlt("Vista previa de la imagen");
+        imagenPreview.setWidth("200px");
+        imagenPreview.setHeight("200px");
+        imagenPreview.getStyle().set("object-fit", "cover");
+        imagenPreview.getStyle().set("border-radius", "8px");
+
+        uploadImagen = new Upload();
+        uploadImagen.setAcceptedFileTypes("image/jpeg", "image/png", "image/jpg");
+        uploadImagen.setMaxFiles(1);
+        uploadImagen.setMaxFileSize(5 * 1024 * 1024);
+        uploadImagen.setDropLabel(new com.vaadin.flow.component.html.Span("Arrastra la imagen aquí"));
+        uploadImagen.setWidthFull();
+
+        uploadImagen.setReceiver((fileName, mimeType) -> {
+            imageBuffer = new ByteArrayOutputStream();
+            return imageBuffer;
+        });
+
+        uploadImagen.addSucceededListener(event -> {
+            try {
+                imagenBytes = imageBuffer.toByteArray();
+                String finalMimeType = (event.getMIMEType() != null && !event.getMIMEType().isEmpty())
+                        ? event.getMIMEType()
+                        : "image/jpeg";
+                String base64 = java.util.Base64.getEncoder().encodeToString(imagenBytes);
+                imagenPreview.setSrc("data:" + finalMimeType + ";base64," + base64);
+                Notification.show("Imagen cargada correctamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } catch (Exception e) {
+                Notification.show("Error al procesar la imagen: " + e.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+
+        uploadImagen.addFileRejectedListener(event ->
+                Notification.show("Archivo rechazado: " + event.getErrorMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR)
+        );
+
+        uploadImagen.addFailedListener(event -> {
+            String reason = event.getReason() != null ? event.getReason().getMessage() : "desconocida";
+            Notification.show("Error al subir la imagen: " + reason).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        });
+    }
+
     private void configurarGrid() {
         productoGrid.removeAllColumns();
         productoGrid.addColumn(Producto::getNombre).setHeader("Nombre").setFlexGrow(2);
@@ -243,47 +287,4 @@ public class CrearMenuView extends VerticalLayout {
         imageBuffer = null;
     }
 
-    private void configurarUploadImagen() {
-        // Preview
-        imagenPreview.setAlt("Vista previa de la imagen");
-        imagenPreview.setWidth("200px");
-        imagenPreview.setHeight("200px");
-        imagenPreview.getStyle().set("object-fit", "cover");
-        imagenPreview.getStyle().set("border-radius", "8px");
-
-        uploadImagen = new Upload();
-        uploadImagen.setAcceptedFileTypes("image/jpeg", "image/png", "image/jpg");
-        uploadImagen.setMaxFiles(1);
-        uploadImagen.setMaxFileSize(5 * 1024 * 1024);
-        uploadImagen.setDropLabel(new com.vaadin.flow.component.html.Span("Arrastra la imagen aquí"));
-        uploadImagen.setWidthFull();
-
-        uploadImagen.setReceiver((fileName, mimeType) -> {
-            imageBuffer = new ByteArrayOutputStream();
-            return imageBuffer;
-        });
-
-        uploadImagen.addSucceededListener(event -> {
-            try {
-                imagenBytes = imageBuffer.toByteArray();
-                String finalMimeType = (event.getMIMEType() != null && !event.getMIMEType().isEmpty())
-                        ? event.getMIMEType()
-                        : "image/jpeg";
-                String base64 = java.util.Base64.getEncoder().encodeToString(imagenBytes);
-                imagenPreview.setSrc("data:" + finalMimeType + ";base64," + base64);
-                Notification.show("Imagen cargada correctamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            } catch (Exception e) {
-                Notification.show("Error al procesar la imagen: " + e.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-        });
-
-        uploadImagen.addFileRejectedListener(event ->
-                Notification.show("Archivo rechazado: " + event.getErrorMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR)
-        );
-
-        uploadImagen.addFailedListener(event -> {
-            String reason = event.getReason() != null ? event.getReason().getMessage() : "desconocida";
-            Notification.show("Error al subir la imagen: " + reason).addThemeVariants(NotificationVariant.LUMO_ERROR);
-        });
-    }
 }

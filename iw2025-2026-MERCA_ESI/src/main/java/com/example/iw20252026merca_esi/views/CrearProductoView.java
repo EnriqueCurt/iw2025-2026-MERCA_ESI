@@ -1,5 +1,6 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Ingrediente;
 import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.IngredienteService;
@@ -60,6 +61,11 @@ public class CrearProductoView extends VerticalLayout {
     private NumberField cantidadField = new NumberField("Cantidad");
     private Grid<IngredienteProductoDTO> gridIngredientes = new Grid<>(IngredienteProductoDTO.class, false);
     private List<IngredienteProductoDTO> ingredientesSeleccionados = new ArrayList<>();
+
+    // Componentes para categorias
+    private ComboBox<Categoria> categoriaComboBox = new ComboBox<>("Seleccionar Categorias");
+    private Grid<Categoria> gridCategorias = new Grid<>(Categoria.class, false);
+    private List<Categoria> CategoriasSeleccionadas = new ArrayList<>();
 
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
@@ -200,6 +206,8 @@ public class CrearProductoView extends VerticalLayout {
         
         // Configurar Grid
         configurarGrid();
+
+        
         
         seccion.add(headerIngredientes, ingredienteComboBox, cantidadField, agregarButton, gridIngredientes);
         return seccion;
