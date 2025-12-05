@@ -29,6 +29,7 @@
     <properties>
         <java.version>21</java.version>
         <vaadin.version>24.9.3</vaadin.version>
+        <sonar.organization>enriquecurt</sonar.organization>
     </properties>
     <dependencies>
         <dependency>

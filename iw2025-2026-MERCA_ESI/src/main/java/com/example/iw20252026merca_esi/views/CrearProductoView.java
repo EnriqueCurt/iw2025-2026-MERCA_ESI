@@ -5,6 +5,7 @@ import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.IngredienteService;
 import com.example.iw20252026merca_esi.service.ProductoIngredienteService;
 import com.example.iw20252026merca_esi.service.ProductoService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -13,6 +14,8 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -149,9 +152,26 @@ public class CrearProductoView extends VerticalLayout {
         seccion.setWidth("100%");
         seccion.setPadding(false);
         
+        // Header con título y botón para crear ingrediente
+        HorizontalLayout headerIngredientes = new HorizontalLayout();
+        headerIngredientes.setWidthFull();
+        headerIngredientes.setAlignItems(Alignment.CENTER);
+        headerIngredientes.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        
         H3 titulo = new H3("Ingredientes del Producto");
         titulo.getStyle().set("color", "#D32F2F");
-        titulo.getStyle().set("margin-top", "20px");
+        titulo.getStyle().set("margin", "20px 0 10px 0");
+        
+        Button crearIngredienteBtn = new Button("Nuevo Ingrediente", new Icon(VaadinIcon.PLUS_CIRCLE));
+        crearIngredienteBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        crearIngredienteBtn.getStyle()
+                .set("color", "#D32F2F")
+                .set("font-size", "0.9rem");
+        crearIngredienteBtn.addClickListener(e -> 
+            UI.getCurrent().navigate("crear-ingrediente")
+        );
+        
+        headerIngredientes.add(titulo, crearIngredienteBtn);
         
         // Configurar ComboBox de ingredientes
         ingredienteComboBox.setItems(ingredienteService.listarIngredientesActivos());
@@ -181,7 +201,7 @@ public class CrearProductoView extends VerticalLayout {
         // Configurar Grid
         configurarGrid();
         
-        seccion.add(titulo, ingredienteComboBox, cantidadField, agregarButton, gridIngredientes);
+        seccion.add(headerIngredientes, ingredienteComboBox, cantidadField, agregarButton, gridIngredientes);
         return seccion;
     }
 
