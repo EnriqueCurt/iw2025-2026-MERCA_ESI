@@ -12,24 +12,23 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Crear Categoría")
-@AnonymousAllowed
+@RolesAllowed("ADMINISTRADOR,PROPIETARIO,MANAGER")
 @Route(value = "crear-categoria", layout = MainLayout.class)
 @Menu(title = "crear categoria")
 public class CrearCategoriaView extends VerticalLayout {
 
     private final CategoriaService categoriaService;
 
-    private TextField nombreField = new TextField("Nombre");
+    private final TextField nombreField = new TextField("Nombre");
 
-    private Checkbox estadoCheckbox = new Checkbox("Activo");
+    private final Checkbox estadoCheckbox = new Checkbox("Activo");
 
     public CrearCategoriaView(CategoriaService categoriaService) {
         this.categoriaService = categoriaService;
@@ -94,12 +93,24 @@ public class CrearCategoriaView extends VerticalLayout {
 
     private void guardarCategoria() {
         if (validarFormulario()) {
-            Categoria Categoria = new Categoria();
-            Categoria.setNombre(nombreField.getValue());
+            String nombre = nombreField.getValue().trim();
+
+            // Comprobación de duplicados (ignorando mayúsculas/minúsculas)
+            boolean existe = categoriaService.listarCategorias()
+                    .stream()
+                    .anyMatch(c -> c.getNombre() != null && c.getNombre().equalsIgnoreCase(nombre));
+
+            if (existe) {
+                Notification.show("Ya existe una categoría con ese nombre").addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            Categoria categoria = new Categoria();
+            categoria.setNombre(nombre);
 
 
             try {
-                categoriaService.guardarCategoria(Categoria);
+                categoriaService.guardarCategoria(categoria);
                 Notification notification = Notification.show("Categoria creada correctamente");
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 limpiarFormulario();

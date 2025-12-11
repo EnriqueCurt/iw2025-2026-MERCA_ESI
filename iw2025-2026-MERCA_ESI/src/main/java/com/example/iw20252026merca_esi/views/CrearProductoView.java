@@ -3,6 +3,7 @@ package com.example.iw20252026merca_esi.views;
 import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Ingrediente;
 import com.example.iw20252026merca_esi.model.Producto;
+import com.example.iw20252026merca_esi.service.CategoriaService;
 import com.example.iw20252026merca_esi.service.IngredienteService;
 import com.example.iw20252026merca_esi.service.ProductoIngredienteService;
 import com.example.iw20252026merca_esi.service.ProductoService;
@@ -29,14 +30,15 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @PageTitle("Crear Producto")
-@AnonymousAllowed
+@RolesAllowed("ADMINISTRADOR,PROPIETARIO,MANAGER")
 @Route(value = "crear-producto", layout = MainLayout.class)
 @Menu(title = "crear producto")
 public class CrearProductoView extends VerticalLayout {
@@ -44,35 +46,37 @@ public class CrearProductoView extends VerticalLayout {
     private final ProductoService productoService;
     private final IngredienteService ingredienteService;
     private final ProductoIngredienteService productoIngredienteService;
+    private final CategoriaService categoriaService;
 
-    private TextField nombreField = new TextField("Nombre");
-    private TextArea descripcionField = new TextArea("Descripción");
-    private NumberField precioField = new NumberField("Precio");
-    private Checkbox esOfertaCheckbox = new Checkbox("Es oferta");
-    private Checkbox puntosCheckbox = new Checkbox("Puntos");
-    private Checkbox estadoCheckbox = new Checkbox("Activo");
+    private final TextField nombreField = new TextField("Nombre");
+    private final TextArea descripcionField = new TextArea("Descripción");
+    private final NumberField precioField = new NumberField("Precio");
+    private final Checkbox esOfertaCheckbox = new Checkbox("Es oferta");
+    private final Checkbox puntosCheckbox = new Checkbox("Puntos");
+    private final Checkbox estadoCheckbox = new Checkbox("Activo");
     private Upload uploadImagen;
-    private Image imagenPreview = new Image();
+    private final Image imagenPreview = new Image();
     private byte[] imagenBytes;
     private ByteArrayOutputStream imageBuffer;
     
     // Componentes para ingredientes
-    private ComboBox<Ingrediente> ingredienteComboBox = new ComboBox<>("Seleccionar Ingrediente");
-    private NumberField cantidadField = new NumberField("Cantidad");
-    private Grid<IngredienteProductoDTO> gridIngredientes = new Grid<>(IngredienteProductoDTO.class, false);
-    private List<IngredienteProductoDTO> ingredientesSeleccionados = new ArrayList<>();
+    private final ComboBox<Ingrediente> ingredienteComboBox = new ComboBox<>("Seleccionar Ingrediente");
+    private final NumberField cantidadField = new NumberField("Cantidad");
+    private final Grid<IngredienteProductoDTO> gridIngredientes = new Grid<>(IngredienteProductoDTO.class, false);
+    private final List<IngredienteProductoDTO> ingredientesSeleccionados = new ArrayList<>();
 
     // Componentes para categorias
-    private ComboBox<Categoria> categoriaComboBox = new ComboBox<>("Seleccionar Categorias");
-    private Grid<Categoria> gridCategorias = new Grid<>(Categoria.class, false);
-    private List<Categoria> CategoriasSeleccionadas = new ArrayList<>();
+    private final ComboBox<Categoria> categoriaComboBox = new ComboBox<>("Seleccionar Categoria");
+    private final Grid<Categoria> gridCategorias = new Grid<>(Categoria.class, false);
+    private final List<Categoria> categoriasSeleccionadas = new ArrayList<>();
 
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
-                            ProductoIngredienteService productoIngredienteService) {
+                            ProductoIngredienteService productoIngredienteService, CategoriaService categoriaService) {
         this.productoService = productoService;
         this.ingredienteService = ingredienteService;
         this.productoIngredienteService = productoIngredienteService;
+        this.categoriaService = categoriaService;
 
         // Título principal con espacio arriba
         H1 titulo = new H1("Crear Producto");
@@ -136,6 +140,9 @@ public class CrearProductoView extends VerticalLayout {
         // Sección de ingredientes
         VerticalLayout seccionIngredientes = createSeccionIngredientes();
 
+        // Sección de categorias
+        VerticalLayout seccionCategorias = createSeccionCategorias();
+
         Button guardarButton = new Button("Guardar", event -> guardarProducto());
         guardarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         guardarButton.getStyle().set("background-color", "#D32F2F");
@@ -147,7 +154,7 @@ public class CrearProductoView extends VerticalLayout {
         limpiarButton.getStyle().set("color", "white");
         limpiarButton.setWidthFull();
 
-        mainLayout.add(formLayout, seccionImagen, seccionIngredientes, guardarButton, limpiarButton);
+        mainLayout.add(formLayout, seccionImagen, seccionIngredientes, seccionCategorias, guardarButton, limpiarButton);
         content.add(mainLayout);
         return content;
     }
@@ -264,6 +271,97 @@ public class CrearProductoView extends VerticalLayout {
         Notification.show("Ingrediente agregado").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 
+    private VerticalLayout createSeccionCategorias() {
+        VerticalLayout seccion = new VerticalLayout();
+        seccion.setWidth("100%");
+        seccion.setPadding(false);
+
+        // Header con título y botón para crear categoria
+        HorizontalLayout headerCategorias = new HorizontalLayout();
+        headerCategorias.setWidthFull();
+        headerCategorias.setAlignItems(Alignment.CENTER);
+        headerCategorias.setJustifyContentMode(JustifyContentMode.BETWEEN);
+
+        H3 titulo = new H3("Categorías del Producto");
+        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set("margin", "20px 0 10px 0");
+
+        Button crearCategoriaBtn = new Button("Nueva Categoría", new Icon(VaadinIcon.PLUS_CIRCLE));
+        crearCategoriaBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        crearCategoriaBtn.getStyle()
+                .set("color", "#D32F2F")
+                .set("font-size", "0.9rem");
+        crearCategoriaBtn.addClickListener(e ->
+            UI.getCurrent().navigate("crear-categoria")
+        );
+
+        headerCategorias.add(titulo, crearCategoriaBtn);
+
+        // Configurar ComboBox de categorias (todas las categorías)
+        categoriaComboBox.setItems(categoriaService.listarCategorias());
+        categoriaComboBox.setItemLabelGenerator(Categoria::getNombre);
+        categoriaComboBox.setPlaceholder("Selecciona una categoría");
+        categoriaComboBox.setWidthFull();
+        categoriaComboBox.getStyle()
+                .set("--lumo-primary-color", "#D32F2F")
+                .set("--vaadin-input-field-label-color", "#D32F2F")
+                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+
+        Button agregarCategoriaButton = new Button("Agregar Categoría", event -> agregarCategoria());
+        agregarCategoriaButton.getStyle().set("background-color", "#D32F2F");
+        agregarCategoriaButton.getStyle().set("color", "white");
+        agregarCategoriaButton.setWidthFull();
+
+        // Configurar Grid
+        configurarGridCategorias();
+
+        seccion.add(headerCategorias, categoriaComboBox, agregarCategoriaButton, gridCategorias);
+        return seccion;
+    }
+
+    private void configurarGridCategorias() {
+        gridCategorias.addColumn(Categoria::getNombre).setHeader("Categoría").setFlexGrow(2);
+
+        gridCategorias.addComponentColumn(categoria -> {
+            Button eliminarButton = new Button("Eliminar");
+            eliminarButton.getStyle().set("color", "#D32F2F");
+            eliminarButton.addClickListener(event -> {
+                categoriasSeleccionadas.remove(categoria);
+                gridCategorias.setItems(categoriasSeleccionadas);
+            });
+            return eliminarButton;
+        }).setHeader("Acciones").setFlexGrow(1);
+
+        gridCategorias.setHeight("200px");
+        gridCategorias.setWidthFull();
+    }
+
+    private void agregarCategoria() {
+        Categoria categoria = categoriaComboBox.getValue();
+
+        if (categoria == null) {
+            Notification.show("Selecciona una categoría").addThemeVariants(NotificationVariant.LUMO_ERROR);
+            return;
+        }
+
+        // Verificar si la categoría ya está agregada
+        boolean yaExiste = categoriasSeleccionadas.stream()
+                .anyMatch(cat -> cat.getIdCategoria().equals(categoria.getIdCategoria()));
+
+        if (yaExiste) {
+            Notification.show("Esta categoría ya ha sido agregada").addThemeVariants(NotificationVariant.LUMO_WARNING);
+            return;
+        }
+
+        categoriasSeleccionadas.add(categoria);
+        gridCategorias.setItems(categoriasSeleccionadas);
+
+        // Limpiar campos
+        categoriaComboBox.clear();
+
+        Notification.show("Categoría agregada").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
     private void configurarCampos() {
         nombreField.setRequired(true);
         nombreField.setMaxLength(100);
@@ -289,17 +387,17 @@ public class CrearProductoView extends VerticalLayout {
                 .set("--vaadin-input-field-label-color", "#D32F2F")
                 .set("--vaadin-input-field-focused-label-color", "#D32F2F");
 
-        estadoCheckbox.setValue(Boolean.valueOf(true));
+        estadoCheckbox.setValue(true);
         estadoCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
 
-        esOfertaCheckbox.setValue(Boolean.valueOf(false));
+        esOfertaCheckbox.setValue(false);
         esOfertaCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
 
-        puntosCheckbox.setValue(Boolean.valueOf(false));
+        puntosCheckbox.setValue(false);
         puntosCheckbox.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", "white")
                 .set("--lumo-primary-color", "#D32F2F");
@@ -317,7 +415,7 @@ public class CrearProductoView extends VerticalLayout {
             Producto producto = new Producto();
             producto.setNombre(nombreField.getValue());
             producto.setDescripcion(descripcionField.getValue());
-            producto.setPrecio(Float.valueOf(precioField.getValue().floatValue()));
+            producto.setPrecio(precioField.getValue().floatValue());
             producto.setEsOferta(esOfertaCheckbox.getValue());
             producto.setPuntos(puntosCheckbox.getValue());
             producto.setEstado(estadoCheckbox.getValue());
@@ -328,8 +426,10 @@ public class CrearProductoView extends VerticalLayout {
             }
 
             try {
+                // Primero guardamos el producto
                 Producto productoGuardado = productoService.guardarProducto(producto);
 
+                // Luego asignamos los ingredientes
                 for (IngredienteProductoDTO dto : ingredientesSeleccionados) {
                     productoIngredienteService.agregarIngredienteAProducto(
                             productoGuardado,
@@ -338,8 +438,12 @@ public class CrearProductoView extends VerticalLayout {
                     );
                 }
 
+                // Finalmente asignamos las categorias y persistimos la relación
+                productoGuardado.setCategorias(new HashSet<>(categoriasSeleccionadas));
+                productoService.guardarProducto(productoGuardado);
+
                 Notification notification = Notification.show(
-                        "Producto creado correctamente con " + ingredientesSeleccionados.size() + " ingrediente(s)"
+                        "Producto creado correctamente"
                 );
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 limpiarFormulario();
@@ -366,13 +470,15 @@ public class CrearProductoView extends VerticalLayout {
         nombreField.clear();
         descripcionField.clear();
         precioField.clear();
-        esOfertaCheckbox.setValue(Boolean.valueOf(false));
-        puntosCheckbox.setValue(Boolean.valueOf(false));
-        estadoCheckbox.setValue(Boolean.valueOf(true));
+        esOfertaCheckbox.setValue(false);
+        puntosCheckbox.setValue(false);
+        estadoCheckbox.setValue(true);
         ingredienteComboBox.clear();
         cantidadField.clear();
         ingredientesSeleccionados.clear();
         gridIngredientes.setItems(ingredientesSeleccionados);
+        categoriasSeleccionadas.clear();
+        gridCategorias.setItems(categoriasSeleccionadas);
 
         if (uploadImagen != null) {
             uploadImagen.clearFileList();
@@ -389,7 +495,7 @@ public class CrearProductoView extends VerticalLayout {
         
         public IngredienteProductoDTO(Ingrediente ingrediente, float cantidad) {
             this.ingrediente = ingrediente;
-            this.cantidad = (Float) cantidad;
+            this.cantidad = cantidad;
         }
         
         public Ingrediente getIngrediente() {
