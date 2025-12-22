@@ -1,18 +1,13 @@
 package com.example.iw20252026merca_esi.views;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Div;
+
+import com.example.iw20252026merca_esi.components.ProductoCard; // Importar el nuevo componente
+import com.example.iw20252026merca_esi.service.ProductoService;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
 @PageTitle("Pizzas")
@@ -21,9 +16,25 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @Menu(title = "Pizzas")
 public class PizzaView extends VerticalLayout {
 
-    public PizzaView(){
-        H1 titulo = new H1("Nuestras pizzas");
+    private final ProductoService productoService;
 
+    public PizzaView(ProductoService productoService) {
+        this.productoService = productoService;
+
+        H1 titulo = new H1("Nuestras pizzas");
+        titulo.getStyle().set("text-align", "center").set("margin-bottom", "20px");
         add(titulo);
+
+        HorizontalLayout productosLayout = new HorizontalLayout();
+        productosLayout.setWidthFull();
+        productosLayout.setJustifyContentMode(JustifyContentMode.CENTER); // Centrar las tarjetas
+        productosLayout.getStyle().set("flex-wrap", "wrap");
+
+        // Aquí reutilizamos el componente ProductoCard
+        productoService.findByCategoriaNombre("Pizza").forEach(producto -> {
+            productosLayout.add(new ProductoCard(producto));
+        });
+
+        add(productosLayout);
     }
 }

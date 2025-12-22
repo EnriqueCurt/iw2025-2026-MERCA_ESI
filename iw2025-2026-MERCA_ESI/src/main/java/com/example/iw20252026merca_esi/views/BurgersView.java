@@ -1,4 +1,6 @@
 package com.example.iw20252026merca_esi.views;
+import com.example.iw20252026merca_esi.components.ProductoCard;
+import com.example.iw20252026merca_esi.service.ProductoService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
@@ -21,9 +23,25 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @Menu(title = "Burgers")
 public class BurgersView extends VerticalLayout {
 
-    public BurgersView(){
+    private final ProductoService productoService;
+
+    public BurgersView(ProductoService productoService) {
+        this.productoService = productoService;
+
         H1 titulo = new H1("Hamburguesas");
 
         add(titulo);
+
+        HorizontalLayout productosLayout = new HorizontalLayout();
+        productosLayout.setWidthFull();
+        productosLayout.setJustifyContentMode(JustifyContentMode.CENTER); // Centrar las tarjetas
+        productosLayout.getStyle().set("flex-wrap", "wrap");
+
+        // Aquí reutilizamos el componente ProductoCard
+        productoService.findByCategoriaNombre("Burger").forEach(producto -> {
+            productosLayout.add(new ProductoCard(producto));
+        });
+
+        add(productosLayout);
     }
 }

@@ -407,53 +407,6 @@ public class CrearProductoView extends VerticalLayout {
     }
 
 
-
-
-
-    private void guardarProducto() {
-        if (validarFormulario()) {
-            Producto producto = new Producto();
-            producto.setNombre(nombreField.getValue());
-            producto.setDescripcion(descripcionField.getValue());
-            producto.setPrecio(precioField.getValue().floatValue());
-            producto.setEsOferta(esOfertaCheckbox.getValue());
-            producto.setPuntos(puntosCheckbox.getValue());
-            producto.setEstado(estadoCheckbox.getValue());
-
-            // Agregar la imagen si existe
-            if (imagenBytes != null) {
-                producto.setImagen(imagenBytes);
-            }
-
-            try {
-                // Primero guardamos el producto
-                Producto productoGuardado = productoService.guardarProducto(producto);
-
-                // Luego asignamos los ingredientes
-                for (IngredienteProductoDTO dto : ingredientesSeleccionados) {
-                    productoIngredienteService.agregarIngredienteAProducto(
-                            productoGuardado,
-                            dto.ingrediente,
-                            dto.cantidad
-                    );
-                }
-
-                // Finalmente asignamos las categorias y persistimos la relación
-                productoGuardado.setCategorias(new HashSet<>(categoriasSeleccionadas));
-                productoService.guardarProducto(productoGuardado);
-
-                Notification notification = Notification.show(
-                        "Producto creado correctamente"
-                );
-                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                limpiarFormulario();
-            } catch (Exception e) {
-                Notification notification = Notification.show("Error al crear el producto: " + e.getMessage());
-                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-            }
-        }
-    }
-
     private boolean validarFormulario() {
         if (nombreField.isEmpty()) {
             Notification.show("El nombre es obligatorio").addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -506,6 +459,49 @@ public class CrearProductoView extends VerticalLayout {
             return cantidad;
         }
     }
+    private void guardarProducto() {
+        if (validarFormulario()) {
+            Producto producto = new Producto();
+            producto.setNombre(nombreField.getValue());
+            producto.setDescripcion(descripcionField.getValue());
+            producto.setPrecio(precioField.getValue().floatValue());
+            producto.setEsOferta(esOfertaCheckbox.getValue());
+            producto.setPuntos(puntosCheckbox.getValue());
+            producto.setEstado(estadoCheckbox.getValue());
+
+            // Agregar la imagen si existe
+            if (imagenBytes != null) {
+                producto.setImagen(imagenBytes);
+            }
+
+            // Asignar las categorías ANTES de guardar el producto
+            producto.setCategorias(new HashSet<>(categoriasSeleccionadas));
+
+            try {
+                // Guardar el producto con las categorías
+                Producto productoGuardado = productoService.guardarProducto(producto);
+
+                // Luego asignamos los ingredientes
+                for (IngredienteProductoDTO dto : ingredientesSeleccionados) {
+                    productoIngredienteService.agregarIngredienteAProducto(
+                            productoGuardado,
+                            dto.ingrediente,
+                            dto.cantidad
+                    );
+                }
+
+                Notification notification = Notification.show(
+                        "Producto creado correctamente"
+                );
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                limpiarFormulario();
+            } catch (Exception e) {
+                Notification notification = Notification.show("Error al crear el producto: " + e.getMessage());
+                notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        }
+    }
+
 
     private void configurarUploadImagen() {
         // Configuración de preview

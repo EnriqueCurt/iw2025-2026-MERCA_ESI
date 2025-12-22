@@ -156,7 +156,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("padding", "8px clamp(10px, 2vw, 20px)");
 
         // Menú principal (visible para todos)
-        String[] menuItems = {"OFERTAS", "MENÚS", "CARTA"};
+        String[] menuItems = {"PIZZAS","MENÚS","OFERTAS","BURGERS","BEBIDAS","POSTRES"};
 
         for (String item : menuItems) {
             Button menuButton = new Button(item);
