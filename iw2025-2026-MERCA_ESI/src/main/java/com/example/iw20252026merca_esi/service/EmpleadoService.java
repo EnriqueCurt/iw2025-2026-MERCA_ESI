@@ -2,6 +2,7 @@ package com.example.iw20252026merca_esi.service;
 
 import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.repository.EmpleadoRepository;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,8 @@ import java.util.Set;
 
 @Service
 public class EmpleadoService {
+    private static final String ERROR_EMPLEADO_NO_ENCONTRADO = "Empleado no encontrado con id: ";
+    private static final String ERROR_ROL_NO_ENCONTRADO = "Rol no encontrado: ";
 
     @Autowired
     private EmpleadoRepository empleadoRepository;
@@ -54,10 +57,10 @@ public class EmpleadoService {
     @Transactional
     public Empleado asignarRolAEmpleado(Integer idEmpleado, String nombreRol) {
         Empleado empleado = empleadoRepository.findById(idEmpleado)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+                .orElseThrow(() -> new IllegalArgumentException( ERROR_EMPLEADO_NO_ENCONTRADO + idEmpleado));
 
         com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombreRol)
-                .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_ROL_NO_ENCONTRADO + nombreRol));
 
         Set<com.example.iw20252026merca_esi.model.Rol> roles = empleado.getRoles();
         if (roles == null) {
@@ -75,10 +78,10 @@ public class EmpleadoService {
     @Transactional
     public Empleado quitarRolAEmpleado(Integer idEmpleado, String nombreRol) {
         Empleado empleado = empleadoRepository.findById(idEmpleado)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_EMPLEADO_NO_ENCONTRADO + idEmpleado));
 
         com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombreRol)
-                .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombreRol));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_ROL_NO_ENCONTRADO + nombreRol));
 
         Set<com.example.iw20252026merca_esi.model.Rol> roles = empleado.getRoles();
         if (roles != null) {
@@ -95,12 +98,12 @@ public class EmpleadoService {
     @Transactional
     public Empleado establecerRolesDeEmpleado(Integer idEmpleado, Set<String> nombresRol) {
         Empleado empleado = empleadoRepository.findById(idEmpleado)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + idEmpleado));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_EMPLEADO_NO_ENCONTRADO + idEmpleado));
 
         Set<com.example.iw20252026merca_esi.model.Rol> roles = new HashSet<>();
         for (String nombre : nombresRol) {
             com.example.iw20252026merca_esi.model.Rol rol = rolRepository.findByNombre(nombre)
-                    .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + nombre));
+                    .orElseThrow(() -> new IllegalArgumentException(ERROR_ROL_NO_ENCONTRADO + nombre));
             roles.add(rol);
         }
 
@@ -164,7 +167,7 @@ public class EmpleadoService {
 
                     return empleadoRepository.save(empleado);
                 })
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado con id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException(ERROR_EMPLEADO_NO_ENCONTRADO + id));
     }
 
     /**
@@ -173,7 +176,7 @@ public class EmpleadoService {
     @Transactional
     public void eliminarEmpleado(Integer id) {
         if (!empleadoRepository.existsById(id)) {
-            throw new IllegalArgumentException("Empleado no encontrado con id: " + id);
+            throw new IllegalArgumentException(ERROR_EMPLEADO_NO_ENCONTRADO + id);
         }
         empleadoRepository.deleteById(id);
     }
