@@ -1,6 +1,9 @@
 package com.example.iw20252026merca_esi.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+
+import java.lang.reflect.Type;
 import java.util.Set;
 
 @Entity
@@ -31,8 +34,9 @@ public class Producto {
     private Boolean puntos = false;
 
     @Lob
+    @Column(name = "imagen", nullable = true)
+    @JdbcTypeCode(java.sql.Types.BINARY)
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "imagen", columnDefinition = "bytea")
     private byte[] imagen;
 
     @ManyToMany
