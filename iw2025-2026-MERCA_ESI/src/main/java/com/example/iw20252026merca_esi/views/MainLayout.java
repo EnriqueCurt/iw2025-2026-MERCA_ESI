@@ -101,6 +101,36 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         rightSection.setSpacing(true);
         rightSection.setAlignItems(Alignment.CENTER);
 
+        // Botón GESTIÓN (solo para administradores)
+        if (esAdministrador()) {
+            MenuBar gestionMenuBar = new MenuBar();
+            gestionMenuBar.addThemeVariants(com.vaadin.flow.component.menubar.MenuBarVariant.LUMO_TERTIARY);
+            gestionMenuBar.getStyle()
+                    .set("background", "transparent")
+                    .set("border", "none");
+            
+            MenuItem gestionItem = gestionMenuBar.addItem(new Icon(VaadinIcon.COG));
+            gestionItem.add("GESTIÓN");
+            gestionItem.getElement().getStyle()
+                    .set("color", "white")
+                    .set("border-radius", "50px")
+                    .set("cursor", "pointer")
+                    .set("background", "transparent")
+                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("transition", "background-color 0.3s");
+            
+            gestionItem.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+            gestionItem.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            
+            SubMenu gestionSubMenu = gestionItem.getSubMenu();
+            MenuItem productosItem = gestionSubMenu.addItem("Gestión de Productos");
+            productosItem.addClickListener(e -> 
+                getUI().ifPresent(ui -> ui.navigate("productos"))
+            );
+            
+            rightSection.add(gestionMenuBar);
+        }
+
         Button cartButton = new Button("CESTA", new Icon(VaadinIcon.CART));
         cartButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
@@ -156,7 +186,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("padding", "8px clamp(10px, 2vw, 20px)");
 
         // Menú principal (visible para todos)
-        String[] menuItems = {"PIZZAS","MENÚS","OFERTAS","BURGERS","BEBIDAS","POSTRES"};
+        String[] menuItems = {"PIZZAS", "MENÚS", "OFERTAS", "BURGERS", "BEBIDAS", "POSTRES"};
 
         for (String item : menuItems) {
             Button menuButton = new Button(item);
@@ -172,40 +202,6 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             menuButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
             menuButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
             menuBar.add(menuButton);
-        }
-
-        // Menú de Gestión (solo para administradores)
-        if (esAdministrador()) {
-            MenuBar gestionMenuBar = new MenuBar();
-            gestionMenuBar.getStyle()
-                    .set("background", "transparent");
-            
-            MenuItem gestionItem = gestionMenuBar.addItem("GESTIÓN");
-            gestionItem.getElement().getStyle()
-                    .set("color", "#333")
-                    .set("font-weight", "500")
-                    .set("padding", "10px 15px")
-                    .set("border-radius", "25px")
-                    .set("cursor", "pointer")
-                    .set("background", "transparent");
-            
-            // Efecto hover
-            gestionItem.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
-            gestionItem.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
-            
-            SubMenu gestionSubMenu = gestionItem.getSubMenu();
-            
-            // Subopciones del menú Gestión
-            MenuItem productosItem = gestionSubMenu.addItem("Gestión de Productos");
-            productosItem.addClickListener(e -> 
-                getUI().ifPresent(ui -> ui.navigate("productos"))
-            );
-            
-            // Aquí puedes agregar más subopciones en el futuro
-            // gestionSubMenu.addItem("Gestión de Ingredientes").addClickListener(...);
-            // gestionSubMenu.addItem("Gestión de Empleados").addClickListener(...);
-            
-            menuBar.add(gestionMenuBar);
         }
         
         return menuBar;
