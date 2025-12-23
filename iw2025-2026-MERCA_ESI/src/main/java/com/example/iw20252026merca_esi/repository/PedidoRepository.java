@@ -27,7 +27,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     List<Pedido> findByFechaBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);
     
     // Buscar pedidos de hoy
-    @Query("SELECT p FROM Pedido p WHERE DATE(p.fecha) = CURRENT_DATE")
+    @Query("SELECT p FROM Pedido p WHERE cast(p.fecha as LocalDate) = current_date")
     List<Pedido> findPedidosDeHoy();
     
     // Buscar pedidos por cliente ordenados por fecha (descendente)
