@@ -1,21 +1,26 @@
-# Dockerfile
+# syntax=docker/dockerfile:1.6
 
 # Etapa de construcción
-FROM maven:3.9.6-eclipse-temurin-17 AS build
-WORKDIR /iw2025-2026-MERCA_ESI
+FROM maven:3.9.11-eclipse-temurin-17 AS build
+WORKDIR /app
 
-# Copiar TODO el repo al contenedor (asegura que entra el pom.xml)
-COPY . /iw2025-2026-MERCA_ESI
+# Copia mínima para cachear dependencias
+COPY pom.xml ./
+COPY .mvn .mvn
+COPY mvnw mvnw
+RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests dependency:go-offline
 
-# Verificación rápida: falla si no existe pom.xml (diagnóstico claro)
-RUN test -f /iw2025-2026-MERCA_ESI/pom.xml
-
-# Build
-RUN mvn -f /iw2025-2026-MERCA_ESI/pom.xml clean package -DskipTests
+# Copia el resto del proyecto y compila
+COPY . .
+RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests clean package
 
 # Etapa de ejecución
 FROM eclipse-temurin:17-jre-alpine
-WORKDIR /iw2025-2026-MERCA_ESI
-COPY --from=build /iw2025-2026-MERCA_ESI/target/*.jar /app/app.jar
+WORKDIR /app
+
+# Render suele inyectar PORT; Spring escucha 8080 por defecto, lo ajustamos
+ENV PORT=8080
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/iw2025-2026-MERCA_ESI/app.jar"]
+
+COPY --from=build /app/target/*.jar /app/app.jar
+ENTRYPOINT ["sh","-c","java -Dserver.port=${PORT} -jar /app/app.jar"]
