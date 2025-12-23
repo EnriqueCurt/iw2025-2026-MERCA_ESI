@@ -28,6 +28,13 @@ public class RolService {
     public List<Rol> findAll() {
         return rolRepository.findAll();
     }
+    
+    /**
+     * Lista todos los roles disponibles
+     */
+    public List<Rol> listarRoles() {
+        return rolRepository.findAll();
+    }
 
     public boolean existsByNombre(String nombre) {
         return rolRepository.existsByNombre(nombre);
