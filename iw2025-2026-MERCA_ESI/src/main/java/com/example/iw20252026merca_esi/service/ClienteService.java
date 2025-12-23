@@ -15,6 +15,9 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     /**
      * Obtiene todos los clientes
      */
@@ -58,8 +61,10 @@ public class ClienteService {
             throw new IllegalArgumentException("El email ya está registrado");
         }
 
-        // Guardar contraseña tal cual (sin hashear por ahora)
-        // TODO: Implementar BCrypt en producción
+        // Hashear la contraseña antes de guardar
+        if (cliente.getContrasena() != null && !cliente.getContrasena().isEmpty()) {
+            cliente.setContrasena(passwordEncoder.encode(cliente.getContrasena()));
+        }
         
         // Inicializar puntos si no están establecidos
         if (cliente.getPuntos() == null) {
@@ -95,10 +100,10 @@ public class ClienteService {
                         cliente.setEmail(clienteActualizado.getEmail());
                     }
 
-                    // Si se proporciona una nueva contraseña (no vacía), actualizarla
+                    // Si se proporciona una nueva contraseña (no vacía), hashearla y actualizarla
                     if (clienteActualizado.getContrasena() != null && 
                         !clienteActualizado.getContrasena().isEmpty()) {
-                        cliente.setContrasena(clienteActualizado.getContrasena());
+                        cliente.setContrasena(passwordEncoder.encode(clienteActualizado.getContrasena()));
                     }
 
                     cliente.setTelefono(clienteActualizado.getTelefono());
@@ -132,8 +137,8 @@ public class ClienteService {
         
         if (clienteOpt.isPresent()) {
             Cliente cliente = clienteOpt.get();
-            // Comparar contraseñas directamente (sin hash por ahora)
-            if (contrasenaPlana.equals(cliente.getContrasena())) {
+            // Verificar contraseña usando BCrypt
+            if (passwordEncoder.matches(contrasenaPlana, cliente.getContrasena())) {
                 return Optional.of(cliente);
             }
         }

@@ -23,6 +23,9 @@ public class EmpleadoService {
     @Autowired
     private com.example.iw20252026merca_esi.repository.RolRepository rolRepository;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     /**
      * Obtiene todos los empleados
      */
@@ -126,8 +129,10 @@ public class EmpleadoService {
             throw new IllegalArgumentException("El email ya está registrado");
         }
 
-        // Guardar contraseña tal cual (sin hashear por ahora)
-        // TODO: Implementar BCrypt en producción
+        // Hashear la contraseña antes de guardar
+        if (empleado.getContrasena() != null && !empleado.getContrasena().isEmpty()) {
+            empleado.setContrasena(passwordEncoder.encode(empleado.getContrasena()));
+        }
         
         return empleadoRepository.save(empleado);
     }
@@ -157,10 +162,10 @@ public class EmpleadoService {
                         empleado.setEmail(empleadoActualizado.getEmail());
                     }
 
-                    // Si se proporciona una nueva contraseña (no vacía), actualizarla
+                    // Si se proporciona una nueva contraseña (no vacía), hashearla y actualizarla
                     if (empleadoActualizado.getContrasena() != null && 
                         !empleadoActualizado.getContrasena().isEmpty()) {
-                        empleado.setContrasena(empleadoActualizado.getContrasena());
+                        empleado.setContrasena(passwordEncoder.encode(empleadoActualizado.getContrasena()));
                     }
 
                     empleado.setTelefono(empleadoActualizado.getTelefono());
@@ -191,9 +196,8 @@ public class EmpleadoService {
         
         if (empleadoOpt.isPresent()) {
             Empleado empleado = empleadoOpt.get();
-            // Comparar contraseñas directamente (sin hash por ahora)
-            // TODO: Implementar BCrypt en producción
-            if (contrasenaPlana.equals(empleado.getContrasena())) {
+            // Verificar contraseña usando BCrypt
+            if (passwordEncoder.matches(contrasenaPlana, empleado.getContrasena())) {
                 // Los roles se cargan EAGER automáticamente ahora
                 return Optional.of(empleado);
             }
