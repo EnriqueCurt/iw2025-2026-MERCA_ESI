@@ -136,6 +136,24 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             rightSection.add(gestionMenuBar);
         }
 
+        // Botón EMPLEADO (para todos los empleados, incluidos los no administradores)
+        if (esEmpleado() && !esAdministrador()) {
+            Button empleadoButton = new Button("EMPLEADO", new Icon(VaadinIcon.USER_CARD));
+            empleadoButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            empleadoButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("pedidos-pendientes")));
+            empleadoButton.getStyle()
+                    .set("color", "white")
+                    .set("border-radius", "50px")
+                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("transition", "background-color 0.3s")
+                    .set("cursor", "pointer");
+            
+            empleadoButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+            empleadoButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            
+            rightSection.add(empleadoButton);
+        }
+
         Button cartButton = new Button("CESTA", new Icon(VaadinIcon.CART));
         cartButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
@@ -218,6 +236,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
     private boolean esAdministrador() {
         com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
         return empleado != null && empleado.esAdministrador();
+    }
+
+    /**
+     * Verifica si el usuario actual es un empleado (cualquier rol de empleado)
+     */
+    private boolean esEmpleado() {
+        com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
+        return empleado != null;
     }
 
     private Footer createFooter() {
