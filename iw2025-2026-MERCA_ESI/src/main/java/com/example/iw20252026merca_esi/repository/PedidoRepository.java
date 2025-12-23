@@ -42,4 +42,20 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     
     // Buscar pedidos con total mayor a cierta cantidad
     List<Pedido> findByTotalGreaterThanEqual(Float total);
+    
+    // Buscar pedidos ordenados por fecha (ascendente - más antiguos primero)
+    List<Pedido> findAllByOrderByFechaAsc();
+    
+    // Buscar pedidos ordenados por fecha (descendente - más recientes primero)
+    List<Pedido> findAllByOrderByFechaDesc();
+    
+    // Buscar pedidos por estado ordenados por fecha ascendente
+    List<Pedido> findByEstadoOrderByFechaAsc(String estado);
+    
+    // Buscar pedidos asignados a un empleado por estado, ordenados por fecha
+    List<Pedido> findByEmpleadoIdEmpleadoAndEstadoOrderByFechaAsc(Integer idEmpleado, String estado);
+    
+    // Buscar pedidos listos para entregar o en reparto, ordenados por fecha
+    @Query("SELECT p FROM Pedido p WHERE p.estado IN ('LISTO', 'EN_REPARTO') ORDER BY p.fecha ASC")
+    List<Pedido> findPedidosParaEntrega();
 }
