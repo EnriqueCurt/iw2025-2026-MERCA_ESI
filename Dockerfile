@@ -1,8 +1,8 @@
 # Etapa de construcción
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+# Copiamos todo el contenido del directorio actual al contenedor
+COPY . .
 RUN mvn clean package -DskipTests
 
 # Etapa de ejecución
