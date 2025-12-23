@@ -1,24 +1,22 @@
-# syntax=docker/dockerfile:1.6
+# syntax=docker/dockerfile:1
 
-# Etapa de construcción
+# Etapa de build
 FROM maven:3.9.11-eclipse-temurin-17 AS build
 WORKDIR /app
 
-# Copia mínima para cachear dependencias
-COPY pom.xml ./
-COPY .mvn .mvn
-COPY mvnw mvnw
-RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests dependency:go-offline
-
-# Copia el resto del proyecto y compila
+# Copia TODO lo que haya en el contexto
 COPY . .
-RUN --mount=type=cache,target=/root/.m2 mvn -B -DskipTests clean package
 
-# Etapa de ejecución
-FROM eclipse-temurin:17-jre-alpine
+# Diagnóstico: deja claro si el contexto no es la raíz del proyecto
+RUN ls -la && test -f pom.xml
+
+# Compila (activa el perfil production para Vaadin)
+RUN mvn -B -Pproduction -DskipTests clean package
+
+# Etapa de runtime
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Render suele inyectar PORT; Spring escucha 8080 por defecto, lo ajustamos
 ENV PORT=8080
 EXPOSE 8080
 
