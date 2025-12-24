@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/3.5.7/spring-boot-configuration-processor-3.5.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/3.5.7/spring-boot-configuration-processor-3.5.7.jar" />
         </processorPath>
         <module name="iw2025-2026-MERCA_ESI" />
       </profile>
