@@ -2,9 +2,12 @@ package com.example.iw20252026merca_esi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -33,6 +36,13 @@ public class Producto {
 
     @Column(nullable = false)
     private Boolean puntos = false;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     @Lob
     @Column(name = "imagen", nullable = true)

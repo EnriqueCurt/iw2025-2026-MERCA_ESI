@@ -1,6 +1,10 @@
 package com.example.iw20252026merca_esi.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -29,6 +33,13 @@ public class Menu {
     
     @Column(nullable = false)
     private Boolean puntos = false;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
     
     @ManyToMany
     @JoinTable(

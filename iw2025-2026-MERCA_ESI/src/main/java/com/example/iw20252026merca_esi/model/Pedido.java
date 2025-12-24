@@ -1,6 +1,9 @@
 package com.example.iw20252026merca_esi.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -33,6 +36,13 @@ public class Pedido {
     
     @Column(name = "para_llevar", nullable = false)
     private Boolean paraLlevar;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
     
     @ManyToOne
     @JoinColumn(name = "id_cliente", nullable = false)
