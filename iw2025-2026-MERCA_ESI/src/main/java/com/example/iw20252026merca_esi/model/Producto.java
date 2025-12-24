@@ -1,5 +1,6 @@
 package com.example.iw20252026merca_esi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 
@@ -37,6 +38,7 @@ public class Producto {
     @Column(name = "imagen", nullable = true)
     @JdbcTypeCode(java.sql.Types.BINARY)
     @Basic(fetch = FetchType.LAZY)
+    @JsonIgnore
     private byte[] imagen;
 
     @ManyToMany
@@ -45,14 +47,19 @@ public class Producto {
             joinColumns = @JoinColumn(name = "id_producto"),
             inverseJoinColumns = @JoinColumn(name = "id_categoria")
     )
+
+    @JsonIgnore
     private Set<Categoria> categorias;
+    @JsonIgnore
 
     @ManyToMany(mappedBy = "productos")
     private Set<Menu> menus;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "producto")
     private Set<DetallePedido> detallePedidos;
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL)
     private Set<ProductoIngrediente> productoIngredientes;
 
