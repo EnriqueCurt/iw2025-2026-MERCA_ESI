@@ -155,7 +155,14 @@ public class Empleado {
     
     /**
      * Verifica si el empleado es propietario
+    
+    /**
+     * Verifica si el empleado es de cocina
      */
+    public boolean esCocina() {
+        return tieneRol("COCINA");
+    }
+
     public boolean esPropietario() {
         return tieneRol("PROPIETARIO");
     }

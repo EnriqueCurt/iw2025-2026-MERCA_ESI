@@ -172,6 +172,24 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             rightSection.add(repartidorButton);
         }
 
+        // Botón COCINA (para personal de cocina)
+        if (esCocina()) {
+            Button cocinaButton = new Button("COCINA", new Icon(VaadinIcon.COFFEE));
+            cocinaButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            cocinaButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("cocina")));
+            cocinaButton.getStyle()
+                    .set("color", "white")
+                    .set("border-radius", "50px")
+                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("transition", "background-color 0.3s")
+                    .set("cursor", "pointer");
+            
+            cocinaButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
+            cocinaButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            
+            rightSection.add(cocinaButton);
+        }
+
         Button cartButton = new Button("CESTA", new Icon(VaadinIcon.CART));
         cartButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
@@ -270,6 +288,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
     private boolean esRepartidor() {
         com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
         return empleado != null && empleado.esRepartidor();
+    }
+
+    /**
+     * Verifica si el usuario actual es de cocina
+     */
+    private boolean esCocina() {
+        com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
+        return empleado != null && empleado.esCocina();
     }
 
     private Footer createFooter() {

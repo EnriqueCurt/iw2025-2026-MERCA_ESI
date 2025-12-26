@@ -73,11 +73,11 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Verificar que el usuario sea administrador
+        // Verificar que el usuario sea administrador o propietario
         Empleado empleado = sessionService.getEmpleado();
-        if (empleado == null || !empleado.esAdministrador()) {
+        if (empleado == null || (!empleado.esAdministrador() && !empleado.esPropietario())) {
             event.rerouteTo("");
-            Notification.show("Acceso denegado. Solo administradores.")
+            Notification.show("Acceso denegado. Solo administradores y propietarios.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

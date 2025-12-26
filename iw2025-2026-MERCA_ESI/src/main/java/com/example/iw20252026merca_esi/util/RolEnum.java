@@ -9,7 +9,8 @@ public enum RolEnum {
     EMPLEADO("EMPLEADO"),
     REPARTIDOR("REPARTIDOR"),
     MANAGER("MANAGER"),
-    PROPIETARIO("PROPIETARIO");
+    PROPIETARIO("PROPIETARIO"),
+    COCINA("COCINA");
 
     private final String nombre;
 

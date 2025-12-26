@@ -58,4 +58,8 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     // Buscar pedidos listos para entregar o en reparto, ordenados por fecha
     @Query("SELECT p FROM Pedido p WHERE p.estado IN ('LISTO', 'EN_REPARTO') ORDER BY p.fecha ASC")
     List<Pedido> findPedidosParaEntrega();
+    
+    // Buscar pedidos con detalles cargados (fetch join)
+    @Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.detallePedidos ORDER BY p.fecha ASC")
+    List<Pedido> findAllWithDetails();
 }

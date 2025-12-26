@@ -6,9 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Integer> {
+
+    Optional<Producto> findByNombre(String nombre);
 
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
 
