@@ -31,33 +31,57 @@ public class MainView extends Div {
         Div overlay = new Div();
         getElement().executeJs(
                 "if ('serviceWorker' in navigator && 'PushManager' in window) {" +
+                        "  console.log('Iniciando proceso de suscripción push...');" +
                         "  Notification.requestPermission().then(function(permission) {" +
+                        "    console.log('Permiso de notificaciones:', permission);" +
                         "    if (permission === 'granted') {" +
-                        "      navigator.serviceWorker.register('/sw.js').then(function(registration) {" +
+                        "      navigator.serviceWorker.register('/push-sw.js').then(function(registration) {" +
+                        "        console.log('Service Worker registrado:', registration);" +
                         "        return registration.pushManager.getSubscription().then(function(subscription) {" +
                         "          if (subscription) {" +
+                        "            console.log('Ya existe suscripción:', subscription);" +
                         "            return subscription;" +
                         "          }" +
+                        "          console.log('Creando nueva suscripción...');" +
                         "          return registration.pushManager.subscribe({" +
                         "            userVisibleOnly: true," +
                         "            applicationServerKey: urlBase64ToUint8Array('BPBDhfJW56VVyf-MVZJfhfHvSnzaFBYN3HkOmj2zhu_YfJFH8ytnhBipLthBIhSrNoySd17msinm2GNXBuXiug8')" +
                         "          });" +
                         "        });" +
                         "      }).then(function(subscription) {" +
+                        "        console.log('Suscripción obtenida, enviando al servidor...');" +
+                        "        var subscriptionData = {" +
+                        "          endpoint: subscription.endpoint," +
+                        "          keys: {" +
+                        "            p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh'))))," +
+                        "            auth: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))" +
+                        "          }" +
+                        "        };" +
+                        "        console.log('Datos de suscripción:', subscriptionData);" +
                         "        return fetch('/api/push/subscribe', {" +
                         "          method: 'POST'," +
                         "          headers: {'Content-Type': 'application/json'}," +
-                        "          body: JSON.stringify({" +
-                        "            endpoint: subscription.endpoint," +
-                        "            p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh'))))," +
-                        "            auth: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))" +
-                        "          })" +
+                        "          body: JSON.stringify(subscriptionData)" +
+                        "        }).then(function(response) {" +
+                        "          console.log('Respuesta del servidor:', response.status);" +
+                        "          if (!response.ok) {" +
+                        "            return response.text().then(function(text) {" +
+                        "              throw new Error('Error del servidor: ' + text);" +
+                        "            });" +
+                        "          }" +
+                        "          return response.text();" +
+                        "        }).then(function(data) {" +
+                        "          console.log('Suscripción guardada exitosamente:', data);" +
                         "        });" +
                         "      }).catch(function(err) {" +
                         "        console.error('Error en suscripción push:', err);" +
                         "      });" +
+                        "    } else {" +
+                        "      console.log('Permiso de notificaciones denegado');" +
                         "    }" +
                         "  });" +
+                        "} else {" +
+                        "  console.log('Push no soportado en este navegador');" +
                         "}" +
                         "function urlBase64ToUint8Array(base64String) {" +
                         "  const padding = '='.repeat((4 - base64String.length % 4) % 4);" +

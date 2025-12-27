@@ -1,67 +1,44 @@
+// src/main/java/com/example/iw20252026merca_esi/model/PushSubscription.java
 package com.example.iw20252026merca_esi.model;
 
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "push_subscriptions")
+@Table(
+        name = "push_subscriptions",
+        uniqueConstraints = @UniqueConstraint(name = "uk_push_endpoint", columnNames = "endpoint")
+)
 public class PushSubscription {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 500)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String endpoint;
 
-    @Column(length = 500)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String p256dh;
 
-    @Column(length = 500)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String auth;
 
     private String userId;
 
-    // Constructor vacío (requerido por JPA)
-    public PushSubscription() {
-    }
+    public PushSubscription() {}
 
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getEndpoint() { return endpoint; }
+    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
 
-    public String getEndpoint() {
-        return endpoint;
-    }
+    public String getP256dh() { return p256dh; }
+    public void setP256dh(String p256dh) { this.p256dh = p256dh; }
 
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
-    }
+    public String getAuth() { return auth; }
+    public void setAuth(String auth) { this.auth = auth; }
 
-    public String getP256dh() {
-        return p256dh;
-    }
-
-    public void setP256dh(String p256dh) {
-        this.p256dh = p256dh;
-    }
-
-    public String getAuth() {
-        return auth;
-    }
-
-    public void setAuth(String auth) {
-        this.auth = auth;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 }
