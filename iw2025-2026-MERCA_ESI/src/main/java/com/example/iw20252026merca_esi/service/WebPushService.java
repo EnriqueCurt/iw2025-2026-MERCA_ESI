@@ -7,6 +7,8 @@ import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ public class WebPushService {
 
     @Autowired
     private PushSubscriptionRepository subscriptionRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(WebPushService.class);
 
     private PushService pushService;
 
@@ -57,14 +61,17 @@ public class WebPushService {
         for (PushSubscription sub : suscripciones) {
             try {
                 Subscription subscription = new Subscription(
-                    sub.getEndpoint(),
-                    new Subscription.Keys(sub.getP256dh(), sub.getAuth())
+                        sub.getEndpoint(),
+                        new Subscription.Keys(sub.getP256dh(), sub.getAuth())
                 );
 
                 Notification notification = new Notification(subscription, payload);
                 pushService.send(notification);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Thread interrumpido al enviar notificación push", e);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error al enviar notificación push a {}", sub.getEndpoint(), e);
             }
         }
     }
