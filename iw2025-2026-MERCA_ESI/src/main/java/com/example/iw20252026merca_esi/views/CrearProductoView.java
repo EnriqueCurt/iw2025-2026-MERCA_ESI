@@ -1,5 +1,6 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.service.AsyncNotificationService;
 import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Ingrediente;
 import com.example.iw20252026merca_esi.model.Producto;
@@ -71,13 +72,17 @@ public class CrearProductoView extends VerticalLayout {
     @Autowired
     private WebPushService webPushService;
 
+    private final AsyncNotificationService asyncNotificationService;
+
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
-                            ProductoIngredienteService productoIngredienteService, CategoriaService categoriaService) {
+                            ProductoIngredienteService productoIngredienteService, CategoriaService categoriaService,
+                            AsyncNotificationService asyncNotificationService) {
         this.productoService = productoService;
         this.ingredienteService = ingredienteService;
         this.productoIngredienteService = productoIngredienteService;
         this.categoriaService = categoriaService;
+        this.asyncNotificationService = asyncNotificationService;
 
         // Título principal con espacio arriba
         H1 titulo = new H1("Crear Producto");
@@ -494,11 +499,14 @@ public class CrearProductoView extends VerticalLayout {
                 Notification notification = Notification.show(
                         "Producto creado correctamente"
                 );
-                // Enviar notificación push
-                webPushService.enviarNotificacionATodos(
-                        "Nuevo Producto",
-                        "Se ha creado un nuevo producto exitosamente"
+
+                // Enviar notificación push ASÍNCRONA con Spring @Async
+                asyncNotificationService.enviarNotificacionAsync(
+                        "Nuevo Producto Disponible",
+                        "Se ha agregado " + productoGuardado.getNombre() + " al catálogo",
+                        "PRODUCTO_NUEVO"
                 );
+
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 limpiarFormulario();
             } catch (Exception e) {
