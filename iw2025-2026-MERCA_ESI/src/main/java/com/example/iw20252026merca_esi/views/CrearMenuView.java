@@ -2,7 +2,10 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.model.Producto;
+import com.example.iw20252026merca_esi.model.Menu;
 import com.example.iw20252026merca_esi.service.ProductoService;
+import com.example.iw20252026merca_esi.service.MenuService;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,11 +23,12 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.router.Menu;
+
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import jakarta.annotation.security.RolesAllowed;
+
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -33,10 +37,11 @@ import java.util.List;
 @PageTitle("Crear Menu")
 @RolesAllowed("ADMINISTRADOR,PROPIETARIO,MANAGER")
 @Route(value = "crear-menu", layout = MainLayout.class)
-@Menu(title = "crear menu")
+@com.vaadin.flow.router.Menu(title = "crear menu")
 public class CrearMenuView extends VerticalLayout {
 
     private final ProductoService productoService;
+    private final MenuService menuService;
 
     private TextField nombreField = new TextField("Nombre");
     private TextArea descripcionField = new TextArea("Descripción");
@@ -50,8 +55,9 @@ public class CrearMenuView extends VerticalLayout {
     private byte[] imagenBytes;
     private ByteArrayOutputStream imageBuffer;
 
-    public CrearMenuView(ProductoService productoService ) {
+    public CrearMenuView(ProductoService productoService, MenuService menuService) {
         this.productoService = productoService;
+        this.menuService = menuService;
 
         H1 titulo = new H1("Crear Menú");
         titulo.getStyle()
@@ -115,14 +121,15 @@ public class CrearMenuView extends VerticalLayout {
                 nombreField,
                 descripcionField,
                 precioField,
-                estadoCheckbox,
+                estadoCheckbox
+        );
+
+        mainLayout.add(formLayout,
+                seccionImagen,
                 productoComboBox,
                 productoGrid,
                 guardarButton,
-                limpiarButton
-        );
-
-        mainLayout.add(formLayout, seccionImagen);
+                limpiarButton);
         content.add(mainLayout);
         return content;
     }
@@ -251,6 +258,16 @@ public class CrearMenuView extends VerticalLayout {
                     "Menú guardado exitosamente con " + productosSeleccionados.size() + " producto(s)"
             );
             n.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            Menu nuevoMenu = new Menu();
+            nuevoMenu.setNombre(nombreField.getValue());
+            nuevoMenu.setDescripcion(descripcionField.getValue());
+            nuevoMenu.setPrecio(precioField.getValue().floatValue());
+            nuevoMenu.setEstado(estadoCheckbox.getValue());
+            nuevoMenu.setProductos(new java.util.HashSet<>(productosSeleccionados));
+            if (imagenBytes != null) {
+                nuevoMenu.setImagen(imagenBytes);
+            }
+            menuService.guardarMenu(nuevoMenu);
             limpiarFormulario();
         }
     }

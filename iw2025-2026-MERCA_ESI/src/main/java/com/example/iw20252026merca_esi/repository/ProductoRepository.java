@@ -15,6 +15,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
 
+    @Query("SELECT p FROM Producto p WHERE p.estado = true")
     List<Producto> findByEstadoTrue();
 
     List<Producto> findByEsOfertaTrue();

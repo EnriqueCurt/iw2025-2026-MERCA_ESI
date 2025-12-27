@@ -25,8 +25,9 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+
     public List<Producto> listarProductosActivos() {
-        return List.of();
+        return productoRepository.findByEstadoTrue();
     }
 }
 

@@ -3,10 +3,7 @@ package com.example.iw20252026merca_esi.views;
 import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Ingrediente;
 import com.example.iw20252026merca_esi.model.Producto;
-import com.example.iw20252026merca_esi.service.CategoriaService;
-import com.example.iw20252026merca_esi.service.IngredienteService;
-import com.example.iw20252026merca_esi.service.ProductoIngredienteService;
-import com.example.iw20252026merca_esi.service.ProductoService;
+import com.example.iw20252026merca_esi.service.*;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -31,6 +28,7 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -69,6 +67,9 @@ public class CrearProductoView extends VerticalLayout {
     private final ComboBox<Categoria> categoriaComboBox = new ComboBox<>("Seleccionar Categoria");
     private final Grid<Categoria> gridCategorias = new Grid<>(Categoria.class, false);
     private final List<Categoria> categoriasSeleccionadas = new ArrayList<>();
+
+    @Autowired
+    private WebPushService webPushService;
 
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
@@ -492,6 +493,11 @@ public class CrearProductoView extends VerticalLayout {
 
                 Notification notification = Notification.show(
                         "Producto creado correctamente"
+                );
+                // Enviar notificación push
+                webPushService.enviarNotificacionATodos(
+                        "Nuevo Producto",
+                        "Se ha creado un nuevo producto exitosamente"
                 );
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 limpiarFormulario();

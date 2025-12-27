@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Image;
 public class MainView extends Div {
 
     public MainView() {
+
         setSizeFull();
         getStyle()
                 .set("background-image", "url('/images/pizita.png')")
@@ -28,6 +29,47 @@ public class MainView extends Div {
                 .set("margin", "40px auto 0 auto");
 
         Div overlay = new Div();
+        getElement().executeJs(
+                "if ('serviceWorker' in navigator && 'PushManager' in window) {" +
+                        "  Notification.requestPermission().then(function(permission) {" +
+                        "    if (permission === 'granted') {" +
+                        "      navigator.serviceWorker.register('/sw.js').then(function(registration) {" +
+                        "        return registration.pushManager.getSubscription().then(function(subscription) {" +
+                        "          if (subscription) {" +
+                        "            return subscription;" +
+                        "          }" +
+                        "          return registration.pushManager.subscribe({" +
+                        "            userVisibleOnly: true," +
+                        "            applicationServerKey: urlBase64ToUint8Array('BPBDhfJW56VVyf-MVZJfhfHvSnzaFBYN3HkOmj2zhu_YfJFH8ytnhBipLthBIhSrNoySd17msinm2GNXBuXiug8')" +
+                        "          });" +
+                        "        });" +
+                        "      }).then(function(subscription) {" +
+                        "        return fetch('/api/push/subscribe', {" +
+                        "          method: 'POST'," +
+                        "          headers: {'Content-Type': 'application/json'}," +
+                        "          body: JSON.stringify({" +
+                        "            endpoint: subscription.endpoint," +
+                        "            p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh'))))," +
+                        "            auth: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))" +
+                        "          })" +
+                        "        });" +
+                        "      }).catch(function(err) {" +
+                        "        console.error('Error en suscripción push:', err);" +
+                        "      });" +
+                        "    }" +
+                        "  });" +
+                        "}" +
+                        "function urlBase64ToUint8Array(base64String) {" +
+                        "  const padding = '='.repeat((4 - base64String.length % 4) % 4);" +
+                        "  const base64 = (base64String + padding).replace(/\\-/g, '+').replace(/_/g, '/');" +
+                        "  const rawData = window.atob(base64);" +
+                        "  const outputArray = new Uint8Array(rawData.length);" +
+                        "  for (let i = 0; i < rawData.length; ++i) {" +
+                        "    outputArray[i] = rawData.charCodeAt(i);" +
+                        "  }" +
+                        "  return outputArray;" +
+                        "}"
+        );
         overlay.add(welcomeMessage);
         overlay.getStyle()
                 .set("background", "rgba(0,0,0,0.35)")
@@ -40,6 +82,7 @@ public class MainView extends Div {
                 .set("text-align", "center");
 
         add(overlay);
+
 
     }
 }
