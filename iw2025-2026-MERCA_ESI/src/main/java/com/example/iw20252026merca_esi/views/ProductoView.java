@@ -1,7 +1,9 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.ProductoService;
+import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -12,22 +14,27 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
 
 @PageTitle("Productos")
-@AnonymousAllowed
+@RolesAllowed("ADMINISTRADOR")
 @Route(value = "productos", layout = MainLayout.class)
 @Menu(title = "Productos")
-public class ProductoView extends VerticalLayout {
+public class ProductoView extends VerticalLayout implements BeforeEnterObserver {
 
     private final ProductoService productoService;
+    private final SessionService sessionService;
     private final Div grid;
     
     private static final String DISPLAY = "display";
@@ -43,8 +50,9 @@ public class ProductoView extends VerticalLayout {
     private static final String BORDER_RADIUS = "border-radius";
     
 
-    public ProductoView(ProductoService productoService) {
+    public ProductoView(ProductoService productoService, SessionService sessionService) {
         this.productoService = productoService;
+        this.sessionService = sessionService;
         
         setSizeFull();
         setSpacing(false);
@@ -247,5 +255,15 @@ public class ProductoView extends VerticalLayout {
         content.add(h3, desc, priceAndBadges, actions);
         card.add(image, content);
         return card;
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        Empleado empleado = sessionService.getEmpleado();
+        if (empleado == null) {
+            event.rerouteTo("");
+            Notification.show("Acceso denegado.")
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 }

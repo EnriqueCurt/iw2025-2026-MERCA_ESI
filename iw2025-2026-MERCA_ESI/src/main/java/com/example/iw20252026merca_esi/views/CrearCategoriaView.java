@@ -1,7 +1,9 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.model.Categoria;
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.service.CategoriaService;
+import com.example.iw20252026merca_esi.service.SessionService;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -13,25 +15,29 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
 @PageTitle("Crear Categoría")
-@RolesAllowed("ADMINISTRADOR,PROPIETARIO,MANAGER")
+@RolesAllowed("ADMINISTRADOR")
 @Route(value = "crear-categoria", layout = MainLayout.class)
 @Menu(title = "crear categoria")
-public class CrearCategoriaView extends VerticalLayout {
+public class CrearCategoriaView extends VerticalLayout implements BeforeEnterObserver {
 
     private final CategoriaService categoriaService;
+    private final SessionService sessionService;
 
     private final TextField nombreField = new TextField("Nombre");
 
     private final Checkbox estadoCheckbox = new Checkbox("Activo");
 
-    public CrearCategoriaView(CategoriaService categoriaService) {
+    public CrearCategoriaView(CategoriaService categoriaService, SessionService sessionService) {
         this.categoriaService = categoriaService;
+        this.sessionService = sessionService;
 
         // Título principal
         H1 titulo = new H1("Crear Categoria");
@@ -133,5 +139,15 @@ public class CrearCategoriaView extends VerticalLayout {
         nombreField.clear();
 
         estadoCheckbox.setValue(true);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        Empleado empleado = sessionService.getEmpleado();
+        if (empleado == null) {
+            event.rerouteTo("");
+            Notification.show("Acceso denegado.")
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 }

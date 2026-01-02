@@ -27,12 +27,14 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.stream.Collectors;
 
 @Route(value = "empleados", layout = MainLayout.class)
 @PageTitle("Gestión de Empleados - MercaESI")
+@RolesAllowed("ADMINISTRADOR")
 public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterObserver {
 
     private final EmpleadoService empleadoService;
@@ -73,11 +75,11 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Verificar que el usuario sea administrador o propietario
+        // Verificar que el usuario esté autenticado
         Empleado empleado = sessionService.getEmpleado();
-        if (empleado == null || (!empleado.esAdministrador() && !empleado.esPropietario())) {
+        if (empleado == null) {
             event.rerouteTo("");
-            Notification.show("Acceso denegado. Solo administradores y propietarios.")
+            Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

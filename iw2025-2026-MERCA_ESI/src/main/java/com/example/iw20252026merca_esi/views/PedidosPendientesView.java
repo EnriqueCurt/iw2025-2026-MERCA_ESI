@@ -84,7 +84,7 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         Empleado empleado = sessionService.getEmpleado();
         if (empleado == null) {
             event.rerouteTo("");
-            Notification.show("Acceso denegado. Solo empleados.")
+            Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

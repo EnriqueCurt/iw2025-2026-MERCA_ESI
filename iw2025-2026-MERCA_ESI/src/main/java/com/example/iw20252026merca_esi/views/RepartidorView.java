@@ -79,11 +79,11 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Verificar que el usuario sea empleado
+        // Verificar que el usuario esté autenticado
         Empleado empleado = sessionService.getEmpleado();
         if (empleado == null) {
             event.rerouteTo("");
-            Notification.show("Acceso denegado. Solo empleados.")
+            Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

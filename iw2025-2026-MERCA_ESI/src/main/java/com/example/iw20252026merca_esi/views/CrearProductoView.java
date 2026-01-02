@@ -2,6 +2,7 @@ package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.service.AsyncNotificationService;
 import com.example.iw20252026merca_esi.model.Categoria;
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.Ingrediente;
 import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.*;
@@ -25,6 +26,8 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -37,12 +40,13 @@ import java.util.HashSet;
 import java.util.List;
 
 @PageTitle("Crear Producto")
-@RolesAllowed("ADMINISTRADOR,PROPIETARIO,MANAGER")
+@RolesAllowed("ADMINISTRADOR")
 @Route(value = "crear-producto", layout = MainLayout.class)
 @Menu(title = "crear producto")
-public class CrearProductoView extends VerticalLayout {
+public class CrearProductoView extends VerticalLayout implements BeforeEnterObserver {
 
     private final ProductoService productoService;
+    private final SessionService sessionService;
     private final IngredienteService ingredienteService;
     private final ProductoIngredienteService productoIngredienteService;
     private final CategoriaService categoriaService;
@@ -77,8 +81,9 @@ public class CrearProductoView extends VerticalLayout {
 
     public CrearProductoView(ProductoService productoService, IngredienteService ingredienteService, 
                             ProductoIngredienteService productoIngredienteService, CategoriaService categoriaService,
-                            AsyncNotificationService asyncNotificationService) {
+                            AsyncNotificationService asyncNotificationService, SessionService sessionService) {
         this.productoService = productoService;
+        this.sessionService = sessionService;
         this.ingredienteService = ingredienteService;
         this.productoIngredienteService = productoIngredienteService;
         this.categoriaService = categoriaService;
@@ -570,5 +575,14 @@ public class CrearProductoView extends VerticalLayout {
         });
     }
 
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        Empleado empleado = sessionService.getEmpleado();
+        if (empleado == null) {
+            event.rerouteTo("");
+            Notification.show("Acceso denegado.")
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
 
 }

@@ -136,8 +136,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             rightSection.add(gestionMenuBar);
         }
 
-        // Botón EMPLEADO (para todos los empleados, incluidos los no administradores)
-        if (esEmpleado() && !esAdministrador()) {
+        // Botón EMPLEADO (para empleados y administradores)
+        if (esEmpleado()) {
             Button empleadoButton = new Button("EMPLEADO", new Icon(VaadinIcon.USER_CARD));
             empleadoButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             empleadoButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("pedidos-pendientes")));
@@ -154,8 +154,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             rightSection.add(empleadoButton);
         }
 
-        // Botón REPARTIDOR (para repartidores)
-        if (esRepartidor() && !esAdministrador()) {
+        // Botón REPARTIDOR (para repartidores y administradores)
+        if (esRepartidor()) {
             Button repartidorButton = new Button("REPARTIDOR", new Icon(VaadinIcon.TRUCK));
             repartidorButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             repartidorButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("repartidor")));
@@ -172,7 +172,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             rightSection.add(repartidorButton);
         }
 
-        // Botón COCINA (para personal de cocina)
+        // Botón COCINA (para personal de cocina y administradores)
         if (esCocina()) {
             Button cocinaButton = new Button("COCINA", new Icon(VaadinIcon.COFFEE));
             cocinaButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -283,19 +283,19 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
     }
 
     /**
-     * Verifica si el usuario actual es repartidor
+     * Verifica si el usuario actual es repartidor o administrador
      */
     private boolean esRepartidor() {
         com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
-        return empleado != null && empleado.esRepartidor();
+        return empleado != null && (empleado.esRepartidor() || empleado.esAdministrador());
     }
 
     /**
-     * Verifica si el usuario actual es de cocina
+     * Verifica si el usuario actual es de cocina o administrador
      */
     private boolean esCocina() {
         com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
-        return empleado != null && empleado.esCocina();
+        return empleado != null && (empleado.esCocina() || empleado.esAdministrador());
     }
 
     private Footer createFooter() {

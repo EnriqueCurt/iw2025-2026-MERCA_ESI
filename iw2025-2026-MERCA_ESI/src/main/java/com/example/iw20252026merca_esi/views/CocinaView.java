@@ -81,9 +81,9 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         Empleado empleado = sessionService.getEmpleado();
-        if (empleado == null || (!empleado.esCocina() && !empleado.esAdministrador() && !empleado.esPropietario())) {
+        if (empleado == null) {
             event.rerouteTo("");
-            Notification.show("Acceso denegado. Solo personal de cocina.")
+            Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
