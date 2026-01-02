@@ -1,12 +1,16 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.Producto;
+import com.example.iw20252026merca_esi.service.CategoriaService;
 import com.example.iw20252026merca_esi.service.ProductoService;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
@@ -25,7 +29,9 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @PageTitle("Productos")
 @RolesAllowed("ADMINISTRADOR")
@@ -34,8 +40,19 @@ import java.util.List;
 public class ProductoView extends VerticalLayout implements BeforeEnterObserver {
 
     private final ProductoService productoService;
+    private final CategoriaService categoriaService;
     private final SessionService sessionService;
     private final Div grid;
+    
+    private final ComboBox<Categoria> categoriaFilter = new ComboBox<>("Categoría");
+    private final Checkbox ofertaFilter = new Checkbox("Solo Ofertas");
+    private final Checkbox puntosFilter = new Checkbox("Solo Puntos");
+    
+    private List<Producto> todosLosProductos = new ArrayList<>();
+    private List<Producto> productosFiltrados = new ArrayList<>();
+    private int paginaActual = 0;
+    private static final int PRODUCTOS_POR_PAGINA = 10;
+    private HorizontalLayout paginacion;
     
     private static final String DISPLAY = "display";
     private static final String PADDING = "padding";
@@ -50,8 +67,9 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
     private static final String BORDER_RADIUS = "border-radius";
     
 
-    public ProductoView(ProductoService productoService, SessionService sessionService) {
+    public ProductoView(ProductoService productoService, CategoriaService categoriaService, SessionService sessionService) {
         this.productoService = productoService;
+        this.categoriaService = categoriaService;
         this.sessionService = sessionService;
         
         setSizeFull();
@@ -64,17 +82,23 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
 
         // Header con título y botones de administración
         HorizontalLayout header = createHeader();
+        
+        // Filtros
+        HorizontalLayout filtros = createFiltros();
 
         grid = new Div();
         grid.getStyle()
                 .set(DISPLAY, "grid")
-                .set("grid-template-columns", "repeat(auto-fit, minmax(min(200px, 100%), 1fr))")
+                .set("grid-template-columns", "repeat(auto-fill, minmax(220px, 1fr))")
                 .set("gap", "clamp(10px, 2vw, 15px)")
                 .set("width", "100%")
                 .set("align-content", "start")
+                .set("max-width", "100%")
                 .set(PADDING, "0 clamp(8px, 2vw, 12px) clamp(16px, 3vw, 30px)");
+        
+        paginacion = createPaginacion();
 
-        add(header, grid);
+        add(header, filtros, grid, paginacion);
         setFlexGrow(1, grid);
 
         cargarProductos();
@@ -123,11 +147,157 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         return header;
     }
 
-    private void cargarProductos() {
-        grid.removeAll();
-        List<Producto> productos = productoService.listarProductos();
+    private HorizontalLayout createFiltros() {
+        HorizontalLayout filtrosLayout = new HorizontalLayout();
+        filtrosLayout.setWidthFull();
+        filtrosLayout.setAlignItems(Alignment.CENTER);
+        filtrosLayout.setSpacing(true);
+        filtrosLayout.getStyle()
+                .set(PADDING, "0 clamp(8px, 2vw, 12px)")
+                .set("flex-wrap", "wrap")
+                .set("gap", "15px")
+                .set(BACKGROUND_COLOR, "#f5f5f5")
+                .set(BORDER_RADIUS, "8px")
+                .set("margin", "0 clamp(8px, 2vw, 12px)");
         
-        if (productos.isEmpty()) {
+        // Configurar ComboBox de categorías
+        categoriaFilter.setItems(categoriaService.listarCategorias());
+        categoriaFilter.setItemLabelGenerator(Categoria::getNombre);
+        categoriaFilter.setPlaceholder("Todas las categorías");
+        categoriaFilter.setClearButtonVisible(true);
+        categoriaFilter.setWidth("200px");
+        categoriaFilter.getStyle()
+                .set("--lumo-primary-color", COLOR_1_IS);
+        categoriaFilter.addValueChangeListener(e -> aplicarFiltros());
+        
+        // Configurar Checkbox de ofertas
+        ofertaFilter.getStyle()
+                .set("--vaadin-checkbox-checkmark-color", COLOR_2_IS)
+                .set("--lumo-primary-color", COLOR_1_IS);
+        ofertaFilter.addValueChangeListener(e -> aplicarFiltros());
+        
+        // Configurar Checkbox de puntos
+        puntosFilter.getStyle()
+                .set("--vaadin-checkbox-checkmark-color", COLOR_2_IS)
+                .set("--lumo-primary-color", COLOR_1_IS);
+        puntosFilter.addValueChangeListener(e -> aplicarFiltros());
+        
+        // Botón para limpiar filtros
+        Button limpiarFiltrosBtn = new Button("Limpiar Filtros", new Icon(VaadinIcon.CLOSE_CIRCLE));
+        limpiarFiltrosBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        limpiarFiltrosBtn.getStyle().set(COLOR, COLOR_1_IS);
+        limpiarFiltrosBtn.addClickListener(e -> {
+            categoriaFilter.clear();
+            ofertaFilter.setValue(false);
+            puntosFilter.setValue(false);
+            aplicarFiltros();
+        });
+        
+        filtrosLayout.add(categoriaFilter, ofertaFilter, puntosFilter, limpiarFiltrosBtn);
+        return filtrosLayout;
+    }
+
+    private HorizontalLayout createPaginacion() {
+        HorizontalLayout paginacionLayout = new HorizontalLayout();
+        paginacionLayout.setWidthFull();
+        paginacionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        paginacionLayout.setAlignItems(Alignment.CENTER);
+        paginacionLayout.setSpacing(true);
+        paginacionLayout.getStyle()
+                .set(PADDING, "clamp(8px, 2vw, 12px)")
+                .set("gap", "10px");
+        
+        return paginacionLayout;
+    }
+
+    private void actualizarPaginacion() {
+        paginacion.removeAll();
+        
+        int totalPaginas = (int) Math.ceil((double) productosFiltrados.size() / PRODUCTOS_POR_PAGINA);
+        
+        if (totalPaginas <= 1) {
+            return; // No mostrar paginación si solo hay una página
+        }
+        
+        Button btnPrimera = new Button("Primera", new Icon(VaadinIcon.ANGLE_DOUBLE_LEFT));
+        btnPrimera.setEnabled(paginaActual > 0);
+        btnPrimera.addClickListener(e -> {
+            paginaActual = 0;
+            mostrarPagina();
+        });
+        
+        Button btnAnterior = new Button("Anterior", new Icon(VaadinIcon.ANGLE_LEFT));
+        btnAnterior.setEnabled(paginaActual > 0);
+        btnAnterior.addClickListener(e -> {
+            paginaActual--;
+            mostrarPagina();
+        });
+        
+        Span infoPagina = new Span("Página " + (paginaActual + 1) + " de " + totalPaginas);
+        infoPagina.getStyle()
+                .set(FONT_WEIGHT, "600")
+                .set(COLOR, COLOR_1_IS);
+        
+        Button btnSiguiente = new Button("Siguiente", new Icon(VaadinIcon.ANGLE_RIGHT));
+        btnSiguiente.setIconAfterText(true);
+        btnSiguiente.setEnabled(paginaActual < totalPaginas - 1);
+        btnSiguiente.addClickListener(e -> {
+            paginaActual++;
+            mostrarPagina();
+        });
+        
+        Button btnUltima = new Button("Última", new Icon(VaadinIcon.ANGLE_DOUBLE_RIGHT));
+        btnUltima.setIconAfterText(true);
+        btnUltima.setEnabled(paginaActual < totalPaginas - 1);
+        btnUltima.addClickListener(e -> {
+            paginaActual = totalPaginas - 1;
+            mostrarPagina();
+        });
+        
+        paginacion.add(btnPrimera, btnAnterior, infoPagina, btnSiguiente, btnUltima);
+    }
+
+    private void cargarProductos() {
+        todosLosProductos = productoService.listarProductosConCategorias();
+        paginaActual = 0;
+        aplicarFiltros();
+    }
+
+    private void aplicarFiltros() {
+        productosFiltrados = new ArrayList<>(todosLosProductos);
+        
+        // Aplicar filtro de categoría
+        if (categoriaFilter.getValue() != null) {
+            Categoria categoriaSeleccionada = categoriaFilter.getValue();
+            productosFiltrados = productosFiltrados.stream()
+                    .filter(p -> p.getCategorias() != null && 
+                                 p.getCategorias().stream()
+                                         .anyMatch(c -> c.getIdCategoria().equals(categoriaSeleccionada.getIdCategoria())))
+                    .collect(Collectors.toList());
+        }
+        
+        // Aplicar filtro de ofertas
+        if (ofertaFilter.getValue()) {
+            productosFiltrados = productosFiltrados.stream()
+                    .filter(Producto::getEsOferta)
+                    .collect(Collectors.toList());
+        }
+        
+        // Aplicar filtro de puntos
+        if (puntosFilter.getValue()) {
+            productosFiltrados = productosFiltrados.stream()
+                    .filter(Producto::getPuntos)
+                    .collect(Collectors.toList());
+        }
+        
+        paginaActual = 0;
+        mostrarPagina();
+    }
+
+    private void mostrarPagina() {
+        grid.removeAll();
+        
+        if (productosFiltrados.isEmpty()) {
             Div emptyState = new Div();
             emptyState.setText("No hay productos disponibles. Crea uno nuevo usando el botón 'Crear Producto'.");
             emptyState.getStyle()
@@ -136,10 +306,16 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                     .set(PADDING, "40px")
                     .set(FONTSIZE, "1.1rem");
             grid.add(emptyState);
+            actualizarPaginacion();
         } else {
-            for (Producto producto : productos) {
-                grid.add(createProductCard(producto));
+            int inicio = paginaActual * PRODUCTOS_POR_PAGINA;
+            int fin = Math.min(inicio + PRODUCTOS_POR_PAGINA, productosFiltrados.size());
+            
+            for (int i = inicio; i < fin; i++) {
+                grid.add(createProductCard(productosFiltrados.get(i)));
             }
+            
+            actualizarPaginacion();
         }
     }
 
@@ -152,7 +328,8 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
                 .set("flex-direction", "column")
-                .set("height", "100%");
+                .set("height", "100%")
+                .set("max-width", "350px");
 
         // Imagen placeholder (puedes agregar campo imagen en el modelo Producto más adelante)
         Image image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250", 
@@ -246,15 +423,31 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         Button editBtn = new Button("Editar", new Icon(VaadinIcon.EDIT));
         editBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         editBtn.getStyle().set(COLOR, COLOR_1_IS);
+        editBtn.addClickListener(e -> 
+            UI.getCurrent().navigate("crear-producto/" + producto.getIdProducto())
+        );
 
         Button deleteBtn = new Button("Eliminar", new Icon(VaadinIcon.TRASH));
         deleteBtn.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
+        deleteBtn.addClickListener(e -> eliminarProducto(producto));
 
         actions.add(editBtn, deleteBtn);
 
         content.add(h3, desc, priceAndBadges, actions);
         card.add(image, content);
         return card;
+    }
+
+    private void eliminarProducto(Producto producto) {
+        try {
+            productoService.eliminarProducto(producto.getIdProducto());
+            Notification.show("Producto eliminado correctamente")
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            aplicarFiltros();
+        } catch (Exception e) {
+            Notification.show("Error al eliminar el producto: " + e.getMessage())
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 
     @Override

@@ -25,9 +25,25 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
+    public List<Producto> listarProductosConCategorias() {
+        return productoRepository.findAllWithCategorias();
+    }
+
 
     public List<Producto> listarProductosActivos() {
         return productoRepository.findByEstadoTrue();
+    }
+
+    public Producto buscarPorId(Integer id) {
+        return productoRepository.findById(id).orElse(null);
+    }
+
+    public Producto buscarPorIdConCategorias(Integer id) {
+        return productoRepository.findByIdWithCategorias(id).orElse(null);
+    }
+
+    public void eliminarProducto(Integer id) {
+        productoRepository.deleteById(id);
     }
 }
 
