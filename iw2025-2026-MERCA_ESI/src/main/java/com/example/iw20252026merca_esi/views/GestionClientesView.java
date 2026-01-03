@@ -20,12 +20,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @Route(value = "clientes", layout = MainLayout.class)
 @PageTitle("Gestión de Clientes - MercaESI")
@@ -92,12 +96,12 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
         grid.setWidthFull();
 
         // Columnas
-        grid.addColumn(Cliente::getIdCliente).setHeader("ID").setWidth("80px").setFlexGrow(0);
-        grid.addColumn(Cliente::getNombre).setHeader("Nombre").setSortable(true);
-        grid.addColumn(Cliente::getUsername).setHeader("Usuario").setSortable(true);
-        grid.addColumn(Cliente::getEmail).setHeader("Email").setSortable(true);
+        grid.addColumn(Cliente::getIdCliente).setHeader("ID").setWidth("80px").setFlexGrow(0).setSortProperty("idCliente");
+        grid.addColumn(Cliente::getNombre).setHeader("Nombre").setSortable(true).setSortProperty("nombre");
+        grid.addColumn(Cliente::getUsername).setHeader("Usuario").setSortable(true).setSortProperty("username");
+        grid.addColumn(Cliente::getEmail).setHeader("Email").setSortable(true).setSortProperty("email");
         grid.addColumn(Cliente::getTelefono).setHeader("Teléfono");
-        grid.addColumn(Cliente::getPuntos).setHeader("Puntos").setSortable(true).setWidth("100px");
+        grid.addColumn(Cliente::getPuntos).setHeader("Puntos").setSortable(true).setWidth("100px").setSortProperty("puntos");
 
         // Columna de acciones
         grid.addComponentColumn(cliente -> {
@@ -116,24 +120,70 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
             return actions;
         }).setHeader("Acciones").setWidth("150px").setFlexGrow(0);
 
-        // Cargar datos
-        actualizarGrid();
+        // Cargar datos con lazy loading
+        configurarLazyDataProvider();
+    }
+
+    private void configurarLazyDataProvider() {
+        String filtro = searchField.getValue();
+        
+        CallbackDataProvider<Cliente, Void> dataProvider = DataProvider.fromCallbacks(
+            // Fetch callback: carga solo los datos necesarios para la página actual
+            query -> {
+                int page = query.getPage();
+                int size = query.getPageSize();
+                
+                // Construir ordenamiento dinámico desde el Grid
+                Sort sort = Sort.by("idCliente").descending(); // Default
+                if (!query.getSortOrders().isEmpty()) {
+                    var sortOrder = query.getSortOrders().get(0);
+                    String property = sortOrder.getSorted();
+                    Sort.Direction direction = sortOrder.getDirection() == com.vaadin.flow.data.provider.SortDirection.ASCENDING 
+                        ? Sort.Direction.ASC 
+                        : Sort.Direction.DESC;
+                    sort = Sort.by(direction, property);
+                }
+                
+                PageRequest pageRequest = PageRequest.of(page, size, sort);
+                
+                if (filtro == null || filtro.trim().isEmpty()) {
+                    return clienteService.listarClientesPaginados(pageRequest).stream();
+                } else {
+                    // Para búsqueda, seguimos usando el método anterior (ya optimizado con índices)
+                    String filtroLower = filtro.toLowerCase();
+                    return clienteService.listarClientes().stream()
+                        .filter(cliente -> 
+                            cliente.getNombre().toLowerCase().contains(filtroLower) ||
+                            cliente.getUsername().toLowerCase().contains(filtroLower) ||
+                            (cliente.getEmail() != null && cliente.getEmail().toLowerCase().contains(filtroLower))
+                        )
+                        .skip(query.getOffset())
+                        .limit(query.getLimit());
+                }
+            },
+            // Count callback: cuenta el total de registros
+            query -> {
+                if (filtro == null || filtro.trim().isEmpty()) {
+                    return (int) clienteService.contarClientes();
+                } else {
+                    String filtroLower = filtro.toLowerCase();
+                    return (int) clienteService.listarClientes().stream()
+                        .filter(cliente -> 
+                            cliente.getNombre().toLowerCase().contains(filtroLower) ||
+                            cliente.getUsername().toLowerCase().contains(filtroLower) ||
+                            (cliente.getEmail() != null && cliente.getEmail().toLowerCase().contains(filtroLower))
+                        )
+                        .count();
+                }
+            }
+        );
+        
+        grid.setDataProvider(dataProvider);
     }
 
     private void actualizarGrid() {
-        String filtro = searchField.getValue();
-        if (filtro == null || filtro.trim().isEmpty()) {
-            grid.setItems(clienteService.listarClientes());
-        } else {
-            String filtroLower = filtro.toLowerCase();
-            grid.setItems(clienteService.listarClientes().stream()
-                .filter(cliente -> 
-                    cliente.getNombre().toLowerCase().contains(filtroLower) ||
-                    cliente.getUsername().toLowerCase().contains(filtroLower) ||
-                    (cliente.getEmail() != null && cliente.getEmail().toLowerCase().contains(filtroLower))
-                )
-                .toList());
-        }
+        // Reconfigurar el data provider con el filtro actualizado
+        configurarLazyDataProvider();
     }
 
     private void abrirDialogoNuevo() {

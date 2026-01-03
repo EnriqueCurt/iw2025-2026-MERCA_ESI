@@ -23,13 +23,19 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.CallbackDataProvider;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Route(value = "empleados", layout = MainLayout.class)
@@ -99,10 +105,10 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         grid.setWidthFull();
 
         // Columnas
-        grid.addColumn(Empleado::getIdEmpleado).setHeader("ID").setWidth("80px").setFlexGrow(0);
-        grid.addColumn(Empleado::getNombre).setHeader("Nombre").setSortable(true);
-        grid.addColumn(Empleado::getUsername).setHeader("Usuario").setSortable(true);
-        grid.addColumn(Empleado::getEmail).setHeader("Email").setSortable(true);
+        grid.addColumn(Empleado::getIdEmpleado).setHeader("ID").setWidth("80px").setFlexGrow(0).setSortProperty("idEmpleado");
+        grid.addColumn(Empleado::getNombre).setHeader("Nombre").setSortable(true).setSortProperty("nombre");
+        grid.addColumn(Empleado::getUsername).setHeader("Usuario").setSortable(true).setSortProperty("username");
+        grid.addColumn(Empleado::getEmail).setHeader("Email").setSortable(true).setSortProperty("email");
         grid.addColumn(Empleado::getTelefono).setHeader("Teléfono");
         grid.addColumn(empleado -> {
             if (empleado.getRoles() != null && !empleado.getRoles().isEmpty()) {
@@ -130,24 +136,70 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
             return actions;
         }).setHeader("Acciones").setWidth("150px").setFlexGrow(0);
 
-        // Cargar datos
-        actualizarGrid();
+        // Cargar datos con lazy loading
+        configurarLazyDataProvider();
+    }
+
+    private void configurarLazyDataProvider() {
+        String filtro = searchField.getValue();
+        
+        CallbackDataProvider<Empleado, Void> dataProvider = DataProvider.fromCallbacks(
+            // Fetch callback: carga solo los datos necesarios para la página actual
+            query -> {
+                int page = query.getPage();
+                int size = query.getPageSize();
+                
+                // Construir ordenamiento dinámico desde el Grid
+                Sort sort = Sort.by("idEmpleado").descending(); // Default
+                if (!query.getSortOrders().isEmpty()) {
+                    var sortOrder = query.getSortOrders().get(0);
+                    String property = sortOrder.getSorted();
+                    Sort.Direction direction = sortOrder.getDirection() == com.vaadin.flow.data.provider.SortDirection.ASCENDING 
+                        ? Sort.Direction.ASC 
+                        : Sort.Direction.DESC;
+                    sort = Sort.by(direction, property);
+                }
+                
+                PageRequest pageRequest = PageRequest.of(page, size, sort);
+                
+                if (filtro == null || filtro.trim().isEmpty()) {
+                    return empleadoService.listarEmpleadosPaginados(pageRequest).stream();
+                } else {
+                    // Para búsqueda, seguimos usando el método anterior (ya optimizado con índices)
+                    String filtroLower = filtro.toLowerCase();
+                    return empleadoService.listarEmpleados().stream()
+                        .filter(empleado -> 
+                            empleado.getNombre().toLowerCase().contains(filtroLower) ||
+                            empleado.getUsername().toLowerCase().contains(filtroLower) ||
+                            (empleado.getEmail() != null && empleado.getEmail().toLowerCase().contains(filtroLower))
+                        )
+                        .skip(query.getOffset())
+                        .limit(query.getLimit());
+                }
+            },
+            // Count callback: cuenta el total de registros
+            query -> {
+                if (filtro == null || filtro.trim().isEmpty()) {
+                    return (int) empleadoService.contarEmpleados();
+                } else {
+                    String filtroLower = filtro.toLowerCase();
+                    return (int) empleadoService.listarEmpleados().stream()
+                        .filter(empleado -> 
+                            empleado.getNombre().toLowerCase().contains(filtroLower) ||
+                            empleado.getUsername().toLowerCase().contains(filtroLower) ||
+                            (empleado.getEmail() != null && empleado.getEmail().toLowerCase().contains(filtroLower))
+                        )
+                        .count();
+                }
+            }
+        );
+        
+        grid.setDataProvider(dataProvider);
     }
 
     private void actualizarGrid() {
-        String filtro = searchField.getValue();
-        if (filtro == null || filtro.trim().isEmpty()) {
-            grid.setItems(empleadoService.listarEmpleados());
-        } else {
-            String filtroLower = filtro.toLowerCase();
-            grid.setItems(empleadoService.listarEmpleados().stream()
-                .filter(empleado -> 
-                    empleado.getNombre().toLowerCase().contains(filtroLower) ||
-                    empleado.getUsername().toLowerCase().contains(filtroLower) ||
-                    (empleado.getEmail() != null && empleado.getEmail().toLowerCase().contains(filtroLower))
-                )
-                .toList());
-        }
+        // Reconfigurar el data provider con el filtro actualizado
+        configurarLazyDataProvider();
     }
 
     private void abrirDialogoNuevo() {

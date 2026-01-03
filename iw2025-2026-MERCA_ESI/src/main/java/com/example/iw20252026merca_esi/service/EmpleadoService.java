@@ -4,6 +4,8 @@ import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.repository.EmpleadoRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,20 @@ public class EmpleadoService {
      */
     public List<Empleado> listarEmpleados() {
         return empleadoRepository.findAll();
+    }
+
+    /**
+     * Obtiene empleados paginados (para carga lazy)
+     */
+    public Page<Empleado> listarEmpleadosPaginados(Pageable pageable) {
+        return empleadoRepository.findAll(pageable);
+    }
+
+    /**
+     * Cuenta empleados (para carga lazy)
+     */
+    public long contarEmpleados() {
+        return empleadoRepository.count();
     }
 
     /**

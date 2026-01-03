@@ -3,6 +3,8 @@ package com.example.iw20252026merca_esi.service;
 import com.example.iw20252026merca_esi.model.Cliente;
 import com.example.iw20252026merca_esi.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,20 @@ public class ClienteService {
      */
     public List<Cliente> listarClientes() {
         return clienteRepository.findAll();
+    }
+
+    /**
+     * Obtiene clientes paginados (para carga lazy)
+     */
+    public Page<Cliente> listarClientesPaginados(Pageable pageable) {
+        return clienteRepository.findAll(pageable);
+    }
+
+    /**
+     * Cuenta clientes (para carga lazy)
+     */
+    public long contarClientes() {
+        return clienteRepository.count();
     }
 
     /**
