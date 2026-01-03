@@ -380,7 +380,13 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         priceAndBadges.setAlignItems(Alignment.CENTER);
         priceAndBadges.setSpacing(true);
 
-        Span priceTag = new Span(String.format("%.2f €", producto.getPrecio()));
+        String precioTexto;
+        if (producto.getPuntos()) {
+            precioTexto = String.format("%d puntos", producto.getPrecio().intValue());
+        } else {
+            precioTexto = String.format("%.2f €", producto.getPrecio());
+        }
+        Span priceTag = new Span(precioTexto);
         priceTag.getStyle()
                 .set(COLOR, COLOR_1_IS)
                 .set(FONT_WEIGHT, "700")

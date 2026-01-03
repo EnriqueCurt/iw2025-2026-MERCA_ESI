@@ -92,7 +92,7 @@ public class OfertasView extends VerticalLayout {
                 .set(PADDING, "clamp(16px, 3vw, 24px)")
                 .set("flex-wrap", "wrap");
 
-        H1 titulo = new H1("Nuestras Ofertas");
+        H1 titulo = new H1("Ofertas y Puntos");
         titulo.getStyle()
                 .set("margin", "0")
                 .set(COLOR, COLOR_1_IS)
@@ -195,7 +195,7 @@ public class OfertasView extends VerticalLayout {
 
     private void cargarProductos() {
         todosLosProductos = productoService.listarProductosActivos().stream()
-                .filter(Producto::getEsOferta)
+                .filter(p -> p.getEsOferta() || p.getPuntos())
                 .collect(Collectors.toList());
         paginaActual = 0;
         aplicarFiltros();
@@ -219,7 +219,7 @@ public class OfertasView extends VerticalLayout {
         
         if (productosFiltrados.isEmpty()) {
             Div emptyState = new Div();
-            emptyState.setText("No hay ofertas disponibles en este momento.");
+            emptyState.setText("No hay ofertas ni productos por puntos disponibles.");
             emptyState.getStyle()
                     .set("text-align", "center")
                     .set(COLOR, "#666")
@@ -228,24 +228,80 @@ public class OfertasView extends VerticalLayout {
             grid.add(emptyState);
             actualizarPaginacion();
         } else {
-            int inicio = paginaActual * PRODUCTOS_POR_PAGINA;
-            int fin = Math.min(inicio + PRODUCTOS_POR_PAGINA, productosFiltrados.size());
+            // Cambiar el grid a layout vertical para mostrar secciones
+            grid.getStyle()
+                    .set(DISPLAY, "flex")
+                    .set("flex-direction", "column")
+                    .set("gap", "30px");
             
-            for (int i = inicio; i < fin; i++) {
-                grid.add(createProductCard(productosFiltrados.get(i)));
+            // Separar ofertas de productos por puntos
+            List<Producto> ofertas = productosFiltrados.stream()
+                    .filter(Producto::getEsOferta)
+                    .collect(Collectors.toList());
+            List<Producto> productosPuntos = productosFiltrados.stream()
+                    .filter(Producto::getPuntos)
+                    .collect(Collectors.toList());
+            
+            // Sección de Productos por Puntos PRIMERO
+            if (!productosPuntos.isEmpty()) {
+                Div seccionPuntos = crearSeccion("⭐ PRODUCTOS POR PUNTOS", productosPuntos, false);
+                grid.add(seccionPuntos);
+            }
+            
+            // Sección de Ofertas DESPUÉS
+            if (!ofertas.isEmpty()) {
+                Div seccionOfertas = crearSeccion("🔥 OFERTAS ESPECIALES", ofertas, true);
+                grid.add(seccionOfertas);
             }
             
             actualizarPaginacion();
         }
     }
+    
+    private Div crearSeccion(String titulo, List<Producto> productos, boolean esOferta) {
+        Div seccion = new Div();
+        seccion.getStyle()
+                .set("width", "100%")
+                .set("margin-bottom", "40px");
+        
+        // Título de la sección
+        com.vaadin.flow.component.html.H2 tituloSeccion = new com.vaadin.flow.component.html.H2(titulo);
+        tituloSeccion.getStyle()
+                .set("margin", "0 0 20px 0")
+                .set(FONTSIZE, "2rem")
+                .set(FONT_WEIGHT, "700")
+                .set(COLOR, esOferta ? "#FF9800" : "#9C27B0")
+                .set("text-align", "left")
+                .set("border-bottom", esOferta ? "3px solid #FF9800" : "3px solid #9C27B0")
+                .set("padding-bottom", "10px");
+        
+        // Grid de productos
+        Div gridProductos = new Div();
+        gridProductos.getStyle()
+                .set(DISPLAY, "grid")
+                .set("grid-template-columns", "repeat(auto-fill, minmax(220px, 1fr))")
+                .set("gap", "clamp(10px, 2vw, 15px)")
+                .set("width", "100%");
+        
+        for (Producto producto : productos) {
+            gridProductos.add(createProductCard(producto, esOferta));
+        }
+        
+        seccion.add(tituloSeccion, gridProductos);
+        return seccion;
+    }
 
-    private Div createProductCard(Producto producto) {
+    private Div createProductCard(Producto producto, boolean esOferta) {
+        String colorBorde = esOferta ? "#FF9800" : "#9C27B0";
+        String colorSombra = esOferta ? "rgba(255, 152, 0, 0.3)" : "rgba(156, 39, 176, 0.3)";
+        String colorSombraHover = esOferta ? "rgba(255, 152, 0, 0.5)" : "rgba(156, 39, 176, 0.5)";
+        
         Div card = new Div();
         card.getStyle()
                 .set("background", "#ffffff")
                 .set(BORDER_RADIUS, "12px")
-                .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
-                .set("border", "3px solid #FF9800")
+                .set("box-shadow", "0 8px 24px " + colorSombra)
+                .set("border", "3px solid " + colorBorde)
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
                 .set("flex-direction", "column")
@@ -254,16 +310,16 @@ public class OfertasView extends VerticalLayout {
                 .set("transition", "all 0.3s ease")
                 .set("cursor", "pointer");
         
-        // Efecto hover para ofertas
+        // Efecto hover diferenciado
         card.getElement().addEventListener("mouseenter", e -> 
             card.getStyle()
                 .set("transform", "scale(1.05) translateY(-5px)")
-                .set("box-shadow", "0 12px 32px rgba(255, 152, 0, 0.5)")
+                .set("box-shadow", "0 12px 32px " + colorSombraHover)
         );
         card.getElement().addEventListener("mouseleave", e -> 
             card.getStyle()
                 .set("transform", "scale(1)")
-                .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
+                .set("box-shadow", "0 8px 24px " + colorSombra)
         );
 
         Image image;
@@ -313,7 +369,13 @@ public class OfertasView extends VerticalLayout {
         priceAndBadges.setAlignItems(Alignment.CENTER);
         priceAndBadges.setSpacing(true);
 
-        Span priceTag = new Span(String.format("%.2f €", producto.getPrecio()));
+        String precioTexto;
+        if (producto.getPuntos()) {
+            precioTexto = String.format("%d puntos", producto.getPrecio().intValue());
+        } else {
+            precioTexto = String.format("%.2f €", producto.getPrecio());
+        }
+        Span priceTag = new Span(precioTexto);
         priceTag.getStyle()
                 .set(COLOR, COLOR_1_IS)
                 .set(FONT_WEIGHT, "700")
@@ -323,20 +385,22 @@ public class OfertasView extends VerticalLayout {
         badges.setSpacing(true);
         badges.getStyle().set("margin-left", "auto");
 
-        Span ofertaBadge = new Span("OFERTA");
-        ofertaBadge.getStyle()
-                .set(BACKGROUND_COLOR, "#FF9800")
-                .set(COLOR, COLOR_2_IS)
-                .set(PADDING, PADDING_IS)
-                .set(BORDER_RADIUS, "4px")
-                .set(FONTSIZE, FONTSIZE_IS)
-                .set(FONT_WEIGHT, "bold");
-        badges.add(ofertaBadge);
+        if (esOferta && producto.getEsOferta()) {
+            Span ofertaBadge = new Span("OFERTA");
+            ofertaBadge.getStyle()
+                    .set(BACKGROUND_COLOR, "#FF9800")
+                    .set(COLOR, COLOR_2_IS)
+                    .set(PADDING, PADDING_IS)
+                    .set(BORDER_RADIUS, "4px")
+                    .set(FONTSIZE, FONTSIZE_IS)
+                    .set(FONT_WEIGHT, "bold");
+            badges.add(ofertaBadge);
+        }
 
-        if (producto.getPuntos()) {
+        if (!esOferta && producto.getPuntos()) {
             Span puntosBadge = new Span("PUNTOS");
             puntosBadge.getStyle()
-                    .set(BACKGROUND_COLOR, "#4CAF50")
+                    .set(BACKGROUND_COLOR, "#9C27B0")
                     .set(COLOR, COLOR_2_IS)
                     .set(PADDING, PADDING_IS)
                     .set(BORDER_RADIUS, "4px")

@@ -74,9 +74,10 @@ public class CartaView extends VerticalLayout {
                 .set(PADDING, "30px 20px")
                 .set("width", "100%");
 
-        // Obtener productos activos agrupados por categoría
+        // Obtener productos activos agrupados por categoría (excluyendo ofertas y puntos)
         List<Producto> productosActivos = productoService.listarProductosConCategorias().stream()
                 .filter(Producto::getEstado)
+                .filter(p -> !p.getEsOferta() && !p.getPuntos())
                 .collect(Collectors.toList());
         Map<String, List<Producto>> productosPorCategoria = productosActivos.stream()
                 .flatMap(p -> p.getCategorias().stream()
@@ -85,15 +86,6 @@ public class CartaView extends VerticalLayout {
                         Map.Entry::getKey,
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())
                 ));
-
-        // Mostrar sección de ofertas primero si hay ofertas
-        List<Producto> ofertas = productosActivos.stream()
-                .filter(Producto::getEsOferta)
-                .collect(Collectors.toList());
-
-        if (!ofertas.isEmpty()) {
-            mainContainer.add(crearSeccionCategoria("¡OFERTAS ESPECIALES!", ofertas, true));
-        }
 
         // Mostrar cada categoría
         List<Categoria> categorias = categoriaService.listarCategorias();
@@ -255,8 +247,14 @@ public class CartaView extends VerticalLayout {
             badges.add(puntosBadge);
         }
 
-        // Precio
-        Span precio = new Span(String.format("%.2f€", producto.getPrecio()));
+        // Precio o Puntos
+        String precioTexto;
+        if (Boolean.TRUE.equals(producto.getPuntos())) {
+            precioTexto = String.format("%d puntos", producto.getPrecio().intValue());
+        } else {
+            precioTexto = String.format("%.2f€", producto.getPrecio());
+        }
+        Span precio = new Span(precioTexto);
         precio.getStyle()
                 .set(DISPLAY, "block")
                 .set(FONTSIZE, "1.3rem")
