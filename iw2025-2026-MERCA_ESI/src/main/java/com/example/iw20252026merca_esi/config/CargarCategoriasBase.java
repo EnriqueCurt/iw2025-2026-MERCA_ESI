@@ -7,7 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+//@Component
 public class CargarCategoriasBase implements CommandLineRunner {
 
     private final CategoriaRepository categoriaRepository;
@@ -19,9 +19,10 @@ public class CargarCategoriasBase implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        createIfNotExists("Pizza");
-        createIfNotExists("Bebida");
-        createIfNotExists("Burger");
+        // Deshabilitado: No cargar categorías predeterminadas
+        // createIfNotExists("Pizza");
+        // createIfNotExists("Bebida");
+        // createIfNotExists("Burger");
     }
 
     private void createIfNotExists(String nombre) {

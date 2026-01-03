@@ -51,7 +51,7 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
     private List<Producto> todosLosProductos = new ArrayList<>();
     private List<Producto> productosFiltrados = new ArrayList<>();
     private int paginaActual = 0;
-    private static final int PRODUCTOS_POR_PAGINA = 10;
+    private static final int PRODUCTOS_POR_PAGINA = 30;
     private HorizontalLayout paginacion;
     
     private static final String DISPLAY = "display";
@@ -412,7 +412,7 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         if (producto.getPuntos()) {
             Span puntosBadge = new Span("PUNTOS");
             puntosBadge.getStyle()
-                    .set(BACKGROUND_COLOR, "#4CAF50")
+                    .set(BACKGROUND_COLOR, "#9C27B0")
                     .set(COLOR, COLOR_2_IS)
                     .set(PADDING, PADDING_IS)
                     .set(BORDER_RADIUS, "4px")

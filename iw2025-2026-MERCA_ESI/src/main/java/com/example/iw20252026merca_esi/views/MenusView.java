@@ -20,8 +20,14 @@ public class MenusView extends VerticalLayout {
     public MenusView(MenuService menuService) {
         this.menuService = menuService;
 
-        H1 titulo = new H1("Los Menús");
-        titulo.getStyle().set("text-align", "center").set("margin-bottom", "20px");
+        setAlignItems(Alignment.CENTER);
+        setWidthFull();
+
+        H1 titulo = new H1("Menús");
+        titulo.getStyle()
+                .set("text-align", "center")
+                .set("margin-bottom", "20px")
+                .set("color", "#e30613");
         add(titulo);
 
         HorizontalLayout menusLayout = new HorizontalLayout();
