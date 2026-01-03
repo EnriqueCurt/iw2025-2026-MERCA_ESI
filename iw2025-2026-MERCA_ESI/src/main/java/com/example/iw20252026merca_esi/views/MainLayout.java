@@ -101,8 +101,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         rightSection.setSpacing(true);
         rightSection.setAlignItems(Alignment.CENTER);
 
-        // Botón GESTIÓN (solo para administradores)
-        if (esAdministrador()) {
+        // Botón GESTIÓN (para administradores y managers)
+        if (esAdministrador() || esManager()) {
             MenuBar gestionMenuBar = new MenuBar();
             gestionMenuBar.addThemeVariants(com.vaadin.flow.component.menubar.MenuBarVariant.LUMO_TERTIARY);
             gestionMenuBar.getStyle()
@@ -128,10 +128,18 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 getUI().ifPresent(ui -> ui.navigate("productos"))
             );
             
-            MenuItem empleadosItem = gestionSubMenu.addItem("Gestión de Empleados");
-            empleadosItem.addClickListener(e -> 
-                getUI().ifPresent(ui -> ui.navigate("empleados"))
+            MenuItem menusItem = gestionSubMenu.addItem("Gestión de Menús");
+            menusItem.addClickListener(e -> 
+                getUI().ifPresent(ui -> ui.navigate("menus-gestion"))
             );
+            
+            // Gestión de Empleados solo para administradores
+            if (esAdministrador()) {
+                MenuItem empleadosItem = gestionSubMenu.addItem("Gestión de Empleados");
+                empleadosItem.addClickListener(e -> 
+                    getUI().ifPresent(ui -> ui.navigate("empleados"))
+                );
+            }
             
             rightSection.add(gestionMenuBar);
         }
@@ -272,6 +280,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
     private boolean esAdministrador() {
         com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
         return empleado != null && empleado.esAdministrador();
+    }
+
+    /**
+     * Verifica si el usuario actual es manager
+     */
+    private boolean esManager() {
+        com.example.iw20252026merca_esi.model.Empleado empleado = sessionService.getEmpleado();
+        return empleado != null && empleado.esManager();
     }
 
     /**

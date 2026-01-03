@@ -23,4 +23,9 @@ public class MenuService {
     public List<Menu> listarMenus() {
         return menuRepository.findAllWithProductos();
     }
+
+    @Transactional
+    public void eliminarMenu(Integer id) {
+        menuRepository.deleteById(id);
+    }
 }
