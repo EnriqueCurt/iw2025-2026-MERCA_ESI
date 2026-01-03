@@ -1,16 +1,10 @@
 package com.example.iw20252026merca_esi.views;
 
-import com.example.iw20252026merca_esi.model.Categoria;
-import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.Producto;
-import com.example.iw20252026merca_esi.service.CategoriaService;
 import com.example.iw20252026merca_esi.service.ProductoService;
-import com.example.iw20252026merca_esi.service.SessionService;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
@@ -18,41 +12,25 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.Menu;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.RolesAllowed;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@PageTitle("Productos")
-@RolesAllowed("ADMINISTRADOR")
-@Route(value = "productos", layout = MainLayout.class)
-@Menu(title = "Productos")
-public class ProductoView extends VerticalLayout implements BeforeEnterObserver {
+public abstract class CategoriaProductosView extends VerticalLayout {
 
-    private final ProductoService productoService;
-    private final CategoriaService categoriaService;
-    private final SessionService sessionService;
-    private final Div grid;
+    protected final ProductoService productoService;
+    protected final Div grid;
+    protected final Checkbox ofertaFilter = new Checkbox("Solo Ofertas");
+    protected final Checkbox puntosFilter = new Checkbox("Solo Puntos");
     
-    private final ComboBox<Categoria> categoriaFilter = new ComboBox<>("Categoría");
-    private final Checkbox ofertaFilter = new Checkbox("Solo Ofertas");
-    private final Checkbox puntosFilter = new Checkbox("Solo Puntos");
-    
-    private List<Producto> todosLosProductos = new ArrayList<>();
-    private List<Producto> productosFiltrados = new ArrayList<>();
-    private int paginaActual = 0;
-    private static final int PRODUCTOS_POR_PAGINA = 10;
-    private HorizontalLayout paginacion;
+    protected List<Producto> todosLosProductos = new ArrayList<>();
+    protected List<Producto> productosFiltrados = new ArrayList<>();
+    protected int paginaActual = 0;
+    protected static final int PRODUCTOS_POR_PAGINA = 12;
+    protected HorizontalLayout paginacion;
     
     private static final String DISPLAY = "display";
     private static final String PADDING = "padding";
@@ -65,12 +43,9 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
     private static final String FONTSIZE_IS = "0.75rem";
     private static final String FONT_WEIGHT = "font-weight";
     private static final String BORDER_RADIUS = "border-radius";
-    
 
-    public ProductoView(ProductoService productoService, CategoriaService categoriaService, SessionService sessionService) {
+    protected CategoriaProductosView(ProductoService productoService, String titulo, String nombreCategoria) {
         this.productoService = productoService;
-        this.categoriaService = categoriaService;
-        this.sessionService = sessionService;
         
         setSizeFull();
         setSpacing(false);
@@ -80,8 +55,8 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set("box-sizing", "border-box")
                 .set("min-height", "0");
 
-        // Header con título y botones de administración
-        HorizontalLayout header = createHeader();
+        // Header con título
+        HorizontalLayout header = createHeader(titulo);
         
         // Filtros
         HorizontalLayout filtros = createFiltros();
@@ -101,49 +76,25 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         add(header, filtros, grid, paginacion);
         setFlexGrow(1, grid);
 
-        cargarProductos();
+        cargarProductos(nombreCategoria);
     }
 
-    private HorizontalLayout createHeader() {
+    private HorizontalLayout createHeader(String titulo) {
         HorizontalLayout header = new HorizontalLayout();
         header.setWidthFull();
         header.setAlignItems(Alignment.CENTER);
-        header.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        header.setJustifyContentMode(JustifyContentMode.CENTER);
         header.getStyle()
-                .set(PADDING, "clamp(8px, 2vw, 12px)")
-                .set("flex-wrap", "wrap")
-                .set("gap", "10px");
+                .set(PADDING, "clamp(16px, 3vw, 24px)")
+                .set("flex-wrap", "wrap");
 
-        H1 titulo = new H1("Gestión de Productos");
-        titulo.getStyle()
+        H1 tituloH1 = new H1(titulo);
+        tituloH1.getStyle()
                 .set("margin", "0")
-                .set(COLOR, COLOR_1_IS);
+                .set(COLOR, COLOR_1_IS)
+                .set("text-align", "center");
 
-        HorizontalLayout botones = new HorizontalLayout();
-        botones.setSpacing(true);
-        botones.getStyle().set("flex-wrap", "wrap");
-
-        Button crearProductoBtn = new Button("Crear Producto", new Icon(VaadinIcon.PLUS));
-        crearProductoBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        crearProductoBtn.getStyle()
-                .set(BACKGROUND_COLOR, COLOR_1_IS)
-                .set(COLOR, COLOR_2_IS);
-        crearProductoBtn.addClickListener(e -> 
-            UI.getCurrent().navigate("crear-producto")
-        );
-
-        Button crearIngredienteBtn = new Button("Crear Ingrediente", new Icon(VaadinIcon.PLUS_CIRCLE));
-        crearIngredienteBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        crearIngredienteBtn.getStyle()
-                .set(BACKGROUND_COLOR, "#D32F2F")
-                .set(COLOR, COLOR_2_IS);
-        crearIngredienteBtn.addClickListener(e -> 
-            UI.getCurrent().navigate("crear-ingrediente")
-        );
-
-        botones.add(crearProductoBtn, crearIngredienteBtn);
-
-        header.add(titulo, botones);
+        header.add(tituloH1);
         return header;
     }
 
@@ -151,6 +102,7 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         HorizontalLayout filtrosLayout = new HorizontalLayout();
         filtrosLayout.setWidthFull();
         filtrosLayout.setAlignItems(Alignment.CENTER);
+        filtrosLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         filtrosLayout.setSpacing(true);
         filtrosLayout.getStyle()
                 .set(PADDING, "0 clamp(8px, 2vw, 12px)")
@@ -159,16 +111,6 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set(BACKGROUND_COLOR, "#f5f5f5")
                 .set(BORDER_RADIUS, "8px")
                 .set("margin", "0 clamp(8px, 2vw, 12px)");
-        
-        // Configurar ComboBox de categorías
-        categoriaFilter.setItems(categoriaService.listarCategorias());
-        categoriaFilter.setItemLabelGenerator(Categoria::getNombre);
-        categoriaFilter.setPlaceholder("Todas las categorías");
-        categoriaFilter.setClearButtonVisible(true);
-        categoriaFilter.setWidth("200px");
-        categoriaFilter.getStyle()
-                .set("--lumo-primary-color", COLOR_1_IS);
-        categoriaFilter.addValueChangeListener(e -> aplicarFiltros());
         
         // Configurar Checkbox de ofertas
         ofertaFilter.getStyle()
@@ -187,13 +129,12 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         limpiarFiltrosBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         limpiarFiltrosBtn.getStyle().set(COLOR, COLOR_1_IS);
         limpiarFiltrosBtn.addClickListener(e -> {
-            categoriaFilter.clear();
             ofertaFilter.setValue(false);
             puntosFilter.setValue(false);
             aplicarFiltros();
         });
         
-        filtrosLayout.add(categoriaFilter, ofertaFilter, puntosFilter, limpiarFiltrosBtn);
+        filtrosLayout.add(ofertaFilter, puntosFilter, limpiarFiltrosBtn);
         return filtrosLayout;
     }
 
@@ -257,24 +198,15 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         paginacion.add(btnPrimera, btnAnterior, infoPagina, btnSiguiente, btnUltima);
     }
 
-    private void cargarProductos() {
-        todosLosProductos = productoService.listarProductosConCategorias();
+    private void cargarProductos(String nombreCategoria) {
+        // Cargar solo productos activos de la categoría
+        todosLosProductos = productoService.findByCategoriaNombre(nombreCategoria);
         paginaActual = 0;
         aplicarFiltros();
     }
 
     private void aplicarFiltros() {
         productosFiltrados = new ArrayList<>(todosLosProductos);
-        
-        // Aplicar filtro de categoría
-        if (categoriaFilter.getValue() != null) {
-            Categoria categoriaSeleccionada = categoriaFilter.getValue();
-            productosFiltrados = productosFiltrados.stream()
-                    .filter(p -> p.getCategorias() != null && 
-                                 p.getCategorias().stream()
-                                         .anyMatch(c -> c.getIdCategoria().equals(categoriaSeleccionada.getIdCategoria())))
-                    .collect(Collectors.toList());
-        }
         
         // Aplicar filtro de ofertas
         if (ofertaFilter.getValue()) {
@@ -299,7 +231,7 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
         
         if (productosFiltrados.isEmpty()) {
             Div emptyState = new Div();
-            emptyState.setText("No hay productos disponibles. Crea uno nuevo usando el botón 'Crear Producto'.");
+            emptyState.setText("No hay productos disponibles en esta categoría.");
             emptyState.getStyle()
                     .set("text-align", "center")
                     .set(COLOR, "#666")
@@ -308,23 +240,93 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
             grid.add(emptyState);
             actualizarPaginacion();
         } else {
-            int inicio = paginaActual * PRODUCTOS_POR_PAGINA;
-            int fin = Math.min(inicio + PRODUCTOS_POR_PAGINA, productosFiltrados.size());
+            // Separar ofertas de productos normales
+            List<Producto> ofertas = productosFiltrados.stream()
+                    .filter(Producto::getEsOferta)
+                    .collect(Collectors.toList());
+            List<Producto> productosNormales = productosFiltrados.stream()
+                    .filter(p -> !p.getEsOferta())
+                    .collect(Collectors.toList());
             
-            for (int i = inicio; i < fin; i++) {
-                grid.add(createProductCard(productosFiltrados.get(i)));
+            // Si hay ofertas, mostrar sección destacada
+            if (!ofertas.isEmpty()) {
+                // Título de sección de ofertas
+                Div seccionOfertas = new Div();
+                seccionOfertas.getStyle()
+                        .set("grid-column", "1 / -1")
+                        .set("margin-bottom", "10px");
+                
+                com.vaadin.flow.component.html.H2 tituloOfertas = new com.vaadin.flow.component.html.H2("¡OFERTAS ESPECIALES!");
+                tituloOfertas.getStyle()
+                        .set("margin", "20px 0 10px 0")
+                        .set(COLOR, "#FF9800")
+                        .set(FONT_WEIGHT, "800")
+                        .set("text-align", "center")
+                        .set(FONTSIZE, "1.5rem")
+                        .set("text-transform", "uppercase");
+                
+                seccionOfertas.add(tituloOfertas);
+                grid.add(seccionOfertas);
+                
+                // Mostrar ofertas
+                for (Producto oferta : ofertas) {
+                    grid.add(createProductCard(oferta, true));
+                }
+                
+                // Separador si también hay productos normales
+                if (!productosNormales.isEmpty()) {
+                    Div separador = new Div();
+                    separador.getStyle()
+                            .set("grid-column", "1 / -1")
+                            .set("height", "2px")
+                            .set(BACKGROUND_COLOR, "#e0e0e0")
+                            .set("margin", "20px 0");
+                    grid.add(separador);
+                    
+                    // Título de productos normales
+                    Div seccionNormales = new Div();
+                    seccionNormales.getStyle()
+                            .set("grid-column", "1 / -1")
+                            .set("margin-bottom", "10px");
+                    
+                    com.vaadin.flow.component.html.H2 tituloNormales = new com.vaadin.flow.component.html.H2("Otros Productos");
+                    tituloNormales.getStyle()
+                            .set("margin", "10px 0")
+                            .set(COLOR, "#666")
+                            .set(FONT_WEIGHT, "600")
+                            .set("text-align", "center")
+                            .set(FONTSIZE, "1.2rem");
+                    
+                    seccionNormales.add(tituloNormales);
+                    grid.add(seccionNormales);
+                }
+            }
+            
+            // Mostrar productos normales (aplicando paginación)
+            int inicio = paginaActual * PRODUCTOS_POR_PAGINA;
+            int totalProductosMostrados = ofertas.size();
+            
+            // Ajustar inicio considerando las ofertas ya mostradas
+            int inicioNormales = Math.max(0, inicio - totalProductosMostrados);
+            int finNormales = Math.min(inicioNormales + (PRODUCTOS_POR_PAGINA - Math.min(ofertas.size(), PRODUCTOS_POR_PAGINA)), productosNormales.size());
+            
+            for (int i = inicioNormales; i < finNormales; i++) {
+                grid.add(createProductCard(productosNormales.get(i), false));
             }
             
             actualizarPaginacion();
         }
     }
-
+    
     private Div createProductCard(Producto producto) {
+        return createProductCard(producto, false);
+    }
+
+    private Div createProductCard(Producto producto, boolean destacada) {
         Div card = new Div();
         card.getStyle()
                 .set("background", "#ffffff")
                 .set(BORDER_RADIUS, "12px")
-                .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
                 .set("flex-direction", "column")
@@ -333,21 +335,52 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set("transition", "all 0.3s ease")
                 .set("cursor", "pointer");
         
-        // Efecto hover
-        card.getElement().addEventListener("mouseenter", e -> 
+        // Si es oferta destacada, añadir borde dorado y sombra más pronunciada
+        if (destacada) {
             card.getStyle()
-                .set("transform", "translateY(-8px)")
-                .set("box-shadow", "0 12px 24px rgba(0,0,0,0.20)")
-        );
-        card.getElement().addEventListener("mouseleave", e -> 
+                    .set("border", "3px solid #FF9800")
+                    .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
+                    .set("transform", "scale(1.02)");
+            
+            // Efecto hover para ofertas destacadas
+            card.getElement().addEventListener("mouseenter", e -> 
+                card.getStyle()
+                    .set("transform", "scale(1.05) translateY(-5px)")
+                    .set("box-shadow", "0 12px 32px rgba(255, 152, 0, 0.5)")
+            );
+            card.getElement().addEventListener("mouseleave", e -> 
+                card.getStyle()
+                    .set("transform", "scale(1.02)")
+                    .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
+            );
+        } else {
             card.getStyle()
-                .set("transform", "translateY(0)")
-                .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
-        );
+                    .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)");
+            
+            // Efecto hover para productos normales
+            card.getElement().addEventListener("mouseenter", e -> 
+                card.getStyle()
+                    .set("transform", "translateY(-8px)")
+                    .set("box-shadow", "0 12px 28px rgba(0,0,0,0.20)")
+            );
+            card.getElement().addEventListener("mouseleave", e -> 
+                card.getStyle()
+                    .set("transform", "translateY(0)")
+                    .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
+            );
+        }
 
-        // Imagen placeholder (puedes agregar campo imagen en el modelo Producto más adelante)
-        Image image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250", 
-                                producto.getNombre());
+        // Imagen
+        Image image;
+        if (producto.getImagen() != null && producto.getImagen().length > 0) {
+            image = new Image();
+            String base64 = java.util.Base64.getEncoder().encodeToString(producto.getImagen());
+            image.setSrc("data:image/jpeg;base64," + base64);
+            image.setAlt(producto.getNombre());
+        } else {
+            image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250", 
+                            producto.getNombre());
+        }
         image.setWidth("100%");
         image.setHeight("auto");
         image.getStyle()
@@ -373,7 +406,12 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set(DISPLAY, "block")
                 .set(COLOR, "#555")
                 .set(FONTSIZE, "clamp(0.85rem, 1.8vw, 0.9rem)")
-                .set(FONTSIZE, "clamp(0.9rem, 2vw, 0.95rem)");
+                .set("line-height", "1.4")
+                .set("overflow", "hidden")
+                .set("text-overflow", "ellipsis")
+                .set("display", "-webkit-box")
+                .set("-webkit-line-clamp", "2")
+                .set("-webkit-box-orient", "vertical");
 
         HorizontalLayout priceAndBadges = new HorizontalLayout();
         priceAndBadges.setWidthFull();
@@ -415,62 +453,22 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
             badges.add(puntosBadge);
         }
 
-        if (!producto.getEstado()) {
-            Span inactivoBadge = new Span("INACTIVO");
-            inactivoBadge.getStyle()
-                    .set(BACKGROUND_COLOR, "#9E9E9E")
-                    .set(COLOR, COLOR_2_IS)
-                    .set(PADDING, PADDING_IS)
-                    .set(BORDER_RADIUS, "4px")
-                    .set(FONTSIZE, FONTSIZE_IS)
-                    .set(FONT_WEIGHT, "bold");
-            badges.add(inactivoBadge);
-        }
-
         priceAndBadges.add(priceTag, badges);
 
-        HorizontalLayout actions = new HorizontalLayout();
-        actions.setWidthFull();
-        actions.setSpacing(true);
-        actions.getStyle().set("margin-top", "auto");
+        Button pedirBtn = new Button("PEDIR");
+        pedirBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        pedirBtn.setWidthFull();
+        pedirBtn.getStyle()
+                .set(BACKGROUND_COLOR, COLOR_1_IS)
+                .set(COLOR, COLOR_2_IS)
+                .set("margin-top", "auto");
+        pedirBtn.addClickListener(e -> {
+            // Aquí iría la lógica para añadir al carrito
+            System.out.println("Añadido al carrito: " + producto.getNombre());
+        });
 
-        Button editBtn = new Button("Editar", new Icon(VaadinIcon.EDIT));
-        editBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        editBtn.getStyle().set(COLOR, COLOR_1_IS);
-        editBtn.addClickListener(e -> 
-            UI.getCurrent().navigate("crear-producto/" + producto.getIdProducto())
-        );
-
-        Button deleteBtn = new Button("Eliminar", new Icon(VaadinIcon.TRASH));
-        deleteBtn.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
-        deleteBtn.addClickListener(e -> eliminarProducto(producto));
-
-        actions.add(editBtn, deleteBtn);
-
-        content.add(h3, desc, priceAndBadges, actions);
+        content.add(h3, desc, priceAndBadges, pedirBtn);
         card.add(image, content);
         return card;
-    }
-
-    private void eliminarProducto(Producto producto) {
-        try {
-            productoService.eliminarProducto(producto.getIdProducto());
-            Notification.show("Producto eliminado correctamente")
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            aplicarFiltros();
-        } catch (Exception e) {
-            Notification.show("Error al eliminar el producto: " + e.getMessage())
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
-        }
-    }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        Empleado empleado = sessionService.getEmpleado();
-        if (empleado == null) {
-            event.rerouteTo("");
-            Notification.show("Acceso denegado.")
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
-        }
     }
 }
