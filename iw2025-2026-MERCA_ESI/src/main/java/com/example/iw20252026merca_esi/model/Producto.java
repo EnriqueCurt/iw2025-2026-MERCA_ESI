@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "productos")
+@Table(name = "productos",
+    indexes = {
+        @Index(name = "idx_producto_estado", columnList = "estado"),
+        @Index(name = "idx_producto_oferta", columnList = "es_oferta")
+    }
+)
 public class Producto {
 
     @Id
