@@ -1,17 +1,14 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Cliente;
 import com.example.iw20252026merca_esi.model.Empleado;
-import com.example.iw20252026merca_esi.model.Rol;
-import com.example.iw20252026merca_esi.service.EmpleadoService;
-import com.example.iw20252026merca_esi.service.RolService;
+import com.example.iw20252026merca_esi.service.ClienteService;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
@@ -20,9 +17,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
@@ -30,23 +27,19 @@ import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.stream.Collectors;
-
-@Route(value = "empleados", layout = MainLayout.class)
-@PageTitle("Gestión de Empleados - MercaESI")
+@Route(value = "clientes", layout = MainLayout.class)
+@PageTitle("Gestión de Clientes - MercaESI")
 @RolesAllowed("ADMINISTRADOR")
-public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterObserver {
+public class GestionClientesView extends VerticalLayout implements BeforeEnterObserver {
 
-    private final EmpleadoService empleadoService;
-    private final RolService rolService;
+    private final ClienteService clienteService;
     private final SessionService sessionService;
-    private Grid<Empleado> grid;
+    private Grid<Cliente> grid;
     private TextField searchField;
 
     @Autowired
-    public GestionEmpleadosView(EmpleadoService empleadoService, RolService rolService, SessionService sessionService) {
-        this.empleadoService = empleadoService;
-        this.rolService = rolService;
+    public GestionClientesView(ClienteService clienteService, SessionService sessionService) {
+        this.clienteService = clienteService;
         this.sessionService = sessionService;
 
         setSizeFull();
@@ -54,11 +47,11 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         setSpacing(true);
 
         // Título
-        H2 titulo = new H2("Gestión de Empleados");
+        H2 titulo = new H2("Gestión de Clientes");
         titulo.getStyle().set("color", "#D32F2F");
 
-        // Botón para crear nuevo empleado
-        Button btnNuevo = new Button("Nuevo Empleado", new Icon(VaadinIcon.PLUS));
+        // Botón para crear nuevo cliente
+        Button btnNuevo = new Button("Nuevo Cliente", new Icon(VaadinIcon.PLUS));
         btnNuevo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNuevo.getStyle().set("background-color", "#D32F2F");
         btnNuevo.addClickListener(e -> abrirDialogoNuevo());
@@ -86,7 +79,7 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
     public void beforeEnter(BeforeEnterEvent event) {
         // Verificar que el usuario esté autenticado
         Empleado empleado = sessionService.getEmpleado();
-        if (empleado == null) {
+        if (empleado == null || !empleado.esAdministrador()) {
             event.rerouteTo("");
             Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -94,37 +87,30 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
     }
 
     private void configurarGrid() {
-        grid = new Grid<>(Empleado.class, false);
+        grid = new Grid<>(Cliente.class, false);
         grid.setHeight("600px");
         grid.setWidthFull();
 
         // Columnas
-        grid.addColumn(Empleado::getIdEmpleado).setHeader("ID").setWidth("80px").setFlexGrow(0);
-        grid.addColumn(Empleado::getNombre).setHeader("Nombre").setSortable(true);
-        grid.addColumn(Empleado::getUsername).setHeader("Usuario").setSortable(true);
-        grid.addColumn(Empleado::getEmail).setHeader("Email").setSortable(true);
-        grid.addColumn(Empleado::getTelefono).setHeader("Teléfono");
-        grid.addColumn(empleado -> {
-            if (empleado.getRoles() != null && !empleado.getRoles().isEmpty()) {
-                return empleado.getRoles().stream()
-                        .map(Rol::getNombre)
-                        .collect(Collectors.joining(", "));
-            }
-            return "Sin roles";
-        }).setHeader("Roles").setSortable(false);
+        grid.addColumn(Cliente::getIdCliente).setHeader("ID").setWidth("80px").setFlexGrow(0);
+        grid.addColumn(Cliente::getNombre).setHeader("Nombre").setSortable(true);
+        grid.addColumn(Cliente::getUsername).setHeader("Usuario").setSortable(true);
+        grid.addColumn(Cliente::getEmail).setHeader("Email").setSortable(true);
+        grid.addColumn(Cliente::getTelefono).setHeader("Teléfono");
+        grid.addColumn(Cliente::getPuntos).setHeader("Puntos").setSortable(true).setWidth("100px");
 
         // Columna de acciones
-        grid.addComponentColumn(empleado -> {
+        grid.addComponentColumn(cliente -> {
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
 
             Button btnEditar = new Button(new Icon(VaadinIcon.EDIT));
             btnEditar.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
-            btnEditar.addClickListener(e -> abrirDialogoEditar(empleado));
+            btnEditar.addClickListener(e -> abrirDialogoEditar(cliente));
 
             Button btnEliminar = new Button(new Icon(VaadinIcon.TRASH));
             btnEliminar.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-            btnEliminar.addClickListener(e -> confirmarEliminar(empleado));
+            btnEliminar.addClickListener(e -> confirmarEliminar(cliente));
 
             actions.add(btnEditar, btnEliminar);
             return actions;
@@ -137,14 +123,14 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
     private void actualizarGrid() {
         String filtro = searchField.getValue();
         if (filtro == null || filtro.trim().isEmpty()) {
-            grid.setItems(empleadoService.listarEmpleados());
+            grid.setItems(clienteService.listarClientes());
         } else {
             String filtroLower = filtro.toLowerCase();
-            grid.setItems(empleadoService.listarEmpleados().stream()
-                .filter(empleado -> 
-                    empleado.getNombre().toLowerCase().contains(filtroLower) ||
-                    empleado.getUsername().toLowerCase().contains(filtroLower) ||
-                    (empleado.getEmail() != null && empleado.getEmail().toLowerCase().contains(filtroLower))
+            grid.setItems(clienteService.listarClientes().stream()
+                .filter(cliente -> 
+                    cliente.getNombre().toLowerCase().contains(filtroLower) ||
+                    cliente.getUsername().toLowerCase().contains(filtroLower) ||
+                    (cliente.getEmail() != null && cliente.getEmail().toLowerCase().contains(filtroLower))
                 )
                 .toList());
         }
@@ -152,7 +138,7 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
 
     private void abrirDialogoNuevo() {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Nuevo Empleado");
+        dialog.setHeaderTitle("Nuevo Cliente");
         dialog.setWidth("500px");
 
         // Formulario
@@ -175,14 +161,12 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         passwordField.setWidthFull();
         passwordField.setRequired(true);
 
-        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>("Roles");
-        rolesCombo.setWidthFull();
-        rolesCombo.setItems(rolService.listarRoles().stream()
-                .map(Rol::getNombre)
-                .toList());
-        rolesCombo.setHelperText("Seleccione uno o más roles");
+        IntegerField puntosField = new IntegerField("Puntos");
+        puntosField.setWidthFull();
+        puntosField.setValue(0);
+        puntosField.setMin(0);
 
-        FormLayout formLayout = new FormLayout(nombreField, usernameField, emailField, telefonoField, passwordField, rolesCombo);
+        FormLayout formLayout = new FormLayout(nombreField, usernameField, emailField, telefonoField, passwordField, puntosField);
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1)
         );
@@ -190,29 +174,19 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         // Botones
         Button btnGuardar = new Button("Guardar", e -> {
             try {
-                Empleado nuevoEmpleado = new Empleado();
-                nuevoEmpleado.setNombre(nombreField.getValue());
-                nuevoEmpleado.setUsername(usernameField.getValue());
-                nuevoEmpleado.setEmail(emailField.getValue());
-                nuevoEmpleado.setTelefono(telefonoField.getValue().isEmpty() ? null : telefonoField.getValue());
-                nuevoEmpleado.setContrasena(passwordField.getValue());
+                Cliente nuevoCliente = new Cliente();
+                nuevoCliente.setNombre(nombreField.getValue());
+                nuevoCliente.setUsername(usernameField.getValue());
+                nuevoCliente.setEmail(emailField.getValue());
+                nuevoCliente.setTelefono(telefonoField.getValue().isEmpty() ? null : telefonoField.getValue());
+                nuevoCliente.setContrasena(passwordField.getValue());
+                nuevoCliente.setPuntos(puntosField.getValue());
 
-                empleadoService.registrarEmpleado(nuevoEmpleado);
-
-                // Asignar roles si se especificaron
-                if (!rolesCombo.getValue().isEmpty()) {
-                    for (String rol : rolesCombo.getValue()) {
-                        try {
-                            empleadoService.asignarRolAEmpleado(nuevoEmpleado.getIdEmpleado(), rol.toUpperCase());
-                        } catch (Exception ex) {
-                            // Ignorar si el rol no existe
-                        }
-                    }
-                }
+                clienteService.registrarCliente(nuevoCliente);
 
                 actualizarGrid();
                 dialog.close();
-                Notification.show("Empleado creado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                Notification.show("Cliente creado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
                 Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
@@ -230,45 +204,38 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         dialog.open();
     }
 
-    private void abrirDialogoEditar(Empleado empleado) {
+    private void abrirDialogoEditar(Cliente cliente) {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Editar Empleado");
+        dialog.setHeaderTitle("Editar Cliente");
         dialog.setWidth("500px");
 
         // Formulario
         TextField nombreField = new TextField("Nombre");
-        nombreField.setValue(empleado.getNombre());
+        nombreField.setValue(cliente.getNombre());
         nombreField.setWidthFull();
 
         TextField usernameField = new TextField("Usuario");
-        usernameField.setValue(empleado.getUsername());
+        usernameField.setValue(cliente.getUsername());
         usernameField.setWidthFull();
 
         TextField emailField = new TextField("Email");
-        emailField.setValue(empleado.getEmail());
+        emailField.setValue(cliente.getEmail());
         emailField.setWidthFull();
 
         TextField telefonoField = new TextField("Teléfono");
-        telefonoField.setValue(empleado.getTelefono() != null ? empleado.getTelefono() : "");
+        telefonoField.setValue(cliente.getTelefono() != null ? cliente.getTelefono() : "");
         telefonoField.setWidthFull();
 
         PasswordField passwordField = new PasswordField("Nueva Contraseña");
         passwordField.setWidthFull();
         passwordField.setHelperText("Dejar en blanco para mantener la actual");
 
-        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>("Roles");
-        rolesCombo.setWidthFull();
-        rolesCombo.setItems(rolService.listarRoles().stream()
-                .map(Rol::getNombre)
-                .toList());
-        if (empleado.getRoles() != null && !empleado.getRoles().isEmpty()) {
-            rolesCombo.setValue(empleado.getRoles().stream()
-                    .map(Rol::getNombre)
-                    .collect(Collectors.toSet()));
-        }
-        rolesCombo.setHelperText("Seleccione uno o más roles");
+        IntegerField puntosField = new IntegerField("Puntos");
+        puntosField.setValue(cliente.getPuntos());
+        puntosField.setWidthFull();
+        puntosField.setMin(0);
 
-        FormLayout formLayout = new FormLayout(nombreField, usernameField, emailField, telefonoField, passwordField, rolesCombo);
+        FormLayout formLayout = new FormLayout(nombreField, usernameField, emailField, telefonoField, passwordField, puntosField);
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1)
         );
@@ -276,27 +243,22 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         // Botones
         Button btnGuardar = new Button("Guardar", e -> {
             try {
-                Empleado empleadoActualizado = new Empleado();
-                empleadoActualizado.setNombre(nombreField.getValue());
-                empleadoActualizado.setUsername(usernameField.getValue());
-                empleadoActualizado.setEmail(emailField.getValue());
-                empleadoActualizado.setTelefono(telefonoField.getValue().isEmpty() ? null : telefonoField.getValue());
+                Cliente clienteActualizado = new Cliente();
+                clienteActualizado.setNombre(nombreField.getValue());
+                clienteActualizado.setUsername(usernameField.getValue());
+                clienteActualizado.setEmail(emailField.getValue());
+                clienteActualizado.setTelefono(telefonoField.getValue().isEmpty() ? null : telefonoField.getValue());
+                clienteActualizado.setPuntos(puntosField.getValue());
                 
                 if (!passwordField.getValue().isEmpty()) {
-                    empleadoActualizado.setContrasena(passwordField.getValue());
+                    clienteActualizado.setContrasena(passwordField.getValue());
                 }
 
-                empleadoService.actualizarEmpleado(empleado.getIdEmpleado(), empleadoActualizado);
-
-                // Actualizar roles
-                if (!rolesCombo.getValue().isEmpty()) {
-                    java.util.Set<String> rolesSet = new java.util.HashSet<>(rolesCombo.getValue());
-                    empleadoService.establecerRolesDeEmpleado(empleado.getIdEmpleado(), rolesSet);
-                }
+                clienteService.actualizarCliente(cliente.getIdCliente(), clienteActualizado);
 
                 actualizarGrid();
                 dialog.close();
-                Notification.show("Empleado actualizado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                Notification.show("Cliente actualizado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
                 Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
@@ -314,20 +276,20 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         dialog.open();
     }
 
-    private void confirmarEliminar(Empleado empleado) {
+    private void confirmarEliminar(Cliente cliente) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Confirmar eliminación");
         
         Div contenido = new Div();
-        contenido.setText("¿Está seguro que desea eliminar al empleado '" + empleado.getNombre() + "'?");
+        contenido.setText("¿Está seguro que desea eliminar al cliente '" + cliente.getNombre() + "'?");
         contenido.getStyle().set("padding", "20px");
 
         Button btnConfirmar = new Button("Eliminar", e -> {
             try {
-                empleadoService.eliminarEmpleado(empleado.getIdEmpleado());
+                clienteService.eliminarCliente(cliente.getIdCliente());
                 actualizarGrid();
                 dialog.close();
-                Notification.show("Empleado eliminado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                Notification.show("Cliente eliminado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
                 Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }

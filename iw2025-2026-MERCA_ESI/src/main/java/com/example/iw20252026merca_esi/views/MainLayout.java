@@ -139,6 +139,11 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 empleadosItem.addClickListener(e -> 
                     getUI().ifPresent(ui -> ui.navigate("empleados"))
                 );
+                
+                MenuItem clientesItem = gestionSubMenu.addItem("Gestión de Clientes");
+                clientesItem.addClickListener(e -> 
+                    getUI().ifPresent(ui -> ui.navigate("clientes"))
+                );
             }
             
             rightSection.add(gestionMenuBar);
