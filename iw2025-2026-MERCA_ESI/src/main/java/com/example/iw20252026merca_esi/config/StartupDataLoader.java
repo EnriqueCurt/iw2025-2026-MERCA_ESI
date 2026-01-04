@@ -10,6 +10,7 @@ import com.example.iw20252026merca_esi.util.RolEnum;
 import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,9 @@ public class StartupDataLoader implements ApplicationRunner {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Value("${app.admin.default-password}")
+    private String adminDefaultPassword;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -52,7 +56,7 @@ public class StartupDataLoader implements ApplicationRunner {
             Empleado admin = new Empleado();
             admin.setNombre("admin");
             admin.setUsername("admin");
-            admin.setContrasena(passwordEncoder.encode("123456"));
+            admin.setContrasena(passwordEncoder.encode(adminDefaultPassword));
             admin.setEmail("admin@mail.com");
             admin.setTelefono(null);
             
