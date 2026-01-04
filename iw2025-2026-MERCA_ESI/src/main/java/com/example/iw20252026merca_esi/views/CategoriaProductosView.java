@@ -36,13 +36,20 @@ public abstract class CategoriaProductosView extends VerticalLayout {
     private static final String PADDING = "padding";
     private static final String PADDING_IS = "2px 8px";
     private static final String COLOR = "color";
-    private static final String COLOR_1_IS = "#e30613";
-    private static final String COLOR_2_IS = "white";
+    private static final String COLOR2 = "#e30613";
+    private static final String COLOR1 = "white";
     private static final String BACKGROUND_COLOR = "background-color";
     private static final String FONTSIZE = "font-size";
     private static final String FONTSIZE_IS = "0.75rem";
     private static final String FONT_WEIGHT = "font-weight";
     private static final String BORDER_RADIUS = "border-radius";
+    private static final String MARGIN = "margin";
+    private static final String CENTER = "center";
+    private static final String TEXTALIGN = "text-align";
+    private static final String GRIDCOLUMN = "grid-column";
+    private static final String GRIDCOLUMN1 = "1 / -1";
+    private static final String BOXSHADOW = "box-shadow";
+    private static final String TRANSFORM = "transform";
 
     protected CategoriaProductosView(ProductoService productoService, String titulo, String nombreCategoria) {
         this.productoService = productoService;
@@ -90,9 +97,9 @@ public abstract class CategoriaProductosView extends VerticalLayout {
 
         H1 tituloH1 = new H1(titulo);
         tituloH1.getStyle()
-                .set("margin", "0")
-                .set(COLOR, COLOR_1_IS)
-                .set("text-align", "center");
+                .set(MARGIN, "0")
+                .set(COLOR, COLOR2)
+                .set(TEXTALIGN, CENTER);
 
         header.add(tituloH1);
         return header;
@@ -110,24 +117,24 @@ public abstract class CategoriaProductosView extends VerticalLayout {
                 .set("gap", "15px")
                 .set(BACKGROUND_COLOR, "#f5f5f5")
                 .set(BORDER_RADIUS, "8px")
-                .set("margin", "0 clamp(8px, 2vw, 12px)");
+                .set(MARGIN, "0 clamp(8px, 2vw, 12px)");
         
         // Configurar Checkbox de ofertas
         ofertaFilter.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", COLOR_2_IS)
-                .set("--lumo-primary-color", COLOR_1_IS);
+                .set("--vaadin-checkbox-checkmark-color", COLOR1)
+                .set("--lumo-primary-color", COLOR2);
         ofertaFilter.addValueChangeListener(e -> aplicarFiltros());
         
         // Configurar Checkbox de puntos
         puntosFilter.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", COLOR_2_IS)
-                .set("--lumo-primary-color", COLOR_1_IS);
+                .set("--vaadin-checkbox-checkmark-color", COLOR1)
+                .set("--lumo-primary-color", COLOR2);
         puntosFilter.addValueChangeListener(e -> aplicarFiltros());
         
         // Botón para limpiar filtros
         Button limpiarFiltrosBtn = new Button("Limpiar Filtros", new Icon(VaadinIcon.CLOSE_CIRCLE));
         limpiarFiltrosBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        limpiarFiltrosBtn.getStyle().set(COLOR, COLOR_1_IS);
+        limpiarFiltrosBtn.getStyle().set(COLOR, COLOR2);
         limpiarFiltrosBtn.addClickListener(e -> {
             ofertaFilter.setValue(false);
             puntosFilter.setValue(false);
@@ -177,7 +184,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
         Span infoPagina = new Span("Página " + (paginaActual + 1) + " de " + totalPaginas);
         infoPagina.getStyle()
                 .set(FONT_WEIGHT, "600")
-                .set(COLOR, COLOR_1_IS);
+                .set(COLOR, COLOR2);
         
         Button btnSiguiente = new Button("Siguiente", new Icon(VaadinIcon.ANGLE_RIGHT));
         btnSiguiente.setIconAfterText(true);
@@ -233,7 +240,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
             Div emptyState = new Div();
             emptyState.setText("No hay productos disponibles en esta categoría.");
             emptyState.getStyle()
-                    .set("text-align", "center")
+                    .set(TEXTALIGN, CENTER)
                     .set(COLOR, "#666")
                     .set(PADDING, "40px")
                     .set(FONTSIZE, "1.1rem");
@@ -253,15 +260,15 @@ public abstract class CategoriaProductosView extends VerticalLayout {
                 // Título de sección de ofertas
                 Div seccionOfertas = new Div();
                 seccionOfertas.getStyle()
-                        .set("grid-column", "1 / -1")
+                        .set(GRIDCOLUMN, GRIDCOLUMN1)
                         .set("margin-bottom", "10px");
                 
                 com.vaadin.flow.component.html.H2 tituloOfertas = new com.vaadin.flow.component.html.H2("¡OFERTAS ESPECIALES!");
                 tituloOfertas.getStyle()
-                        .set("margin", "20px 0 10px 0")
+                        .set(MARGIN, "20px 0 10px 0")
                         .set(COLOR, "#FF9800")
                         .set(FONT_WEIGHT, "800")
-                        .set("text-align", "center")
+                        .set(TEXTALIGN, CENTER)
                         .set(FONTSIZE, "1.5rem")
                         .set("text-transform", "uppercase");
                 
@@ -277,24 +284,24 @@ public abstract class CategoriaProductosView extends VerticalLayout {
                 if (!productosNormales.isEmpty()) {
                     Div separador = new Div();
                     separador.getStyle()
-                            .set("grid-column", "1 / -1")
+                            .set(GRIDCOLUMN, GRIDCOLUMN1)
                             .set("height", "2px")
                             .set(BACKGROUND_COLOR, "#e0e0e0")
-                            .set("margin", "20px 0");
+                            .set(MARGIN, "20px 0");
                     grid.add(separador);
                     
                     // Título de productos normales
                     Div seccionNormales = new Div();
                     seccionNormales.getStyle()
-                            .set("grid-column", "1 / -1")
+                            .set(GRIDCOLUMN, GRIDCOLUMN1)
                             .set("margin-bottom", "10px");
                     
                     com.vaadin.flow.component.html.H2 tituloNormales = new com.vaadin.flow.component.html.H2("Otros Productos");
                     tituloNormales.getStyle()
-                            .set("margin", "10px 0")
+                            .set(MARGIN, "10px 0")
                             .set(COLOR, "#666")
                             .set(FONT_WEIGHT, "600")
-                            .set("text-align", "center")
+                            .set(TEXTALIGN, CENTER)
                             .set(FONTSIZE, "1.2rem");
                     
                     seccionNormales.add(tituloNormales);
@@ -339,34 +346,34 @@ public abstract class CategoriaProductosView extends VerticalLayout {
         if (destacada) {
             card.getStyle()
                     .set("border", "3px solid #FF9800")
-                    .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
-                    .set("transform", "scale(1.02)");
+                    .set(BOXSHADOW, "0 8px 24px rgba(255, 152, 0, 0.3)")
+                    .set(TRANSFORM, "scale(1.02)");
             
             // Efecto hover para ofertas destacadas
             card.getElement().addEventListener("mouseenter", e -> 
                 card.getStyle()
-                    .set("transform", "scale(1.05) translateY(-5px)")
-                    .set("box-shadow", "0 12px 32px rgba(255, 152, 0, 0.5)")
+                    .set(TRANSFORM, "scale(1.05) translateY(-5px)")
+                    .set(BOXSHADOW, "0 12px 32px rgba(255, 152, 0, 0.5)")
             );
             card.getElement().addEventListener("mouseleave", e -> 
                 card.getStyle()
-                    .set("transform", "scale(1.02)")
-                    .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
+                    .set(TRANSFORM, "scale(1.02)")
+                    .set(BOXSHADOW, "0 8px 24px rgba(255, 152, 0, 0.3)")
             );
         } else {
             card.getStyle()
-                    .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)");
+                    .set(BOXSHADOW, "0 4px 14px rgba(0,0,0,0.10)");
             
             // Efecto hover para productos normales
             card.getElement().addEventListener("mouseenter", e -> 
                 card.getStyle()
-                    .set("transform", "translateY(-8px)")
-                    .set("box-shadow", "0 12px 28px rgba(0,0,0,0.20)")
+                    .set(TRANSFORM, "translateY(-8px)")
+                    .set(BOXSHADOW, "0 12px 28px rgba(0,0,0,0.20)")
             );
             card.getElement().addEventListener("mouseleave", e -> 
                 card.getStyle()
-                    .set("transform", "translateY(0)")
-                    .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
+                    .set(TRANSFORM, "translateY(0)")
+                    .set(BOXSHADOW, "0 4px 14px rgba(0,0,0,0.10)")
             );
         }
 
@@ -397,7 +404,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
 
         H3 h3 = new H3(producto.getNombre());
         h3.getStyle()
-                .set("margin", "0")
+                .set(MARGIN, "0")
                 .set(FONTSIZE, "clamp(0.95rem, 2vw, 1.05rem)")
                 .set("line-height", "1.2");
 
@@ -409,7 +416,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
                 .set("line-height", "1.4")
                 .set("overflow", "hidden")
                 .set("text-overflow", "ellipsis")
-                .set("display", "-webkit-box")
+                .set(DISPLAY, "-webkit-box")
                 .set("-webkit-line-clamp", "2")
                 .set("-webkit-box-orient", "vertical");
 
@@ -426,7 +433,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
         }
         Span priceTag = new Span(precioTexto);
         priceTag.getStyle()
-                .set(COLOR, COLOR_1_IS)
+                .set(COLOR, COLOR2)
                 .set(FONT_WEIGHT, "700")
                 .set(FONTSIZE, "clamp(1rem, 2.2vw, 1.05rem)");
 
@@ -439,7 +446,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
             Span ofertaBadge = new Span("OFERTA");
             ofertaBadge.getStyle()
                     .set(BACKGROUND_COLOR, "#FF9800")
-                    .set(COLOR, COLOR_2_IS)
+                    .set(COLOR, COLOR1)
                     .set(PADDING, PADDING_IS)
                     .set(BORDER_RADIUS, "4px")
                     .set(FONTSIZE, FONTSIZE_IS)
@@ -451,7 +458,7 @@ public abstract class CategoriaProductosView extends VerticalLayout {
             Span puntosBadge = new Span("PUNTOS");
             puntosBadge.getStyle()
                     .set(BACKGROUND_COLOR, "#4CAF50")
-                    .set(COLOR, COLOR_2_IS)
+                    .set(COLOR, COLOR1)
                     .set(PADDING, PADDING_IS)
                     .set(BORDER_RADIUS, "4px")
                     .set(FONTSIZE, FONTSIZE_IS)
@@ -465,8 +472,8 @@ public abstract class CategoriaProductosView extends VerticalLayout {
         pedirBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         pedirBtn.setWidthFull();
         pedirBtn.getStyle()
-                .set(BACKGROUND_COLOR, COLOR_1_IS)
-                .set(COLOR, COLOR_2_IS)
+                .set(BACKGROUND_COLOR, COLOR2)
+                .set(COLOR, COLOR1)
                 .set("margin-top", "auto");
         pedirBtn.addClickListener(e -> {
             // Aquí iría la lógica para añadir al carrito

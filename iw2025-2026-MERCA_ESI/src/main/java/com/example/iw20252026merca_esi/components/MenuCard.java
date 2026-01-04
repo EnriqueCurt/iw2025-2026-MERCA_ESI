@@ -14,17 +14,23 @@ public class MenuCard extends Div {
     private static final String FONTSIZE = "font-size";
     private static final String FONTWEIGHT = "font-weight";
     private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private  static final String COLOR2 = "#E3001B";
     private static final String PADDING = "padding";
+    private static final String BORDERRADIUS = "border-radius";
+    private static final String FLEXDIRECTION = "flex-direction";
+    private static final String COLUMN = "column";
+    private static final String BACKGROUNDCOLOR = "background-color";
 
     public MenuCard(Menu menu) {
         // Estilos del contenedor principal (Tarjeta)
         getStyle()
-                .set("background", "white")
-                .set("border-radius", "24px")
+                .set("background", COLOR1)
+                .set(BORDERRADIUS, "24px")
                 .set("box-shadow", "0 4px 12px rgba(0,0,0,0.08)")
                 .set(WIDTH, "300px")
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEXDIRECTION, COLUMN)
                 .set("margin", "16px")
                 .set("overflow", "hidden")
                 .set("transition", "transform 0.2s");
@@ -40,7 +46,7 @@ public class MenuCard extends Div {
         contenedorImagen.getStyle()
                 .set(WIDTH, "100%")
                 .set("height", "200px")
-                .set("background-color", "#f0f0f0")
+                .set(BACKGROUNDCOLOR, "#f0f0f0")
                 .set("position", "relative");
 
         if (menu.getImagen() != null && menu.getImagen().length > 0) {
@@ -62,7 +68,7 @@ public class MenuCard extends Div {
                 .set("right", "12px")
                 .set(DISPLAY, "flex")
                 .set("gap", "8px")
-                .set("flex-direction", "column")
+                .set(FLEXDIRECTION, COLUMN)
                 .set("align-items", "flex-end");
 
         if (menu.getEsOferta()) {
@@ -87,7 +93,7 @@ public class MenuCard extends Div {
         contenido.getStyle()
                 .set(PADDING, "24px")
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEXDIRECTION, COLUMN)
                 .set("flex-grow", "1")
                 .set("gap", "12px");
 
@@ -129,11 +135,11 @@ public class MenuCard extends Div {
         precio.getStyle()
                 .set(FONTWEIGHT, "bold")
                 .set(FONTSIZE, "1.1rem")
-                .set(COLOR, "#E3001B");
+                .set(COLOR, COLOR2);
 
         Span verMas = new Span("Ver más");
         verMas.getStyle()
-                .set(COLOR, "#E3001B")
+                .set(COLOR, COLOR2)
                 .set("text-decoration", "underline")
                 .set("cursor", "pointer")
                 .set(FONTSIZE, "0.9rem");
@@ -142,9 +148,9 @@ public class MenuCard extends Div {
 
         Button btnPedir = new Button("PEDIR");
         btnPedir.getStyle()
-                .set("background-color", "#E3001B")
-                .set(COLOR, "white")
-                .set("border-radius", "999px")
+                .set(BACKGROUNDCOLOR, COLOR2)
+                .set(COLOR, COLOR1)
+                .set(BORDERRADIUS, "999px")
                 .set(FONTWEIGHT, "700")
                 .set(WIDTH, "100%")
                 .set("height", "45px")
@@ -164,10 +170,10 @@ public class MenuCard extends Div {
     private Span createBadge(String text, String backgroundColor) {
         Span badge = new Span(text);
         badge.getStyle()
-                .set("background-color", backgroundColor)
-                .set(COLOR, "white")
+                .set(BACKGROUNDCOLOR, backgroundColor)
+                .set(COLOR, COLOR1)
                 .set(PADDING, "4px 10px")
-                .set("border-radius", "12px")
+                .set(BORDERRADIUS, "12px")
                 .set(FONTSIZE, "0.7rem")
                 .set(FONTWEIGHT, "bold")
                 .set("box-shadow", "0 2px 4px rgba(0,0,0,0.2)");

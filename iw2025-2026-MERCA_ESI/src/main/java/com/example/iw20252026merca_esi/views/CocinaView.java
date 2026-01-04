@@ -46,6 +46,20 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     private Div statsPanel;
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
+    private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
+    private static final String COLOR3 = "#FF9800";
+    private static final String COLOR4 = "#4CAF50";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String BADGE = "badge";
+    private static final String PADDING = "padding";
+    private static final String PADDING1 = "2px 8px";
+    private  static final String BORDERRADIUS = "border-radius";
+    private static final String FONTSIZE = "font-size";
+    private static final String FONTWEIGHT = "font-weight";
+    private static final String MARGINTOP = "margin-top";
+
     @Autowired
     public CocinaView(PedidoRepository pedidoRepository, SessionService sessionService) {
         this.pedidoRepository = pedidoRepository;
@@ -56,11 +70,11 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         setSpacing(true);
 
         H2 titulo = new H2("🍳 Panel de Cocina");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR2);
 
         Button btnActualizar = new Button("Actualizar", new Icon(VaadinIcon.REFRESH));
         btnActualizar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnActualizar.getStyle().set("background-color", "#D32F2F");
+        btnActualizar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
         btnActualizar.addClickListener(e -> cargarPedidos());
 
         HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnActualizar);
@@ -158,37 +172,37 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
             
             if (Boolean.TRUE.equals(pedido.getADomicilio())) {
                 Span badge = new Span("🏠 Domicilio");
-                badge.getElement().getThemeList().add("badge");
+                badge.getElement().getThemeList().add(BADGE);
                 badge.getStyle()
-                    .set("background-color", "#FF5722")
-                    .set("color", "white")
-                    .set("padding", "2px 8px")
-                    .set("border-radius", "8px")
-                    .set("font-size", "11px");
+                    .set(BACKGROUNDCOLOR, "#FF5722")
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
+                    .set(BORDERRADIUS, "8px")
+                    .set(FONTSIZE, "11px");
                 layout.add(badge);
             }
             
             if (Boolean.TRUE.equals(pedido.getParaLlevar())) {
                 Span badge = new Span("📦 Para llevar");
-                badge.getElement().getThemeList().add("badge");
+                badge.getElement().getThemeList().add(BADGE);
                 badge.getStyle()
-                    .set("background-color", "#FF9800")
-                    .set("color", "white")
-                    .set("padding", "2px 8px")
-                    .set("border-radius", "8px")
-                    .set("font-size", "11px");
+                    .set(BACKGROUNDCOLOR, COLOR3)
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
+                    .set(BORDERRADIUS, "8px")
+                    .set(FONTSIZE, "11px");
                 layout.add(badge);
             }
             
             if (!Boolean.TRUE.equals(pedido.getADomicilio()) && !Boolean.TRUE.equals(pedido.getParaLlevar())) {
                 Span badge = new Span("🍽️ En local");
-                badge.getElement().getThemeList().add("badge");
+                badge.getElement().getThemeList().add(BADGE);
                 badge.getStyle()
-                    .set("background-color", "#4CAF50")
-                    .set("color", "white")
-                    .set("padding", "2px 8px")
-                    .set("border-radius", "8px")
-                    .set("font-size", "11px");
+                    .set(BACKGROUNDCOLOR, COLOR4)
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
+                    .set(BORDERRADIUS, "8px")
+                    .set(FONTSIZE, "11px");
                 layout.add(badge);
             }
             
@@ -201,24 +215,24 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         // Columna de estado
         pedidosGrid.addComponentColumn(pedido -> {
             Span badge = new Span(pedido.getEstadoDescripcion());
-            badge.getElement().getThemeList().add("badge");
+            badge.getElement().getThemeList().add(BADGE);
             
             String colorFondo = switch(pedido.getEstado()) {
-                case "PENDIENTE_PAGO" -> "#FF9800";
+                case "PENDIENTE_PAGO" -> COLOR3;
                 case "EN_COCINA" -> "#2196F3";
                 case "EN_REPARTO" -> "#9C27B0";
-                case "LISTO" -> "#4CAF50";
+                case "LISTO" -> COLOR4;
                 case "FINALIZADO" -> "#607D8B";
                 default -> "#757575";
             };
             
             badge.getStyle()
-                    .set("background-color", colorFondo)
-                    .set("color", "white")
-                    .set("padding", "4px 12px")
-                    .set("border-radius", "12px")
-                    .set("font-size", "12px")
-                    .set("font-weight", "500");
+                    .set(BACKGROUNDCOLOR, colorFondo)
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, "4px 12px")
+                    .set(BORDERRADIUS, "12px")
+                    .set(FONTSIZE, "12px")
+                    .set(FONTWEIGHT, "500");
             
             return badge;
         })
@@ -239,7 +253,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 actions.add(btnListo);
             } else if ("LISTO".equals(pedido.getEstado())) {
                 Span texto = new Span("✓ Listo");
-                texto.getStyle().set("color", "#4CAF50").set("font-weight", "bold");
+                texto.getStyle().set(COLOR, COLOR4).set(FONTWEIGHT, "bold");
                 actions.add(texto);
             }
             
@@ -254,11 +268,11 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
             detallesLayout.setSpacing(true);
             detallesLayout.setPadding(true);
             detallesLayout.getStyle()
-                .set("background-color", "#f5f5f5")
-                .set("border-radius", "8px");
+                .set(BACKGROUNDCOLOR, "#f5f5f5")
+                .set(BORDERRADIUS, "8px");
 
             H4 tituloProductos = new H4("📋 Productos del Pedido #" + pedido.getIdPedido());
-            tituloProductos.getStyle().set("color", "#D32F2F").set("margin-top", "0");
+            tituloProductos.getStyle().set(COLOR, COLOR2).set(MARGINTOP, "0");
             detallesLayout.add(tituloProductos);
 
             if (pedido.getDetallePedidos() != null && !pedido.getDetallePedidos().isEmpty()) {
@@ -267,17 +281,17 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                     productoLayout.setWidthFull();
                     productoLayout.setAlignItems(Alignment.CENTER);
                     productoLayout.getStyle()
-                        .set("background-color", "white")
-                        .set("padding", "10px")
-                        .set("border-radius", "4px")
+                        .set(BACKGROUNDCOLOR, COLOR1)
+                        .set(PADDING, "10px")
+                        .set(BORDERRADIUS, "4px")
                         .set("margin-bottom", "5px");
 
                     // Cantidad
                     Span cantidad = new Span(String.valueOf(detalle.getCantidad()) + "x");
                     cantidad.getStyle()
-                        .set("font-weight", "bold")
-                        .set("font-size", "18px")
-                        .set("color", "#D32F2F")
+                        .set(FONTWEIGHT, "bold")
+                        .set(FONTSIZE, "18px")
+                        .set(COLOR, COLOR2)
                         .set("min-width", "40px");
 
                     // Nombre del producto
@@ -287,8 +301,8 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                     
                     Span nombreProducto = new Span(detalle.getProducto().getNombre());
                     nombreProducto.getStyle()
-                        .set("font-weight", "bold")
-                        .set("font-size", "16px");
+                        .set(FONTWEIGHT, "bold")
+                        .set(FONTSIZE, "16px");
                     
                     infoProducto.add(nombreProducto);
                     
@@ -296,16 +310,16 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                     if (detalle.getProducto().getDescripcion() != null && !detalle.getProducto().getDescripcion().isEmpty()) {
                         Span descripcion = new Span(detalle.getProducto().getDescripcion());
                         descripcion.getStyle()
-                            .set("font-size", "12px")
-                            .set("color", "#666");
+                            .set(FONTSIZE, "12px")
+                            .set(COLOR, "#666");
                         infoProducto.add(descripcion);
                     }
 
                     // Precio
                     Span precio = new Span(String.format("%.2f €", detalle.calcularSubtotal()));
                     precio.getStyle()
-                        .set("font-weight", "bold")
-                        .set("color", "#4CAF50");
+                        .set(FONTWEIGHT, "bold")
+                        .set(COLOR, COLOR4);
 
                     productoLayout.add(cantidad, infoProducto, precio);
                     productoLayout.setFlexGrow(1, infoProducto);
@@ -319,24 +333,24 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 totalLayout.getStyle()
                     .set("border-top", "2px solid #D32F2F")
                     .set("padding-top", "10px")
-                    .set("margin-top", "10px");
+                    .set(MARGINTOP, "10px");
                 
                 Span totalLabel = new Span("TOTAL: ");
                 totalLabel.getStyle()
-                    .set("font-weight", "bold")
-                    .set("font-size", "18px");
+                    .set(FONTWEIGHT, "bold")
+                    .set(FONTSIZE, "18px");
                 
                 Span totalValor = new Span(String.format("%.2f €", pedido.getTotal()));
                 totalValor.getStyle()
-                    .set("font-weight", "bold")
-                    .set("font-size", "20px")
-                    .set("color", "#D32F2F");
+                    .set(FONTWEIGHT, "bold")
+                    .set(FONTSIZE, "20px")
+                    .set(COLOR, COLOR2);
                 
                 totalLayout.add(totalLabel, totalValor);
                 detallesLayout.add(totalLayout);
             } else {
                 Paragraph sinProductos = new Paragraph("No hay productos en este pedido");
-                sinProductos.getStyle().set("color", "#999");
+                sinProductos.getStyle().set(COLOR, "#999");
                 detallesLayout.add(sinProductos);
             }
 
@@ -381,9 +395,9 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     private Div createStatsPanel() {
         Div panel = new Div();
         panel.getStyle()
-                .set("background-color", "white")
-                .set("border-radius", "8px")
-                .set("padding", "20px")
+                .set(BACKGROUNDCOLOR, COLOR1)
+                .set(BORDERRADIUS, "8px")
+                .set(PADDING, "20px")
                 .set("box-shadow", "0 2px 8px rgba(0,0,0,0.1)")
                 .set("margin-bottom", "20px");
 
@@ -433,18 +447,18 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         tituloLayout.getStyle().set("margin-right", "20px");
         
         Span icono = new Span("🍕");
-        icono.getStyle().set("font-size", "32px");
+        icono.getStyle().set(FONTSIZE, "32px");
         
         Span titulo = new Span("Productos");
         titulo.getStyle()
-                .set("font-size", "14px")
-                .set("color", "#666")
-                .set("font-weight", "500");
+                .set(FONTSIZE, "14px")
+                .set(COLOR, "#666")
+                .set(FONTWEIGHT, "500");
         
         Span subtitulo = new Span("a preparar");
         subtitulo.getStyle()
-                .set("font-size", "12px")
-                .set("color", "#999");
+                .set(FONTSIZE, "12px")
+                .set(COLOR, "#999");
         
         tituloLayout.add(icono, titulo, subtitulo);
         statsLayout.add(tituloLayout);
@@ -453,12 +467,12 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         if (topProductos.isEmpty()) {
             Span sinPedidos = new Span("No hay pedidos en cocina");
             sinPedidos.getStyle()
-                    .set("color", "#999")
+                    .set(COLOR, "#999")
                     .set("font-style", "italic")
-                    .set("padding", "20px");
+                    .set(PADDING, "20px");
             statsLayout.add(sinPedidos);
         } else {
-            String[] colores = {"#D32F2F", "#FF5722", "#FF9800", "#FFC107"};
+            String[] colores = {COLOR2, "#FF5722", COLOR3, "#FFC107"};
             for (int i = 0; i < topProductos.size(); i++) {
                 Map.Entry<String, Integer> entry = topProductos.get(i);
                 statsLayout.add(createProductoCard(entry.getKey(), String.valueOf(entry.getValue()), colores[i]));
@@ -476,24 +490,24 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         card.setSpacing(false);
         card.getStyle()
                 .set("border-left", "4px solid " + color)
-                .set("background-color", "#f9f9f9")
-                .set("border-radius", "8px")
+                .set(BACKGROUNDCOLOR, "#f9f9f9")
+                .set(BORDERRADIUS, "8px")
                 .set("min-width", "140px")
-                .set("padding", "15px");
+                .set(PADDING, "15px");
 
         Span cantidadSpan = new Span(cantidad);
         cantidadSpan.getStyle()
-                .set("color", color)
-                .set("font-size", "42px")
-                .set("font-weight", "bold")
+                .set(COLOR, color)
+                .set(FONTSIZE, "42px")
+                .set(FONTWEIGHT, "bold")
                 .set("line-height", "1");
 
         Span nombreSpan = new Span(nombreProducto);
         nombreSpan.getStyle()
-                .set("color", "#333")
-                .set("font-size", "13px")
-                .set("font-weight", "500")
-                .set("margin-top", "8px")
+                .set(COLOR, "#333")
+                .set(FONTSIZE, "13px")
+                .set(FONTWEIGHT, "500")
+                .set(MARGINTOP, "8px")
                 .set("text-align", "center")
                 .set("max-width", "120px")
                 .set("overflow", "hidden")

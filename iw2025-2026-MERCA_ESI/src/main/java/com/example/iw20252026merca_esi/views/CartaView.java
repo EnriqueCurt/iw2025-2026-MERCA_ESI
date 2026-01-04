@@ -28,7 +28,15 @@ public class CartaView extends VerticalLayout {
     private static final String DISPLAY = "display";
     private static final String PADDING = "padding";
     private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#e30613";
     private static final String FONTSIZE = "font-size";
+    private static final String BACKGROUND = "background";
+    private static final String MARGIN = "margin";
+    private static final String FONTWEIGHT = "font-weight";
+    private static final String BOXSHADOW = "box-shadow";
+    private static final String TRANSFORM = "transform";
+    private static final String MARGINTOP = "margin-top";
     
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
@@ -41,7 +49,7 @@ public class CartaView extends VerticalLayout {
         setPadding(false);
         setSpacing(false);
         getStyle()
-                .set("background", "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)")
+                .set(BACKGROUND, "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)")
                 .set("overflow-y", "auto");
 
         crearContenido();
@@ -59,8 +67,8 @@ public class CartaView extends VerticalLayout {
 
         H1 titulo = new H1("Carta");
         titulo.getStyle()
-                .set("margin", "0")
-                .set(COLOR, "#e30613")
+                .set(MARGIN, "0")
+                .set(COLOR, COLOR2)
                 .set("text-align", "center");
 
         header.add(titulo);
@@ -70,7 +78,7 @@ public class CartaView extends VerticalLayout {
         Div mainContainer = new Div();
         mainContainer.getStyle()
                 .set("max-width", "1400px")
-                .set("margin", "0 auto")
+                .set(MARGIN, "0 auto")
                 .set(PADDING, "30px 20px")
                 .set("width", "100%");
 
@@ -107,9 +115,9 @@ public class CartaView extends VerticalLayout {
         // Título de categoría
         H2 tituloCategoria = new H2(nombreCategoria);
         tituloCategoria.getStyle()
-                .set("margin", "0 0 20px 0")
+                .set(MARGIN, "0 0 20px 0")
                 .set(FONTSIZE, "2rem")
-                .set("font-weight", "700")
+                .set(FONTWEIGHT, "700")
                 .set(COLOR, esOferta ? "#FF9800" : "#333")
                 .set("text-align", "left")
                 .set("border-bottom", esOferta ? "3px solid #FF9800" : "3px solid #e30613")
@@ -136,9 +144,9 @@ public class CartaView extends VerticalLayout {
     private Div createProductCard(Producto producto, boolean destacada) {
         Div card = new Div();
         card.getStyle()
-                .set("background", "#ffffff")
+                .set(BACKGROUND, "#ffffff")
                 .set(BORDER_RADIUS, "12px")
-                .set("box-shadow", destacada ? "0 8px 24px rgba(255, 152, 0, 0.3)" : "0 4px 14px rgba(0,0,0,0.10)")
+                .set(BOXSHADOW, destacada ? "0 8px 24px rgba(255, 152, 0, 0.3)" : "0 4px 14px rgba(0,0,0,0.10)")
                 .set("border", destacada ? "3px solid #FF9800" : "none")
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
@@ -149,31 +157,31 @@ public class CartaView extends VerticalLayout {
                 .set("cursor", "pointer");
 
         if (destacada) {
-            card.getStyle().set("transform", "scale(1.02)");
+            card.getStyle().set(TRANSFORM, "scale(1.02)");
         }
 
         // Efecto hover
         if (destacada) {
             card.getElement().addEventListener("mouseenter", e ->
                     card.getStyle()
-                            .set("transform", "scale(1.05) translateY(-5px)")
-                            .set("box-shadow", "0 12px 32px rgba(255, 152, 0, 0.5)")
+                            .set(TRANSFORM, "scale(1.05) translateY(-5px)")
+                            .set(BOXSHADOW, "0 12px 32px rgba(255, 152, 0, 0.5)")
             );
             card.getElement().addEventListener("mouseleave", e ->
                     card.getStyle()
-                            .set("transform", "scale(1.02)")
-                            .set("box-shadow", "0 8px 24px rgba(255, 152, 0, 0.3)")
+                            .set(TRANSFORM, "scale(1.02)")
+                            .set(BOXSHADOW, "0 8px 24px rgba(255, 152, 0, 0.3)")
             );
         } else {
             card.getElement().addEventListener("mouseenter", e ->
                     card.getStyle()
-                            .set("transform", "translateY(-8px)")
-                            .set("box-shadow", "0 12px 24px rgba(0,0,0,0.20)")
+                            .set(TRANSFORM, "translateY(-8px)")
+                            .set(BOXSHADOW, "0 12px 24px rgba(0,0,0,0.20)")
             );
             card.getElement().addEventListener("mouseleave", e ->
                     card.getStyle()
-                            .set("transform", "translateY(0)")
-                            .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
+                            .set(TRANSFORM, "translateY(0)")
+                            .set(BOXSHADOW, "0 4px 14px rgba(0,0,0,0.10)")
             );
         }
 
@@ -196,7 +204,7 @@ public class CartaView extends VerticalLayout {
 
         H3 h3 = new H3(producto.getNombre());
         h3.getStyle()
-                .set("margin", "0")
+                .set(MARGIN, "0")
                 .set(FONTSIZE, "clamp(0.95rem, 2vw, 1.05rem)")
                 .set("line-height", "1.2");
 
@@ -206,10 +214,10 @@ public class CartaView extends VerticalLayout {
                 .set(COLOR, "#555")
                 .set(FONTSIZE, "0.85rem")
                 .set("line-height", "1.4")
-                .set("margin", "4px 0")
+                .set(MARGIN, "4px 0")
                 .set("overflow", "hidden")
                 .set("text-overflow", "ellipsis")
-                .set("display", "-webkit-box")
+                .set(DISPLAY, "-webkit-box")
                 .set("-webkit-line-clamp", "2")
                 .set("-webkit-box-orient", "vertical");
 
@@ -219,31 +227,31 @@ public class CartaView extends VerticalLayout {
                 .set(DISPLAY, "flex")
                 .set("gap", "6px")
                 .set("flex-wrap", "wrap")
-                .set("margin-top", "auto");
+                .set(MARGINTOP, "auto");
 
         if (Boolean.TRUE.equals(producto.getEsOferta())) {
             Span ofertaBadge = new Span("🔥 OFERTA");
             ofertaBadge.getStyle()
-                    .set("background", "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)")
-                    .set(COLOR, "white")
+                    .set(BACKGROUND, "linear-gradient(135deg, #FF9800 0%, #F57C00 100%)")
+                    .set(COLOR, COLOR1)
                     .set(PADDING, "4px 10px")
                     .set(BORDER_RADIUS, "20px")
                     .set(FONTSIZE, "0.75rem")
-                    .set("font-weight", "600")
-                    .set("box-shadow", "0 2px 6px rgba(255, 152, 0, 0.3)");
+                    .set(FONTWEIGHT, "600")
+                    .set(BOXSHADOW, "0 2px 6px rgba(255, 152, 0, 0.3)");
             badges.add(ofertaBadge);
         }
 
         if (Boolean.TRUE.equals(producto.getPuntos())) {
             Span puntosBadge = new Span("⭐ PUNTOS");
             puntosBadge.getStyle()
-                    .set("background", "linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)")
-                    .set(COLOR, "white")
+                    .set(BACKGROUND, "linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)")
+                    .set(COLOR, COLOR1)
                     .set(PADDING, "4px 10px")
                     .set(BORDER_RADIUS, "20px")
                     .set(FONTSIZE, "0.75rem")
-                    .set("font-weight", "600")
-                    .set("box-shadow", "0 2px 6px rgba(156, 39, 176, 0.3)");
+                    .set(FONTWEIGHT, "600")
+                    .set(BOXSHADOW, "0 2px 6px rgba(156, 39, 176, 0.3)");
             badges.add(puntosBadge);
         }
 
@@ -258,20 +266,20 @@ public class CartaView extends VerticalLayout {
         precio.getStyle()
                 .set(DISPLAY, "block")
                 .set(FONTSIZE, "1.3rem")
-                .set("font-weight", "700")
-                .set(COLOR, "#e30613")
-                .set("margin-top", "8px");
+                .set(FONTWEIGHT, "700")
+                .set(COLOR, COLOR2)
+                .set(MARGINTOP, "8px");
 
         // Botón Pedir
         Button pedirBtn = new Button("PEDIR");
         pedirBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         pedirBtn.setWidthFull();
         pedirBtn.getStyle()
-                .set("background-color", "#e30613")
-                .set(COLOR, "white")
-                .set("margin-top", "auto")
-                .set("border-radius", "8px")
-                .set("font-weight", "600");
+                .set("background-color", COLOR2)
+                .set(COLOR, COLOR1)
+                .set(MARGINTOP, "auto")
+                .set(BORDER_RADIUS, "8px")
+                .set(FONTWEIGHT, "600");
         pedirBtn.addClickListener(e -> {
             // Aquí iría la lógica para añadir al carrito
             System.out.println("Añadido al carrito: " + producto.getNombre());
