@@ -10,7 +10,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
@@ -428,7 +427,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
             if (pedido.getDetallePedidos() != null) {
                 for (DetallePedido detalle : pedido.getDetallePedidos()) {
                     String nombreProducto = detalle.getProducto().getNombre();
-                    productosCantidad.merge(nombreProducto, detalle.getCantidad(), Integer::sum);
+                    productosCantidad.merge(nombreProducto, detalle.getCantidad(), (a, b) -> a + b);
                 }
             }
         }

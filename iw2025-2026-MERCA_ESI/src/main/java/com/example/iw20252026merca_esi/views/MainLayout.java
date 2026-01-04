@@ -1,6 +1,5 @@
 package com.example.iw20252026merca_esi.views;
 
-import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.button.Button;

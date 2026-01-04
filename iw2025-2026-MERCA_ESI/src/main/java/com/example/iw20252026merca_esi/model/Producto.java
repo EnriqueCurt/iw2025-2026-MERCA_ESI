@@ -6,7 +6,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.Set;
 

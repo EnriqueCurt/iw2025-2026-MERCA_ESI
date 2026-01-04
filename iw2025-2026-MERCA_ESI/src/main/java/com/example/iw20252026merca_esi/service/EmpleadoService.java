@@ -2,7 +2,6 @@ package com.example.iw20252026merca_esi.service;
 
 import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.repository.EmpleadoRepository;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

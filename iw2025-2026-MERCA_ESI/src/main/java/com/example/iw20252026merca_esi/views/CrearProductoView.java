@@ -74,7 +74,7 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
     private final List<Categoria> categoriasSeleccionadas = new ArrayList<>();
 
     @Autowired
-    private WebPushService webPushService;
+    // private WebPushService webPushService;
 
     private final AsyncNotificationService asyncNotificationService;
     

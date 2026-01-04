@@ -1,7 +1,6 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.model.Menu;
-import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.MenuService;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.UI;

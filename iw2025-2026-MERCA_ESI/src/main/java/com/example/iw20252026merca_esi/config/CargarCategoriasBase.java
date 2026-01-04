@@ -4,7 +4,7 @@ package com.example.iw20252026merca_esi.config;
 import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.repository.CategoriaRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+
 import org.springframework.transaction.annotation.Transactional;
 
 //@Component
