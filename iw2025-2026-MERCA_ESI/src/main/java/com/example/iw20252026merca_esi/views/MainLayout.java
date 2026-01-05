@@ -18,12 +18,20 @@ import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.router.RouterLayout;
 import org.springframework.beans.factory.annotation.Autowired;
 
+
 @Layout
 public class MainLayout extends VerticalLayout implements RouterLayout {
 
     private final Div contentContainer;
     private final SessionService sessionService;
     private Button loginButton;
+
+    private static final String COLOR5 = "0 4px 10px rgba(0, 0, 0, 0.3)";
+    private static final String COLOR1 = "white";
+    private static final String COLOR = "color";
+    private static final String PADDING = "padding";
+    private static final String BACKGROUND_COLOR = "background-color";
+    private static final String DISPLAY = "display";
 
     public MainLayout(@Autowired SessionService sessionService) {
         this.sessionService = sessionService;
@@ -33,7 +41,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         setWidthFull();
         setAlignItems(Alignment.STRETCH);
         getStyle()
-                .set("display", "flex")
+                .set(DISPLAY, "flex")
                 .set("flex-direction", "column")
                 .set("height", "100vh")
                 .set("min-height", "0")
@@ -49,8 +57,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         contentContainer.setWidthFull();
         contentContainer.getStyle()
                 .set("box-sizing", "border-box")
-                .set("background-color", "#f5f5f5")
-                .set("padding", "clamp(8px, 2vw, 24px)")
+                .set(BACKGROUND_COLOR, "#f5f5f5")
+                .set(PADDING, "clamp(8px, 2vw, 24px)")
                 .set("overflow", "auto")
                 .set("flex", "1 1 auto")
                 .set("min-height", "0")
@@ -75,9 +83,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         header.setPadding(true);
         header.setSpacing(true);
         header.getStyle()
-                .set("background-color", "#e30613")
-                .set("color", "white")
-                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)");
+                .set(BACKGROUND_COLOR, "#e30613")
+                .set(COLOR, COLOR1)
+                .set("box-shadow", COLOR5);
         header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         Div logoDiv = new Div();
@@ -85,7 +93,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         logo.getStyle()
                 .set("font-size", "24px")
                 .set("font-weight", "bold")
-                .set("color", "white")
+                .set(COLOR, COLOR1)
                 .set("cursor", "pointer");
         logo.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
         logo.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
@@ -111,11 +119,11 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             MenuItem gestionItem = gestionMenuBar.addItem(new Icon(VaadinIcon.COG));
             gestionItem.add("GESTIÓN");
             gestionItem.getElement().getStyle()
-                    .set("color", "white")
+                    .set(COLOR, COLOR1)
                     .set("border-radius", "50px")
                     .set("cursor", "pointer")
                     .set("background", "transparent")
-                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("box-shadow", COLOR5)
                     .set("transition", "background-color 0.3s");
             
             gestionItem.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
@@ -159,9 +167,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             empleadoButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             empleadoButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("pedidos-pendientes")));
             empleadoButton.getStyle()
-                    .set("color", "white")
+                    .set(COLOR, COLOR1)
                     .set("border-radius", "50px")
-                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("box-shadow", COLOR5)
                     .set("transition", "background-color 0.3s")
                     .set("cursor", "pointer");
             
@@ -177,9 +185,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             repartidorButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             repartidorButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("repartidor")));
             repartidorButton.getStyle()
-                    .set("color", "white")
+                    .set(COLOR, COLOR1)
                     .set("border-radius", "50px")
-                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("box-shadow", COLOR5)
                     .set("transition", "background-color 0.3s")
                     .set("cursor", "pointer");
             
@@ -195,9 +203,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             cocinaButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             cocinaButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("cocina")));
             cocinaButton.getStyle()
-                    .set("color", "white")
+                    .set(COLOR, COLOR1)
                     .set("border-radius", "50px")
-                    .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                    .set("box-shadow", COLOR5)
                     .set("transition", "background-color 0.3s")
                     .set("cursor", "pointer");
             
@@ -211,9 +219,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
         cartButton.getStyle()
-                .set("color", "white")
+                .set(COLOR, COLOR1)
                 .set("border-radius","50px")
-                .set("box-shadow", "0 4px 10px rgba(0, 0, 0, 0.3)")
+                .set("box-shadow", COLOR5)
                 .set("transition", "background-color 0.3s")
                 .set("cursor", "pointer");
 
@@ -230,7 +238,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         loginButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(navigationTarget)));
         loginButton.getStyle()
-                .set("color", "white")
+                .set(COLOR, COLOR1)
                 .set("border-radius","50px")
                 .set("box-shadow", "0 4px 12px rgba(0,0,0,0.3)")
                 .set("transition", "background-color 0.3s")
@@ -252,14 +260,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         menuBar.setPadding(true);
         menuBar.setJustifyContentMode(JustifyContentMode.CENTER);
         menuBar.getStyle()
-                .set("display", "flex")
+                .set(DISPLAY, "flex")
                 .set("flex-wrap", "wrap")
                 .set("gap", "6px")
-                .set("background-color", "white")
+                .set(BACKGROUND_COLOR, COLOR1)
                 .set("border-radius", "50px")
                 .set("box-shadow", "0 4px 12px rgba(0,0,0,0.55)")
                 .set("margin", "0")
-                .set("padding", "8px clamp(10px, 2vw, 20px)");
+                .set(PADDING, "8px clamp(10px, 2vw, 20px)");
 
         // Menú principal (visible para todos)
         String[] menuItems = {"CARTA", "MENÚS", "OFERTAS"};
@@ -268,9 +276,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             Button menuButton = new Button(item);
             menuButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             menuButton.getStyle()
-                    .set("color", "#333")
+                    .set(COLOR, "#333")
                     .set("font-weight", "500")
-                    .set("padding", "10px 15px")
+                    .set(PADDING, "10px 15px")
                     .set("border-radius", "25px")
                     .set("transition", "background-color 0.3s")
                     .set("cursor", "pointer");
@@ -328,11 +336,11 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         footer.setWidthFull();
         footer.getStyle()
                 .set("box-sizing", "border-box")
-                .set("background-color", "#333")
-                .set("color", "white")
-                .set("padding", "clamp(12px, 2vw, 20px)")
+                .set(BACKGROUND_COLOR, "#333")
+                .set(COLOR, COLOR1)
+                .set(PADDING, "clamp(12px, 2vw, 20px)")
                 .set("margin", "0")
-                .set("display", "flex")
+                .set(DISPLAY, "flex")
                 .set("flex-wrap", "wrap")
                 .set("justify-content", "center")
                 .set("align-items", "center")
