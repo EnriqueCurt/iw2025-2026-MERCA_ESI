@@ -36,6 +36,15 @@ import org.springframework.data.domain.Sort;
 @RolesAllowed("ADMINISTRADOR")
 public class GestionClientesView extends VerticalLayout implements BeforeEnterObserver {
 
+    private static final String COLOR2 = "#D32F2F";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String NOMBRE = "Nombre";
+    private static final String USUARIO = "Usuario";
+    private static final String EMAIL = "Email";
+    private static final String TELEFONO = "Teléfono";
+    private static final String PUNTOS = "Puntos";
+    private static final String CANCELAR = "Cancelar";
+
     private final ClienteService clienteService;
     private final SessionService sessionService;
     private Grid<Cliente> grid;
@@ -52,12 +61,12 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
 
         // Título
         H2 titulo = new H2("Gestión de Clientes");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set("color", COLOR2);
 
         // Botón para crear nuevo cliente
         Button btnNuevo = new Button("Nuevo Cliente", new Icon(VaadinIcon.PLUS));
         btnNuevo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNuevo.getStyle().set("background-color", "#D32F2F");
+        btnNuevo.getStyle().set(BACKGROUNDCOLOR, COLOR2);
         btnNuevo.addClickListener(e -> abrirDialogoNuevo());
 
         HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnNuevo);
@@ -97,11 +106,11 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
 
         // Columnas
         grid.addColumn(Cliente::getIdCliente).setHeader("ID").setWidth("80px").setFlexGrow(0).setSortProperty("idCliente");
-        grid.addColumn(Cliente::getNombre).setHeader("Nombre").setSortable(true).setSortProperty("nombre");
-        grid.addColumn(Cliente::getUsername).setHeader("Usuario").setSortable(true).setSortProperty("username");
-        grid.addColumn(Cliente::getEmail).setHeader("Email").setSortable(true).setSortProperty("email");
-        grid.addColumn(Cliente::getTelefono).setHeader("Teléfono");
-        grid.addColumn(Cliente::getPuntos).setHeader("Puntos").setSortable(true).setWidth("100px").setSortProperty("puntos");
+        grid.addColumn(Cliente::getNombre).setHeader(NOMBRE).setSortable(true).setSortProperty("nombre");
+        grid.addColumn(Cliente::getUsername).setHeader(USUARIO).setSortable(true).setSortProperty("username");
+        grid.addColumn(Cliente::getEmail).setHeader(EMAIL).setSortable(true).setSortProperty("email");
+        grid.addColumn(Cliente::getTelefono).setHeader(TELEFONO);
+        grid.addColumn(Cliente::getPuntos).setHeader(PUNTOS).setSortable(true).setWidth("100px").setSortProperty("puntos");
 
         // Columna de acciones
         grid.addComponentColumn(cliente -> {
@@ -192,26 +201,26 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
         dialog.setWidth("500px");
 
         // Formulario
-        TextField nombreField = new TextField("Nombre");
+        TextField nombreField = new TextField(NOMBRE);
         nombreField.setWidthFull();
         nombreField.setRequired(true);
 
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setWidthFull();
         usernameField.setRequired(true);
 
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setWidthFull();
         emailField.setRequired(true);
 
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setWidthFull();
 
         PasswordField passwordField = new PasswordField("Contraseña");
         passwordField.setWidthFull();
         passwordField.setRequired(true);
 
-        IntegerField puntosField = new IntegerField("Puntos");
+        IntegerField puntosField = new IntegerField(PUNTOS);
         puntosField.setWidthFull();
         puntosField.setValue(0);
         puntosField.setMin(0);
@@ -242,9 +251,9 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
             }
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#D32F2F");
+        btnGuardar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnGuardar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);
@@ -260,19 +269,19 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
         dialog.setWidth("500px");
 
         // Formulario
-        TextField nombreField = new TextField("Nombre");
+        TextField nombreField = new TextField(NOMBRE);
         nombreField.setValue(cliente.getNombre());
         nombreField.setWidthFull();
 
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setValue(cliente.getUsername());
         usernameField.setWidthFull();
 
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setValue(cliente.getEmail());
         emailField.setWidthFull();
 
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setValue(cliente.getTelefono() != null ? cliente.getTelefono() : "");
         telefonoField.setWidthFull();
 
@@ -280,7 +289,7 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
         passwordField.setWidthFull();
         passwordField.setHelperText("Dejar en blanco para mantener la actual");
 
-        IntegerField puntosField = new IntegerField("Puntos");
+        IntegerField puntosField = new IntegerField(PUNTOS);
         puntosField.setValue(cliente.getPuntos());
         puntosField.setWidthFull();
         puntosField.setMin(0);
@@ -314,9 +323,9 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
             }
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#D32F2F");
+        btnGuardar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnGuardar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);
@@ -346,7 +355,7 @@ public class GestionClientesView extends VerticalLayout implements BeforeEnterOb
         });
         btnConfirmar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnConfirmar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);
