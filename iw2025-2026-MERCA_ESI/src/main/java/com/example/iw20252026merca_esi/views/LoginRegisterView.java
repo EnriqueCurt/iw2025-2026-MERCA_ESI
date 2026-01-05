@@ -34,6 +34,12 @@ public class LoginRegisterView extends VerticalLayout {
     private VerticalLayout loginPanel;
     private VerticalLayout registerPanel;
 
+    private static final String COLOR6 = "--vaadin-input-field-focused-label-color";
+    private static final String COLOR7 = "--vaadin-input-field-label-color";
+    private static final String COLOR8 = "--lumo-primary-color";
+    private static final String COLOR = "color";
+    private static final String COLOR3 = "#D32F2F";
+
     @Autowired
     public LoginRegisterView(ClienteService clienteService, EmpleadoService empleadoService, SessionService sessionService) {
         this.clienteService = clienteService;
@@ -51,7 +57,7 @@ public class LoginRegisterView extends VerticalLayout {
         titulo.getStyle()
                 .set("margin-top", "0")
                 .set("margin-bottom", "20px")
-                .set("color", "#D32F2F");
+                .set(COLOR, COLOR3);
         
         // Crear las pestañas
         Tab loginTab = new Tab("Iniciar Sesión");
@@ -102,30 +108,30 @@ public class LoginRegisterView extends VerticalLayout {
         layout.setPadding(false);
         
         H2 titulo = new H2("Iniciar Sesión");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR3);
         
         TextField usernameField = new TextField("Usuario");
         usernameField.setWidthFull();
         usernameField.setRequired(true);
         usernameField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         PasswordField passwordField = new PasswordField("Contraseña");
         passwordField.setWidthFull();
         passwordField.setRequired(true);
         passwordField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         Button loginButton = new Button("Entrar");
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         loginButton.setWidthFull();
         loginButton.getStyle()
-                .set("background-color", "#D32F2F")
-                .set("color", "white");
+                .set("background-color", COLOR3)
+                .set(COLOR, "white");
         
         loginButton.addClickListener(e -> {
             String username = usernameField.getValue().trim();
@@ -190,65 +196,65 @@ public class LoginRegisterView extends VerticalLayout {
         layout.setPadding(false);
         
         H2 titulo = new H2("Crear Cuenta");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR3);
         
         TextField nombreField = new TextField("Nombre Completo");
         nombreField.setWidthFull();
         nombreField.setRequired(true);
         nombreField.setHelperText("Incluye nombre y apellidos");
         nombreField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         TextField emailField = new TextField("Email");
         emailField.setWidthFull();
         emailField.setRequired(true);
         emailField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         TextField telefonoField = new TextField("Teléfono");
         telefonoField.setWidthFull();
         telefonoField.setPlaceholder("Opcional");
         telefonoField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         TextField usernameField = new TextField("Usuario");
         usernameField.setWidthFull();
         usernameField.setRequired(true);
         usernameField.setHelperText("Mínimo 3 caracteres");
         usernameField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         PasswordField passwordField = new PasswordField("Contraseña");
         passwordField.setWidthFull();
         passwordField.setRequired(true);
         passwordField.setHelperText("Mínimo 6 caracteres");
         passwordField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         PasswordField confirmPasswordField = new PasswordField("Confirmar Contraseña");
         confirmPasswordField.setWidthFull();
         confirmPasswordField.setRequired(true);
         confirmPasswordField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(COLOR8, COLOR3)
+                .set(COLOR7, COLOR3)
+                .set(COLOR6, COLOR3);
         
         Button registerButton = new Button("Registrarse");
         registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         registerButton.setWidthFull();
         registerButton.getStyle()
-                .set("background-color", "#D32F2F")
-                .set("color", "white");
+                .set("background-color", COLOR3)
+                .set(COLOR, "white");
         
         registerButton.addClickListener(e -> {
             String nombre = nombreField.getValue().trim();
