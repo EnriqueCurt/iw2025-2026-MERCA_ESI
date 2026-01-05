@@ -38,6 +38,8 @@ public class GestionEstablecimientoView extends VerticalLayout implements Before
     
     private Establecimiento establecimiento;
 
+    private static final String COLOR2 = "#D32F2F";
+
     @Autowired
     public GestionEstablecimientoView(EstablecimientoService establecimientoService, SessionService sessionService) {
         this.establecimientoService = establecimientoService;
@@ -50,7 +52,7 @@ public class GestionEstablecimientoView extends VerticalLayout implements Before
 
         // Título
         H2 titulo = new H2("Gestión del Establecimiento");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set("color", COLOR2);
 
         // Cargar datos del establecimiento
         cargarEstablecimiento();
@@ -61,7 +63,7 @@ public class GestionEstablecimientoView extends VerticalLayout implements Before
         // Botón para guardar cambios
         Button btnGuardar = new Button("Guardar Cambios", e -> guardarCambios());
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#D32F2F");
+        btnGuardar.getStyle().set("background-color", COLOR2);
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnGuardar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
