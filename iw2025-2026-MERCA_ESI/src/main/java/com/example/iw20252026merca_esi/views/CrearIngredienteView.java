@@ -30,6 +30,10 @@ public class CrearIngredienteView extends VerticalLayout {
     private TextArea descripcionField = new TextArea("Descripción");
     private Checkbox estadoCheckbox = new Checkbox("Activo");
 
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
+    private static final String LUMO = "--lumo-primary-color";
+
     public CrearIngredienteView(IngredienteService ingredienteService) {
         this.ingredienteService = ingredienteService;
 
@@ -59,12 +63,12 @@ public class CrearIngredienteView extends VerticalLayout {
 
         Button guardarButton = new Button("Guardar", event -> guardarIngrediente());
         guardarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guardarButton.getStyle().set("background-color", "#D32F2F");
-        guardarButton.getStyle().set("color", "white");
+        guardarButton.getStyle().set("background-color", COLOR2);
+        guardarButton.getStyle().set("color", COLOR1);
 
         Button limpiarButton = new Button("Limpiar", event -> limpiarFormulario());
-        limpiarButton.getStyle().set("background-color", "#D32F2F");
-        limpiarButton.getStyle().set("color", "white");
+        limpiarButton.getStyle().set("background-color", COLOR2);
+        limpiarButton.getStyle().set("color", COLOR1);
 
         formLayout.add(
                 nombreField,
@@ -83,21 +87,21 @@ public class CrearIngredienteView extends VerticalLayout {
         nombreField.setMaxLength(100);
         nombreField.setPlaceholder("Introduce el nombre del ingrediente");
         nombreField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set("--vaadin-input-field-label-color", COLOR2)
+                .set("--vaadin-input-field-focused-label-color", COLOR2);
 
         descripcionField.setPlaceholder("Introduce una descripción");
         descripcionField.setMaxLength(1000);
         descripcionField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set("--vaadin-input-field-label-color", COLOR2)
+                .set("--vaadin-input-field-focused-label-color", COLOR2);
 
         estadoCheckbox.setValue(true);
         estadoCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set("--vaadin-checkbox-checkmark-color", COLOR1)
+                .set(LUMO, COLOR2);
     }
 
     private void guardarIngrediente() {

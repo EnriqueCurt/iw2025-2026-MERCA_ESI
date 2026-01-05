@@ -9,6 +9,7 @@ import com.example.iw20252026merca_esi.util.RolEnum;
 
 import java.util.HashSet;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -24,6 +25,8 @@ import java.util.Set;
  */
 @Component
 public class StartupDataLoader implements ApplicationRunner {
+
+    private static final String ADMIN = "admin";
 
     @Autowired
     private RolService rolService;
@@ -50,12 +53,12 @@ public class StartupDataLoader implements ApplicationRunner {
         System.out.println("✓ Roles inicializados: ADMINISTRADOR, EMPLEADO, REPARTIDOR, MANAGER, PROPIETARIO");
         
         // Crear usuario admin si no existe
-        Optional<Empleado> adminExistente = empleadoRepository.findByUsername("admin");
+        Optional<Empleado> adminExistente = empleadoRepository.findByUsername(ADMIN);
         
         if (adminExistente.isEmpty()) {
             Empleado admin = new Empleado();
-            admin.setNombre("admin");
-            admin.setUsername("admin");
+            admin.setNombre(ADMIN);
+            admin.setUsername(ADMIN);
             admin.setContrasena(passwordEncoder.encode(adminDefaultPassword));
             admin.setEmail("admin@mail.com");
             admin.setTelefono(null);

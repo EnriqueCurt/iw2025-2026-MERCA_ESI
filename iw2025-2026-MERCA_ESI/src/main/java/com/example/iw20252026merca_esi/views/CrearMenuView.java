@@ -64,6 +64,14 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
     private Menu menuEnEdicion;
     private H1 titulo;
 
+    private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
+    private static final String LUMO = "--lumo-primary-color";
+    private static final String FIELDLABEL = "--vaadin-input-field-label-color";
+    private static final String FOCUSEDLABEL = "--vaadin-input-field-focused-label-color";
+    private static final String CHECKBOX = "--vaadin-checkbox-checkmark-color";
+
     public CrearMenuView(ProductoService productoService, MenuService menuService, SessionService sessionService) {
         this.productoService = productoService;
         this.menuService = menuService;
@@ -73,7 +81,7 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
         titulo.getStyle()
                 .set("margin-top", "0")
                 .set("margin-bottom", "20px")
-                .set("color", "#D32F2F");
+                .set(COLOR, COLOR2);
 
         HorizontalLayout mainContent = createMainContent();
 
@@ -141,18 +149,18 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
         seccionImagen.setWidth("100%");
         seccionImagen.setPadding(false);
         H3 tituloImagen = new H3("Imagen del Menú");
-        tituloImagen.getStyle().set("color", "#D32F2F");
+        tituloImagen.getStyle().set(COLOR, COLOR2);
         seccionImagen.add(tituloImagen, uploadImagen, imagenPreview);
 
         Button guardarButton = new Button("Guardar", event -> guardarMenu());
         guardarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guardarButton.getStyle().set("background-color", "#D32F2F");
-        guardarButton.getStyle().set("color", "white");
+        guardarButton.getStyle().set("background-color", COLOR2);
+        guardarButton.getStyle().set(COLOR, COLOR1);
         guardarButton.setWidthFull();
 
         Button limpiarButton = new Button("Limpiar", event -> limpiarFormulario());
-        limpiarButton.getStyle().set("background-color", "#D32F2F");
-        limpiarButton.getStyle().set("color", "white");
+        limpiarButton.getStyle().set("background-color", COLOR2);
+        limpiarButton.getStyle().set(COLOR, COLOR1);
         limpiarButton.setWidthFull();
 
         formLayout.add(
@@ -166,7 +174,7 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
 
         // Precio de referencia
         precioReferenciaSpan.getStyle()
-                .set("color", "#666")
+                .set(COLOR, "#666")
                 .set("font-size", "0.9rem")
                 .set("font-style", "italic")
                 .set("margin-top", "5px");
@@ -188,40 +196,40 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
         nombreField.setMaxLength(100);
         nombreField.setPlaceholder("Introduce el nombre del menú");
         nombreField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         descripcionField.setMaxLength(500);
         descripcionField.setPlaceholder("Introduce una descripción");
         descripcionField.setHeight("150px");
         descripcionField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         precioField.setRequired(true);
         precioField.setMin(0.0);
         precioField.setPrefixComponent(new com.vaadin.flow.component.html.Span("€"));
         precioField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         estadoCheckbox.setValue(true);
         estadoCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         ofertaCheckbox.setValue(false);
         ofertaCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         puntosCheckbox.setValue(false);
         puntosCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         // ComboBox productos
         List<Producto> productos = productoService.listarProductosActivos();
@@ -230,9 +238,9 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
         productoComboBox.setPlaceholder("Selecciona un producto");
         productoComboBox.setWidthFull();
         productoComboBox.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         productoComboBox.addValueChangeListener(event -> {
             Producto seleccionado = event.getValue();
@@ -299,7 +307,7 @@ public class CrearMenuView extends VerticalLayout implements BeforeEnterObserver
         productoGrid.addColumn(Producto::getPrecio).setHeader("Precio").setFlexGrow(1);
         productoGrid.addComponentColumn(prod -> {
             Button eliminar = new Button("Eliminar");
-            eliminar.getStyle().set("color", "#D32F2F");
+            eliminar.getStyle().set(COLOR, COLOR2);
             eliminar.addClickListener(e -> {
                 productosSeleccionados.remove(prod);
                 productoGrid.setItems(productosSeleccionados);

@@ -35,6 +35,9 @@ public class CrearCategoriaView extends VerticalLayout implements BeforeEnterObs
 
     private final Checkbox estadoCheckbox = new Checkbox("Activo");
 
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
+
     public CrearCategoriaView(CategoriaService categoriaService, SessionService sessionService) {
         this.categoriaService = categoriaService;
         this.sessionService = sessionService;
@@ -65,12 +68,12 @@ public class CrearCategoriaView extends VerticalLayout implements BeforeEnterObs
 
         Button guardarButton = new Button("Guardar", event -> guardarCategoria());
         guardarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guardarButton.getStyle().set("background-color", "#D32F2F");
-        guardarButton.getStyle().set("color", "white");
+        guardarButton.getStyle().set("background-color", COLOR2);
+        guardarButton.getStyle().set("color", COLOR1);
 
         Button limpiarButton = new Button("Limpiar", event -> limpiarFormulario());
-        limpiarButton.getStyle().set("background-color", "#D32F2F");
-        limpiarButton.getStyle().set("color", "white");
+        limpiarButton.getStyle().set("background-color", COLOR2);
+        limpiarButton.getStyle().set("color", COLOR1);
 
         formLayout.add(
                 nombreField,
@@ -87,14 +90,14 @@ public class CrearCategoriaView extends VerticalLayout implements BeforeEnterObs
         nombreField.setMaxLength(100);
         nombreField.setPlaceholder("Introduce el nombre de la Categoria");
         nombreField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set("--lumo-primary-color", COLOR2)
+                .set("--vaadin-input-field-label-color", COLOR2)
+                .set("--vaadin-input-field-focused-label-color", COLOR2);
 
         estadoCheckbox.setValue(true);
         estadoCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set("--vaadin-checkbox-checkmark-color", COLOR1)
+                .set("--lumo-primary-color", COLOR2);
     }
 
     private void guardarCategoria() {
