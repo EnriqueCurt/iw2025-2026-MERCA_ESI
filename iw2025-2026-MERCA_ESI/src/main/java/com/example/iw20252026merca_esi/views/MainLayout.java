@@ -32,6 +32,18 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
     private static final String PADDING = "padding";
     private static final String BACKGROUND_COLOR = "background-color";
     private static final String DISPLAY = "display";
+    private static final String BOX_SHADOW = "box-shadow";
+    private static final String CURSOR = "cursor";
+    private static final String POINTER = "pointer";
+    private static final String ONMOUSEOVER = "onmouseover";
+    private static final String ONMOUSEOUT = "onmouseout";
+    private static final String COLOR4 = "this.style.backgroundColor='rgba(255,255,255,0.3)';";
+    private static final String COLOR2 ="this.style.backgroundColor='';";
+    private static final String BORDER_RADIUS = "border-radius";
+    private static final String TRANSITION = "transition";
+    private static final String CENTER = "center";
+    private static final String COLOR6 = "background-color 0.3s";
+    private static final String COLOR7 = "this.style.backgroundColor='transparent';";
 
     public MainLayout(@Autowired SessionService sessionService) {
         this.sessionService = sessionService;
@@ -85,7 +97,7 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         header.getStyle()
                 .set(BACKGROUND_COLOR, "#e30613")
                 .set(COLOR, COLOR1)
-                .set("box-shadow", COLOR5);
+                .set(BOX_SHADOW, COLOR5);
         header.setDefaultVerticalComponentAlignment(Alignment.CENTER);
 
         Div logoDiv = new Div();
@@ -94,9 +106,9 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("font-size", "24px")
                 .set("font-weight", "bold")
                 .set(COLOR, COLOR1)
-                .set("cursor", "pointer");
-        logo.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-        logo.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+                .set(CURSOR, POINTER);
+        logo.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+        logo.getElement().setAttribute(ONMOUSEOUT, COLOR2);
 
         logo.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("")));
         logoDiv.add(logo);
@@ -120,14 +132,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             gestionItem.add("GESTIÓN");
             gestionItem.getElement().getStyle()
                     .set(COLOR, COLOR1)
-                    .set("border-radius", "50px")
-                    .set("cursor", "pointer")
+                    .set(BORDER_RADIUS, "50px")
+                    .set(CURSOR, POINTER)
                     .set("background", "transparent")
-                    .set("box-shadow", COLOR5)
-                    .set("transition", "background-color 0.3s");
+                    .set(BOX_SHADOW, COLOR5)
+                    .set(TRANSITION, COLOR6);
             
-            gestionItem.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-            gestionItem.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            gestionItem.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+            gestionItem.getElement().setAttribute(ONMOUSEOUT, COLOR7);
             
             SubMenu gestionSubMenu = gestionItem.getSubMenu();
             MenuItem productosItem = gestionSubMenu.addItem("Gestión de Productos");
@@ -168,13 +180,13 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             empleadoButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("pedidos-pendientes")));
             empleadoButton.getStyle()
                     .set(COLOR, COLOR1)
-                    .set("border-radius", "50px")
-                    .set("box-shadow", COLOR5)
-                    .set("transition", "background-color 0.3s")
-                    .set("cursor", "pointer");
+                    .set(BORDER_RADIUS, "50px")
+                    .set(BOX_SHADOW, COLOR5)
+                    .set(TRANSITION, COLOR6)
+                    .set(CURSOR, POINTER);
             
-            empleadoButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-            empleadoButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            empleadoButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+            empleadoButton.getElement().setAttribute(ONMOUSEOUT, COLOR7);
             
             rightSection.add(empleadoButton);
         }
@@ -186,13 +198,13 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             repartidorButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("repartidor")));
             repartidorButton.getStyle()
                     .set(COLOR, COLOR1)
-                    .set("border-radius", "50px")
-                    .set("box-shadow", COLOR5)
-                    .set("transition", "background-color 0.3s")
-                    .set("cursor", "pointer");
+                    .set(BORDER_RADIUS, "50px")
+                    .set(BOX_SHADOW, COLOR5)
+                    .set(TRANSITION, COLOR6)
+                    .set(CURSOR, POINTER);
             
-            repartidorButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-            repartidorButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            repartidorButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+            repartidorButton.getElement().setAttribute(ONMOUSEOUT, COLOR7);
             
             rightSection.add(repartidorButton);
         }
@@ -204,13 +216,13 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
             cocinaButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("cocina")));
             cocinaButton.getStyle()
                     .set(COLOR, COLOR1)
-                    .set("border-radius", "50px")
-                    .set("box-shadow", COLOR5)
-                    .set("transition", "background-color 0.3s")
-                    .set("cursor", "pointer");
+                    .set(BORDER_RADIUS, "50px")
+                    .set(BOX_SHADOW, COLOR5)
+                    .set(TRANSITION, COLOR6)
+                    .set(CURSOR, POINTER);
             
-            cocinaButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-            cocinaButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='transparent';");
+            cocinaButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+            cocinaButton.getElement().setAttribute(ONMOUSEOUT, COLOR7);
             
             rightSection.add(cocinaButton);
         }
@@ -220,14 +232,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carrito")));
         cartButton.getStyle()
                 .set(COLOR, COLOR1)
-                .set("border-radius","50px")
-                .set("box-shadow", COLOR5)
-                .set("transition", "background-color 0.3s")
-                .set("cursor", "pointer");
+                .set(BORDER_RADIUS,"50px")
+                .set(BOX_SHADOW, COLOR5)
+                .set(TRANSITION, COLOR6)
+                .set(CURSOR, POINTER);
 
         // Efecto similar a los botones del menú: cambio sutil de fondo al pasar el ratón
-        cartButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-        cartButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+        cartButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+        cartButton.getElement().setAttribute(ONMOUSEOUT, COLOR2);
 
         // Botón dinámico: ACCESO o PERFIL según el estado de sesión
         boolean isLoggedIn = sessionService.isLoggedIn();
@@ -239,14 +251,14 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         loginButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(navigationTarget)));
         loginButton.getStyle()
                 .set(COLOR, COLOR1)
-                .set("border-radius","50px")
-                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.3)")
-                .set("transition", "background-color 0.3s")
-                .set("cursor", "pointer");
+                .set(BORDER_RADIUS,"50px")
+                .set(BOX_SHADOW, "0 4px 12px rgba(0,0,0,0.3)")
+                .set(TRANSITION, COLOR6)
+                .set(CURSOR, POINTER);
 
         // Efecto similar a los botones del menú: cambio sutil de fondo al pasar el ratón
-        loginButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(255,255,255,0.3)';");
-        loginButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+        loginButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+        loginButton.getElement().setAttribute(ONMOUSEOUT, COLOR2);
 
 
         rightSection.add(cartButton, loginButton);
@@ -264,8 +276,8 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("flex-wrap", "wrap")
                 .set("gap", "6px")
                 .set(BACKGROUND_COLOR, COLOR1)
-                .set("border-radius", "50px")
-                .set("box-shadow", "0 4px 12px rgba(0,0,0,0.55)")
+                .set(BORDER_RADIUS, "50px")
+                .set(BOX_SHADOW, "0 4px 12px rgba(0,0,0,0.55)")
                 .set("margin", "0")
                 .set(PADDING, "8px clamp(10px, 2vw, 20px)");
 
@@ -279,12 +291,12 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                     .set(COLOR, "#333")
                     .set("font-weight", "500")
                     .set(PADDING, "10px 15px")
-                    .set("border-radius", "25px")
-                    .set("transition", "background-color 0.3s")
-                    .set("cursor", "pointer");
+                    .set(BORDER_RADIUS, "25px")
+                    .set(TRANSITION, COLOR6)
+                    .set(CURSOR, POINTER);
             menuButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(item.toLowerCase())));
-            menuButton.getElement().setAttribute("onmouseover", "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
-            menuButton.getElement().setAttribute("onmouseout", "this.style.backgroundColor='';");
+            menuButton.getElement().setAttribute(ONMOUSEOVER, "this.style.backgroundColor='rgba(227, 227, 227, 1)';");
+            menuButton.getElement().setAttribute(ONMOUSEOUT, COLOR2);
             menuBar.add(menuButton);
         }
         
@@ -342,10 +354,10 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
                 .set("margin", "0")
                 .set(DISPLAY, "flex")
                 .set("flex-wrap", "wrap")
-                .set("justify-content", "center")
-                .set("align-items", "center")
+                .set("justify-content", CENTER)
+                .set("align-items", CENTER)
                 .set("gap", "8px")
-                .set("text-align", "center");
+                .set("text-align", CENTER);
 
         Span footerText = new Span("© 2025 MercaESI - Todos los derechos reservados");
         footer.add(footerText);
