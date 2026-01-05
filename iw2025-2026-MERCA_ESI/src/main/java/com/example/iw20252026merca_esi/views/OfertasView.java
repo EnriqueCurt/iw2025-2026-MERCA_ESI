@@ -49,7 +49,13 @@ public class OfertasView extends VerticalLayout {
     private static final String FONTSIZE = "font-size";
     private static final String FONTSIZE_IS = "0.75rem";
     private static final String FONT_WEIGHT = "font-weight";
-    private static final String BORDER_RADIUS = "border-radius";
+    private static final String TEXT_ALIGN = "text-align";
+    private static final String COLUMN = "column";
+    private static final String FLEX_DIRECTION = "flex-direction";
+    private static final String COLOR9 = "#9C27B0";
+    private static final String COLOR8 = "#FF9800";
+    private static final String BOX_SHADOW = "box-shadow";
+
 
     public OfertasView(ProductoService productoService) {
         this.productoService = productoService;
@@ -113,7 +119,7 @@ public class OfertasView extends VerticalLayout {
                 .set("flex-wrap", "wrap")
                 .set("gap", "15px")
                 .set(BACKGROUND_COLOR, "#f5f5f5")
-                .set(BORDER_RADIUS, "8px")
+                .set(TEXT_ALIGN, "8px")
                 .set("margin", "0 clamp(8px, 2vw, 12px)");
         
         puntosFilter.getStyle()
@@ -231,7 +237,7 @@ public class OfertasView extends VerticalLayout {
             // Cambiar el grid a layout vertical para mostrar secciones
             grid.getStyle()
                     .set(DISPLAY, "flex")
-                    .set("flex-direction", "column")
+                    .set(FLEX_DIRECTION, COLUMN)
                     .set("gap", "30px");
             
             // Separar ofertas de productos por puntos
@@ -270,7 +276,7 @@ public class OfertasView extends VerticalLayout {
                 .set("margin", "0 0 20px 0")
                 .set(FONTSIZE, "2rem")
                 .set(FONT_WEIGHT, "700")
-                .set(COLOR, esOferta ? "#FF9800" : "#9C27B0")
+                .set(COLOR, esOferta ? COLOR8 : COLOR9)
                 .set("text-align", "left")
                 .set("border-bottom", esOferta ? "3px solid #FF9800" : "3px solid #9C27B0")
                 .set("padding-bottom", "10px");
@@ -292,19 +298,19 @@ public class OfertasView extends VerticalLayout {
     }
 
     private Div createProductCard(Producto producto, boolean esOferta) {
-        String colorBorde = esOferta ? "#FF9800" : "#9C27B0";
+        String colorBorde = esOferta ? COLOR8 : COLOR9;
         String colorSombra = esOferta ? "rgba(255, 152, 0, 0.3)" : "rgba(156, 39, 176, 0.3)";
         String colorSombraHover = esOferta ? "rgba(255, 152, 0, 0.5)" : "rgba(156, 39, 176, 0.5)";
         
         Div card = new Div();
         card.getStyle()
                 .set("background", "#ffffff")
-                .set(BORDER_RADIUS, "12px")
-                .set("box-shadow", "0 8px 24px " + colorSombra)
+                .set(TEXT_ALIGN, "12px")
+                .set(BOX_SHADOW, "0 8px 24px " + colorSombra)
                 .set("border", "3px solid " + colorBorde)
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEX_DIRECTION, COLUMN)
                 .set("height", "100%")
                 .set("max-width", "350px")
                 .set("transition", "all 0.3s ease")
@@ -314,12 +320,12 @@ public class OfertasView extends VerticalLayout {
         card.getElement().addEventListener("mouseenter", e -> 
             card.getStyle()
                 .set("transform", "scale(1.05) translateY(-5px)")
-                .set("box-shadow", "0 12px 32px " + colorSombraHover)
+                .set(BOX_SHADOW, "0 12px 32px " + colorSombraHover)
         );
         card.getElement().addEventListener("mouseleave", e -> 
             card.getStyle()
                 .set("transform", "scale(1)")
-                .set("box-shadow", "0 8px 24px " + colorSombra)
+                .set(BOX_SHADOW, "0 8px 24px " + colorSombra)
         );
 
         Image image;
@@ -341,7 +347,7 @@ public class OfertasView extends VerticalLayout {
         Div content = new Div();
         content.getStyle()
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEX_DIRECTION, COLUMN)
                 .set("gap", "8px")
                 .set(PADDING, "12px 14px 14px 14px")
                 .set("flex", "1 1 auto");
@@ -388,10 +394,10 @@ public class OfertasView extends VerticalLayout {
         if (esOferta && producto.getEsOferta()) {
             Span ofertaBadge = new Span("OFERTA");
             ofertaBadge.getStyle()
-                    .set(BACKGROUND_COLOR, "#FF9800")
+                    .set(BACKGROUND_COLOR, COLOR8)
                     .set(COLOR, COLOR_2_IS)
                     .set(PADDING, PADDING_IS)
-                    .set(BORDER_RADIUS, "4px")
+                    .set(TEXT_ALIGN, "4px")
                     .set(FONTSIZE, FONTSIZE_IS)
                     .set(FONT_WEIGHT, "bold");
             badges.add(ofertaBadge);
@@ -400,10 +406,10 @@ public class OfertasView extends VerticalLayout {
         if (!esOferta && producto.getPuntos()) {
             Span puntosBadge = new Span("PUNTOS");
             puntosBadge.getStyle()
-                    .set(BACKGROUND_COLOR, "#9C27B0")
+                    .set(BACKGROUND_COLOR, COLOR9)
                     .set(COLOR, COLOR_2_IS)
                     .set(PADDING, PADDING_IS)
-                    .set(BORDER_RADIUS, "4px")
+                    .set(TEXT_ALIGN, "4px")
                     .set(FONTSIZE, FONTSIZE_IS)
                     .set(FONT_WEIGHT, "bold");
             badges.add(puntosBadge);
