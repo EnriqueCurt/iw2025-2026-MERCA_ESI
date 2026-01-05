@@ -23,7 +23,8 @@ public class MainView extends Div {
 
     private final EstablecimientoService establecimientoService;
 
-    private static final String COLOR1 = "#D32F2F";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
     private static final String BOX_SHADOW = "box-shadow";
     private static final String BORDER_RADIUS = "border-radius";
     private static final String TEXT_ALIGN = "text-align";
@@ -32,7 +33,14 @@ public class MainView extends Div {
     private static final String FONT_WEIGHT = "font-weight";
     private static final String FONT_SIZE = "font-size";
     private static final String PADDING = "padding";
+    private static final String PADDING1 = "20px 40px";
     private static final String CENTER = "center";
+    private static  final String MARGINRIGHT = "margin-right";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String POINTER = "pointer";
+    private static final String CURSOR = "cursor";
+    private static final String TRANSITION = "transition";
+    private static final String TRANSITION1 = "all 0.3s ease";
 
 
     @Autowired
@@ -95,8 +103,8 @@ public class MainView extends Div {
                 HorizontalLayout direccionLayout = new HorizontalLayout();
                 direccionLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon locationIcon = new Icon(VaadinIcon.MAP_MARKER);
-                locationIcon.setColor(COLOR1);
-                locationIcon.getStyle().set("margin-right", "8px");
+                locationIcon.setColor(COLOR2);
+                locationIcon.getStyle().set(MARGINRIGHT, "8px");
                 Span direccion = new Span(establecimiento.getDireccion());
                 direccion.getStyle()
                         .set(FONT_SIZE, "16px")
@@ -110,8 +118,8 @@ public class MainView extends Div {
                 HorizontalLayout telefonoLayout = new HorizontalLayout();
                 telefonoLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon phoneIcon = new Icon(VaadinIcon.PHONE);
-                phoneIcon.setColor(COLOR1);
-                phoneIcon.getStyle().set("margin-right", "8px");
+                phoneIcon.setColor(COLOR2);
+                phoneIcon.getStyle().set(MARGINRIGHT, "8px");
                 Span telefono = new Span(establecimiento.getTelefono());
                 telefono.getStyle()
                         .set(FONT_SIZE, "16px")
@@ -125,8 +133,8 @@ public class MainView extends Div {
                 HorizontalLayout horarioLayout = new HorizontalLayout();
                 horarioLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon clockIcon = new Icon(VaadinIcon.CLOCK);
-                clockIcon.setColor(COLOR1);
-                clockIcon.getStyle().set("margin-right", "8px");
+                clockIcon.setColor(COLOR2);
+                clockIcon.getStyle().set(MARGINRIGHT, "8px");
                 Span horario = new Span(establecimiento.getHorario());
                 horario.getStyle()
                         .set(FONT_SIZE, "16px")
@@ -139,7 +147,7 @@ public class MainView extends Div {
         // Botones de navegación destacados
         H3 navegacionTitle = new H3("Explora nuestro catálogo");
         navegacionTitle.getStyle()
-                .set(COLOR, COLOR1)
+                .set(COLOR, COLOR2)
                 .set(MARGIN, "30px 0 20px 0")
                 .set(TEXT_ALIGN, CENTER)
                 .set(FONT_SIZE, "24px");
@@ -155,45 +163,45 @@ public class MainView extends Div {
         Button btnCarta = new Button("CARTA", new Icon(VaadinIcon.BOOK));
         btnCarta.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnCarta.getStyle()
-                .set("background-color", "#e30613")
-                .set(COLOR, "white")
+                .set(BACKGROUNDCOLOR, "#e30613")
+                .set(COLOR, COLOR1)
                 .set(BORDER_RADIUS, "12px")
-                .set(PADDING, "20px 40px")
+                .set(PADDING, PADDING1)
                 .set(FONT_SIZE, "18px")
                 .set(FONT_WEIGHT, "bold")
                 .set(BOX_SHADOW, "0 4px 12px rgba(227, 6, 19, 0.4)")
-                .set("cursor", "pointer")
-                .set("transition", "all 0.3s ease");
+                .set(CURSOR, POINTER)
+                .set(TRANSITION, TRANSITION1);
         btnCarta.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carta")));
 
         // Botón MENÚS
         Button btnMenus = new Button("MENÚS", new Icon(VaadinIcon.LIST));
         btnMenus.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnMenus.getStyle()
-                .set("background-color", "#e30613")
-                .set(COLOR, "white")
+                .set(BACKGROUNDCOLOR, "#e30613")
+                .set(COLOR, COLOR1)
                 .set(BORDER_RADIUS, "12px")
-                .set(PADDING, "20px 40px")
+                .set(PADDING, PADDING1)
                 .set(FONT_SIZE, "18px")
                 .set(FONT_WEIGHT, "bold")
                 .set(BOX_SHADOW, "0 4px 12px rgba(227, 6, 19, 0.4)")
-                .set("cursor", "pointer")
-                .set("transition", "all 0.3s ease");
+                .set(CURSOR, POINTER)
+                .set(TRANSITION, TRANSITION1);
         btnMenus.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("menús")));
 
         // Botón OFERTAS
         Button btnOfertas = new Button("OFERTAS", new Icon(VaadinIcon.STAR));
         btnOfertas.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnOfertas.getStyle()
-                .set("background-color", "#FF9800")
-                .set(COLOR, "white")
+                .set(BACKGROUNDCOLOR, "#FF9800")
+                .set(COLOR, COLOR1)
                 .set(BORDER_RADIUS, "12px")
-                .set(PADDING, "20px 40px")
+                .set(PADDING, PADDING1)
                 .set(FONT_SIZE, "18px")
                 .set(FONT_WEIGHT, "bold")
                 .set(BOX_SHADOW, "0 4px 12px rgba(255, 152, 0, 0.4)")
-                .set("cursor", "pointer")
-                .set("transition", "all 0.3s ease");
+                .set(CURSOR, POINTER)
+                .set(TRANSITION, TRANSITION1);
         btnOfertas.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("ofertas")));
 
         botonesLayout.add(btnCarta, btnMenus, btnOfertas);
