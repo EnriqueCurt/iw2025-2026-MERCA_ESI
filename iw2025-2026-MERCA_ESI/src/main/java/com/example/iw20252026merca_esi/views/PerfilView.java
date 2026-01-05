@@ -38,6 +38,26 @@ public class PerfilView extends VerticalLayout {
     private VerticalLayout contenedorPrincipal;
     private boolean modoEdicion = false;
 
+    private static final String BACKGROUND = "background";
+    private static final String BORDER_RADIUS = "border-radius";
+    private static final String MARGIN_TOP = "margin-top";
+    private static final String EDITAR_PERFIL = "Editar Perfil";
+    private static final String B_COLOR = "background-color";
+    private static final String COLOR1 = "#D32F2F";
+    private static final String PIXEL_TAM = "12px 24px";
+    private static final String PADDING = "padding";
+    private static final String COLOR = "color";
+    private static final String COLOR2 = "#1976D2";
+    private static final String BORDER_COLOR = "border-color";
+    private static final String MARGIN_BOTTOM = "margin-bottom" ;
+    private static final String CENTER = "center";
+    private static final String FONT_SIZE = "font-size";
+    private static final String FONT_WEIGHT = "font-weight";
+    private static final String MARGIN = "margin";
+    private static final String COLOR7 = "0 0 20px 0";
+    private static final String USUARIO = "Usuario";
+    private static final String EMAIL = "Email";
+    private static final String TELEFONO = "Teléfono";
     @Autowired
     public PerfilView(SessionService sessionService, ClienteService clienteService, EmpleadoService empleadoService) {
         this.sessionService = sessionService;
@@ -63,8 +83,8 @@ public class PerfilView extends VerticalLayout {
         contenedorPrincipal.setPadding(true);
         contenedorPrincipal.setSpacing(true);
         contenedorPrincipal.getStyle()
-                .set("background", "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)")
-                .set("border-radius", "16px")
+                .set(BACKGROUND, "linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%)")
+                .set(BORDER_RADIUS, "16px")
                 .set("box-shadow", "0 8px 32px rgba(0,0,0,0.1)");
         
         // Verificar usuario logueado
@@ -97,31 +117,31 @@ public class PerfilView extends VerticalLayout {
         botonesAccion.setWidthFull();
         botonesAccion.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         botonesAccion.setSpacing(true);
-        botonesAccion.getStyle().set("margin-top", "20px");
+        botonesAccion.getStyle().set(MARGIN_TOP, "20px");
         
-        Button btnEditar = new Button("Editar Perfil", new Icon(VaadinIcon.EDIT));
+        Button btnEditar = new Button(EDITAR_PERFIL, new Icon(VaadinIcon.EDIT));
         btnEditar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnEditar.getStyle()
-                .set("background-color", "#D32F2F")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(B_COLOR, COLOR1)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnEditar.addClickListener(e -> mostrarFormularioEdicionCliente(cliente));
         
         Button btnPrivacidad = new Button("Privacidad", new Icon(VaadinIcon.SHIELD));
         btnPrivacidad.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnPrivacidad.getStyle()
-                .set("color", "#1976D2")
-                .set("border-color", "#1976D2")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(COLOR, COLOR2)
+                .set(BORDER_COLOR, COLOR2)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnPrivacidad.addClickListener(e -> UI.getCurrent().navigate("privacidad"));
         
         Button btnCerrarSesion = new Button("Cerrar Sesión", new Icon(VaadinIcon.SIGN_OUT));
         btnCerrarSesion.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnCerrarSesion.getStyle()
-                .set("color", "#D32F2F")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(COLOR, COLOR1)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnCerrarSesion.addClickListener(e -> {
             sessionService.logout();
             UI.getCurrent().navigate("");
@@ -150,31 +170,31 @@ public class PerfilView extends VerticalLayout {
         botonesAccion.setWidthFull();
         botonesAccion.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         botonesAccion.setSpacing(true);
-        botonesAccion.getStyle().set("margin-top", "20px");
+        botonesAccion.getStyle().set(MARGIN_TOP, "20px");
         
-        Button btnEditar = new Button("Editar Perfil", new Icon(VaadinIcon.EDIT));
+        Button btnEditar = new Button(EDITAR_PERFIL, new Icon(VaadinIcon.EDIT));
         btnEditar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnEditar.getStyle()
-                .set("background-color", "#D32F2F")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(B_COLOR, COLOR1)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnEditar.addClickListener(e -> mostrarFormularioEdicionEmpleado(empleado));
         
         Button btnPrivacidad = new Button("Privacidad", new Icon(VaadinIcon.SHIELD));
         btnPrivacidad.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnPrivacidad.getStyle()
-                .set("color", "#1976D2")
-                .set("border-color", "#1976D2")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(COLOR, COLOR2)
+                .set(BORDER_COLOR, COLOR2)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnPrivacidad.addClickListener(e -> UI.getCurrent().navigate("privacidad"));
         
         Button btnCerrarSesion = new Button("Cerrar Sesión", new Icon(VaadinIcon.SIGN_OUT));
         btnCerrarSesion.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnCerrarSesion.getStyle()
-                .set("color", "#D32F2F")
-                .set("border-radius", "8px")
-                .set("padding", "12px 24px");
+                .set(COLOR, COLOR1)
+                .set(BORDER_RADIUS, "8px")
+                .set(PADDING, PIXEL_TAM);
         btnCerrarSesion.addClickListener(e -> {
             sessionService.logout();
             UI.getCurrent().navigate("");
@@ -192,11 +212,11 @@ public class PerfilView extends VerticalLayout {
         header.setSpacing(false);
         header.setPadding(false);
         header.getStyle()
-                .set("background", "linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)")
-                .set("color", "white")
-                .set("border-radius", "12px")
-                .set("padding", "30px")
-                .set("margin-bottom", "20px")
+                .set(BACKGROUND, "linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)")
+                .set(COLOR, "white")
+                .set(BORDER_RADIUS, "12px")
+                .set(PADDING, "30px")
+                .set(MARGIN_BOTTOM, "20px")
                 .set("width", "100%");
         
         // Avatar círculo con inicial
@@ -205,28 +225,28 @@ public class PerfilView extends VerticalLayout {
         avatar.getStyle()
                 .set("width", "80px")
                 .set("height", "80px")
-                .set("border-radius", "50%")
-                .set("background-color", "rgba(255,255,255,0.3)")
+                .set(BORDER_RADIUS, "50%")
+                .set(B_COLOR, "rgba(255,255,255,0.3)")
                 .set("display", "flex")
-                .set("align-items", "center")
-                .set("justify-content", "center")
-                .set("font-size", "36px")
-                .set("font-weight", "bold")
-                .set("margin-bottom", "15px");
+                .set("align-items", CENTER)
+                .set("justify-content", CENTER)
+                .set(FONT_SIZE, "36px")
+                .set(FONT_WEIGHT, "bold")
+                .set(MARGIN_BOTTOM, "15px");
         
         H2 nombreTitle = new H2(nombre);
         nombreTitle.getStyle()
-                .set("margin", "0")
-                .set("color", "white")
-                .set("font-size", "28px");
+                .set(MARGIN, "0")
+                .set(COLOR, "white")
+                .set(FONT_SIZE, "28px");
         
         Span tipoSpan = new Span(tipo);
         tipoSpan.getStyle()
-                .set("background", "rgba(255,255,255,0.2)")
-                .set("padding", "5px 15px")
-                .set("border-radius", "20px")
-                .set("font-size", "14px")
-                .set("margin-top", "10px");
+                .set(BACKGROUND, "rgba(255,255,255,0.2)")
+                .set(PADDING, "5px 15px")
+                .set(BORDER_RADIUS, "20px")
+                .set(FONT_SIZE, "14px")
+                .set(MARGIN_TOP, "10px");
         
         header.add(avatar, nombreTitle, tipoSpan);
         
@@ -236,15 +256,15 @@ public class PerfilView extends VerticalLayout {
             starIcon.setColor("#FFD700");
             starIcon.getStyle().set("margin-right", "5px");
             Span puntosSpan = new Span(puntos + " Puntos");
-            puntosSpan.getStyle().set("font-size", "18px").set("font-weight", "bold");
+            puntosSpan.getStyle().set(FONT_SIZE, "18px").set(FONT_WEIGHT, "bold");
             
             HorizontalLayout puntosLayout = new HorizontalLayout(starIcon, puntosSpan);
             puntosLayout.setAlignItems(Alignment.CENTER);
             puntosLayout.getStyle()
-                    .set("background", "rgba(255,215,0,0.2)")
-                    .set("padding", "10px 20px")
-                    .set("border-radius", "25px")
-                    .set("margin-top", "15px");
+                    .set(BACKGROUND, "rgba(255,215,0,0.2)")
+                    .set(PADDING, "10px 20px")
+                    .set(BORDER_RADIUS, "25px")
+                    .set(MARGIN_TOP, "15px");
             
             header.add(puntosLayout);
         }
@@ -260,14 +280,14 @@ public class PerfilView extends VerticalLayout {
         
         H3 titulo = new H3("Información Personal");
         titulo.getStyle()
-                .set("color", "#333")
-                .set("margin", "0 0 20px 0")
-                .set("font-size", "20px");
+                .set(COLOR, "#333")
+                .set(MARGIN, COLOR7)
+                .set(FONT_SIZE, "20px");
         
         vista.add(titulo);
-        vista.add(crearCampoInfo("Usuario", cliente.getUsername(), VaadinIcon.USER));
-        vista.add(crearCampoInfo("Email", cliente.getEmail(), VaadinIcon.ENVELOPE));
-        vista.add(crearCampoInfo("Teléfono", cliente.getTelefono() != null ? cliente.getTelefono() : "No especificado", VaadinIcon.PHONE));
+        vista.add(crearCampoInfo(USUARIO, cliente.getUsername(), VaadinIcon.USER));
+        vista.add(crearCampoInfo(EMAIL, cliente.getEmail(), VaadinIcon.ENVELOPE));
+        vista.add(crearCampoInfo(TELEFONO, cliente.getTelefono() != null ? cliente.getTelefono() : "No especificado", VaadinIcon.PHONE));
         
         return vista;
     }
@@ -280,14 +300,14 @@ public class PerfilView extends VerticalLayout {
         
         H3 titulo = new H3("Información Personal");
         titulo.getStyle()
-                .set("color", "#333")
-                .set("margin", "0 0 20px 0")
-                .set("font-size", "20px");
+                .set(COLOR, "#333")
+                .set(MARGIN, COLOR7)
+                .set(FONT_SIZE, "20px");
         
         vista.add(titulo);
-        vista.add(crearCampoInfo("Usuario", empleado.getUsername(), VaadinIcon.USER));
-        vista.add(crearCampoInfo("Email", empleado.getEmail(), VaadinIcon.ENVELOPE));
-        vista.add(crearCampoInfo("Teléfono", empleado.getTelefono() != null ? empleado.getTelefono() : "No especificado", VaadinIcon.PHONE));
+        vista.add(crearCampoInfo(USUARIO, empleado.getUsername(), VaadinIcon.USER));
+        vista.add(crearCampoInfo(EMAIL, empleado.getEmail(), VaadinIcon.ENVELOPE));
+        vista.add(crearCampoInfo(TELEFONO, empleado.getTelefono() != null ? empleado.getTelefono() : "No especificado", VaadinIcon.PHONE));
         
         return vista;
     }
@@ -298,14 +318,14 @@ public class PerfilView extends VerticalLayout {
         campo.setAlignItems(Alignment.CENTER);
         campo.setSpacing(true);
         campo.getStyle()
-                .set("background", "white")
-                .set("padding", "15px 20px")
-                .set("border-radius", "8px")
-                .set("margin-bottom", "10px")
+                .set(BACKGROUND, "white")
+                .set(PADDING, "15px 20px")
+                .set(BORDER_RADIUS, "8px")
+                .set(MARGIN_BOTTOM, "10px")
                 .set("box-shadow", "0 2px 4px rgba(0,0,0,0.05)");
         
         Icon icono = new Icon(iconoEnum);
-        icono.setColor("#D32F2F");
+        icono.setColor(COLOR1);
         icono.getStyle()
                 .set("min-width", "24px")
                 .set("margin-right", "10px");
@@ -316,15 +336,15 @@ public class PerfilView extends VerticalLayout {
         
         Span labelSpan = new Span(etiqueta);
         labelSpan.getStyle()
-                .set("font-size", "12px")
-                .set("color", "#666")
-                .set("font-weight", "500");
+                .set(FONT_SIZE, "12px")
+                .set(COLOR, "#666")
+                .set(FONT_WEIGHT, "500");
         
         Span valorSpan = new Span(valor);
         valorSpan.getStyle()
-                .set("font-size", "16px")
-                .set("color", "#333")
-                .set("font-weight", "600");
+                .set(FONT_SIZE, "16px")
+                .set(COLOR, "#333")
+                .set(FONT_WEIGHT, "600");
         
         textos.add(labelSpan, valorSpan);
         campo.add(icono, textos);
@@ -335,31 +355,31 @@ public class PerfilView extends VerticalLayout {
     private void mostrarFormularioEdicionCliente(Cliente cliente) {
         contenedorPrincipal.removeAll();
         
-        H2 titulo = new H2("Editar Perfil");
+        H2 titulo = new H2(EDITAR_PERFIL);
         titulo.getStyle()
-                .set("color", "#D32F2F")
-                .set("margin", "0 0 20px 0");
+                .set(COLOR, COLOR1)
+                .set(MARGIN, COLOR7);
         
         // Formulario de datos personales
         H3 subtituloDatos = new H3("Datos Personales");
-        subtituloDatos.getStyle().set("color", "#666").set("margin-top", "0");
+        subtituloDatos.getStyle().set(COLOR, "#666").set(MARGIN_TOP, "0");
         
         TextField nombreField = new TextField("Nombre Completo");
         nombreField.setValue(cliente.getNombre() != null ? cliente.getNombre() : "");
         nombreField.setWidthFull();
         nombreField.setPrefixComponent(new Icon(VaadinIcon.USER));
         
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setValue(cliente.getUsername() != null ? cliente.getUsername() : "");
         usernameField.setWidthFull();
         usernameField.setPrefixComponent(new Icon(VaadinIcon.USER_CARD));
         
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setValue(cliente.getEmail() != null ? cliente.getEmail() : "");
         emailField.setWidthFull();
         emailField.setPrefixComponent(new Icon(VaadinIcon.ENVELOPE));
         
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setValue(cliente.getTelefono() != null ? cliente.getTelefono() : "");
         telefonoField.setWidthFull();
         telefonoField.setPrefixComponent(new Icon(VaadinIcon.PHONE));
@@ -372,13 +392,13 @@ public class PerfilView extends VerticalLayout {
         
         // Formulario de cambio de contraseña
         H3 subtituloPassword = new H3("Cambiar Contraseña (Opcional)");
-        subtituloPassword.getStyle().set("color", "#666").set("margin-top", "20px");
+        subtituloPassword.getStyle().set(COLOR, "#666").set(MARGIN_TOP, "20px");
         
         Paragraph infoPassword = new Paragraph("Para cambiar tu contraseña, primero debes ingresar la actual.");
         infoPassword.getStyle()
-                .set("color", "#666")
-                .set("font-size", "14px")
-                .set("margin", "0 0 15px 0");
+                .set(COLOR, "#666")
+                .set(FONT_SIZE, "14px")
+                .set(MARGIN, "0 0 15px 0");
         
         PasswordField contrasenaActualField = new PasswordField("Contraseña Actual");
         contrasenaActualField.setWidthFull();
@@ -401,7 +421,7 @@ public class PerfilView extends VerticalLayout {
         botonesLayout.setWidthFull();
         botonesLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         botonesLayout.setSpacing(true);
-        botonesLayout.getStyle().set("margin-top", "30px");
+        botonesLayout.getStyle().set(MARGIN_TOP, "30px");
         
         Button btnGuardar = new Button("Guardar Cambios", new Icon(VaadinIcon.CHECK), e -> {
             try {
@@ -462,16 +482,16 @@ public class PerfilView extends VerticalLayout {
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnGuardar.getStyle()
-                .set("background-color", "#4CAF50")
-                .set("border-radius", "8px");
+                .set(B_COLOR, "#4CAF50")
+                .set(BORDER_RADIUS, "8px");
         
         Button btnCancelar = new Button("Cancelar", new Icon(VaadinIcon.CLOSE), e -> {
             mostrarPerfilCliente(cliente);
         });
         btnCancelar.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
         btnCancelar.getStyle()
-                .set("color", "#666")
-                .set("border-radius", "8px");
+                .set(COLOR, "#666")
+                .set(BORDER_RADIUS, "8px");
         
         botonesLayout.add(btnGuardar, btnCancelar);
         
@@ -481,31 +501,31 @@ public class PerfilView extends VerticalLayout {
     private void mostrarFormularioEdicionEmpleado(Empleado empleado) {
         contenedorPrincipal.removeAll();
         
-        H2 titulo = new H2("Editar Perfil");
+        H2 titulo = new H2(EDITAR_PERFIL);
         titulo.getStyle()
-                .set("color", "#D32F2F")
-                .set("margin", "0 0 20px 0");
+                .set(COLOR, COLOR1)
+                .set(MARGIN, COLOR7);
         
         // Formulario de datos personales
         H3 subtituloDatos = new H3("Datos Personales");
-        subtituloDatos.getStyle().set("color", "#666").set("margin-top", "0");
+        subtituloDatos.getStyle().set(COLOR, "#666").set(MARGIN_TOP, "0");
         
         TextField nombreField = new TextField("Nombre Completo");
         nombreField.setValue(empleado.getNombre() != null ? empleado.getNombre() : "");
         nombreField.setWidthFull();
         nombreField.setPrefixComponent(new Icon(VaadinIcon.USER));
         
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setValue(empleado.getUsername() != null ? empleado.getUsername() : "");
         usernameField.setWidthFull();
         usernameField.setPrefixComponent(new Icon(VaadinIcon.USER_CARD));
         
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setValue(empleado.getEmail() != null ? empleado.getEmail() : "");
         emailField.setWidthFull();
         emailField.setPrefixComponent(new Icon(VaadinIcon.ENVELOPE));
         
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setValue(empleado.getTelefono() != null ? empleado.getTelefono() : "");
         telefonoField.setWidthFull();
         telefonoField.setPrefixComponent(new Icon(VaadinIcon.PHONE));
@@ -518,13 +538,13 @@ public class PerfilView extends VerticalLayout {
         
         // Formulario de cambio de contraseña
         H3 subtituloPassword = new H3("Cambiar Contraseña (Opcional)");
-        subtituloPassword.getStyle().set("color", "#666").set("margin-top", "20px");
+        subtituloPassword.getStyle().set(COLOR, "#666").set(MARGIN_TOP, "20px");
         
         Paragraph infoPassword = new Paragraph("Para cambiar tu contraseña, primero debes ingresar la actual.");
         infoPassword.getStyle()
-                .set("color", "#666")
-                .set("font-size", "14px")
-                .set("margin", "0 0 15px 0");
+                .set(COLOR, "#666")
+                .set(FONT_SIZE, "14px")
+                .set(MARGIN, "0 0 15px 0");
         
         PasswordField contrasenaActualField = new PasswordField("Contraseña Actual");
         contrasenaActualField.setWidthFull();
@@ -547,7 +567,7 @@ public class PerfilView extends VerticalLayout {
         botonesLayout.setWidthFull();
         botonesLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         botonesLayout.setSpacing(true);
-        botonesLayout.getStyle().set("margin-top", "30px");
+        botonesLayout.getStyle().set(MARGIN_TOP, "30px");
         
         Button btnGuardar = new Button("Guardar Cambios", new Icon(VaadinIcon.CHECK), e -> {
             try {
@@ -608,16 +628,16 @@ public class PerfilView extends VerticalLayout {
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnGuardar.getStyle()
-                .set("background-color", "#4CAF50")
-                .set("border-radius", "8px");
+                .set(B_COLOR, "#4CAF50")
+                .set(BORDER_RADIUS, "8px");
         
         Button btnCancelar = new Button("Cancelar", new Icon(VaadinIcon.CLOSE), e -> {
             mostrarPerfilEmpleado(empleado);
         });
         btnCancelar.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
         btnCancelar.getStyle()
-                .set("color", "#666")
-                .set("border-radius", "8px");
+                .set(COLOR, "#666")
+                .set(BORDER_RADIUS, "8px");
         
         botonesLayout.add(btnGuardar, btnCancelar);
         
@@ -629,39 +649,39 @@ public class PerfilView extends VerticalLayout {
         
         Icon lockIcon = new Icon(VaadinIcon.LOCK);
         lockIcon.setSize("64px");
-        lockIcon.setColor("#D32F2F");
-        lockIcon.getStyle().set("margin-bottom", "20px");
+        lockIcon.setColor(COLOR1);
+        lockIcon.getStyle().set(MARGIN_BOTTOM, "20px");
         
         H2 titulo = new H2("Acceso Restringido");
         titulo.getStyle()
-                .set("color", "#333")
-                .set("margin", "0 0 10px 0");
+                .set(COLOR, "#333")
+                .set(MARGIN, "0 0 10px 0");
         
         Paragraph mensaje = new Paragraph("Para ver tu perfil, primero debes iniciar sesión.");
         mensaje.getStyle()
-                .set("color", "#666")
-                .set("font-size", "16px")
-                .set("text-align", "center")
-                .set("margin", "0 0 30px 0");
+                .set(COLOR, "#666")
+                .set(FONT_SIZE, "16px")
+                .set("text-align", CENTER)
+                .set(MARGIN, "0 0 30px 0");
         
         Button loginButton = new Button("Iniciar Sesión", new Icon(VaadinIcon.SIGN_IN));
         loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         loginButton.setWidthFull();
         loginButton.getStyle()
-                .set("background-color", "#D32F2F")
+                .set(B_COLOR, COLOR1)
                 .set("max-width", "300px")
-                .set("border-radius", "8px");
+                .set(BORDER_RADIUS, "8px");
         loginButton.addClickListener(e -> UI.getCurrent().navigate("acceso"));
         
         Button registerButton = new Button("Crear Cuenta", new Icon(VaadinIcon.USER_CARD));
         registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_LARGE);
         registerButton.setWidthFull();
         registerButton.getStyle()
-                .set("color", "#D32F2F")
-                .set("border-color", "#D32F2F")
+                .set(COLOR, COLOR1)
+                .set(BORDER_COLOR, COLOR1)
                 .set("max-width", "300px")
-                .set("border-radius", "8px")
-                .set("margin-top", "10px");
+                .set(BORDER_RADIUS, "8px")
+                .set(MARGIN_TOP, "10px");
         registerButton.addClickListener(e -> UI.getCurrent().navigate("acceso"));
         
         VerticalLayout centerLayout = new VerticalLayout(lockIcon, titulo, mensaje, loginButton, registerButton);

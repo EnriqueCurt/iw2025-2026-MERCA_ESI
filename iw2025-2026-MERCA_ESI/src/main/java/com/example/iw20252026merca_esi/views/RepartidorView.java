@@ -50,6 +50,18 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
     private Div statsPanel;
     private Pedido pedidoSeleccionado;
 
+    private static final String COLOR1 = "#D32F2F";
+    private static final String COLOR2 = "#4CAF50";
+    private static final String COLOR = "color";
+    private static final String COLOR0 = "background-color";
+    private static final String BORDER_RADIUS = "border-radius";
+    private static final String LISTO = "LISTO";
+    private static final String EN_REPARTO = "EN_REPARTO";
+    private static final String FONT_SIZE = "font-size";
+    private static final String FONT_WEIGHT = "font-weight";
+
+
+
     @Autowired
     public RepartidorView(PedidoRepository pedidoRepository, SessionService sessionService) {
         this.pedidoRepository = pedidoRepository;
@@ -90,11 +102,11 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
 
     private HorizontalLayout createHeader() {
         H2 titulo = new H2("Panel de Repartidor");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR1);
 
         Button btnActualizar = new Button("Actualizar", new Icon(VaadinIcon.REFRESH));
         btnActualizar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnActualizar.getStyle().set("background-color", "#D32F2F");
+        btnActualizar.getStyle().set(COLOR0, COLOR1);
         btnActualizar.addClickListener(e -> cargarPedidos());
 
         HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnActualizar);
@@ -109,8 +121,8 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
     private Div createStatsPanel() {
         Div panel = new Div();
         panel.getStyle()
-                .set("background-color", "white")
-                .set("border-radius", "8px")
+                .set(COLOR0, "white")
+                .set(BORDER_RADIUS, "8px")
                 .set("padding", "20px")
                 .set("box-shadow", "0 2px 8px rgba(0,0,0,0.1)")
                 .set("margin-bottom", "20px");
@@ -132,17 +144,17 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         statsLayout.setJustifyContentMode(JustifyContentMode.AROUND);
 
         // Contar solo pedidos LISTO (disponibles) y EN_REPARTO asignados a este repartidor
-        long listos = pedidoRepository.countByEstado("LISTO");
+        long listos = pedidoRepository.countByEstado(LISTO);
         long enReparto = 0;
         if (empleado != null) {
-            enReparto = pedidoRepository.findByEstadoOrderByFechaAsc("EN_REPARTO").stream()
+            enReparto = pedidoRepository.findByEstadoOrderByFechaAsc(EN_REPARTO).stream()
                     .filter(p -> p.getEmpleado() != null && 
                                  p.getEmpleado().getIdEmpleado().equals(empleado.getIdEmpleado()))
                     .count();
         }
         
         statsLayout.add(
-            createStatCard("Listos", String.valueOf(listos), "#4CAF50"),
+            createStatCard("Listos", String.valueOf(listos), COLOR2),
             createStatCard("Mis Repartos", String.valueOf(enReparto), "#9C27B0")
         );
 
@@ -156,19 +168,19 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         card.setPadding(true);
         card.getStyle()
                 .set("border-left", "4px solid " + color)
-                .set("background-color", "#f9f9f9")
-                .set("border-radius", "4px");
+                .set(COLOR0, "#f9f9f9")
+                .set(BORDER_RADIUS, "4px");
 
         Span tituloSpan = new Span(titulo);
         tituloSpan.getStyle()
-                .set("color", "#666")
-                .set("font-size", "14px");
+                .set(COLOR, "#666")
+                .set(FONT_SIZE, "14px");
 
         Span valorSpan = new Span(valor);
         valorSpan.getStyle()
-                .set("color", color)
-                .set("font-size", "32px")
-                .set("font-weight", "bold");
+                .set(COLOR, color)
+                .set(FONT_SIZE, "32px")
+                .set(FONT_WEIGHT, "bold");
 
         card.add(valorSpan, tituloSpan);
         return card;
@@ -180,7 +192,7 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         filtrosLayout.setSpacing(true);
 
         Span labelFiltro = new Span("Mostrar:");
-        labelFiltro.getStyle().set("font-weight", "bold").set("margin-right", "10px");
+        labelFiltro.getStyle().set(FONT_WEIGHT, "bold").set("margin-right", "10px");
 
         checkboxListos = new Checkbox("Listos");
         checkboxListos.setValue(true);
@@ -264,19 +276,19 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
             String colorFondo = switch(pedido.getEstado()) {
                 case "PENDIENTE_PAGO" -> "#FF9800";
                 case "EN_COCINA" -> "#2196F3";
-                case "EN_REPARTO" -> "#9C27B0";
-                case "LISTO" -> "#4CAF50";
-                case "FINALIZADO" -> "#4CAF50";
+                case EN_REPARTO -> "#9C27B0";
+                case LISTO -> COLOR2;
+                case "FINALIZADO" -> COLOR2;
                 default -> "#757575";
             };
             
             badge.getStyle()
-                    .set("background-color", colorFondo)
-                    .set("color", "white")
+                    .set(COLOR0, colorFondo)
+                    .set(COLOR, "white")
                     .set("padding", "4px 12px")
-                    .set("border-radius", "12px")
-                    .set("font-size", "12px")
-                    .set("font-weight", "500");
+                    .set(BORDER_RADIUS, "12px")
+                    .set(FONT_SIZE, "12px")
+                    .set(FONT_WEIGHT, "500");
             
             return badge;
         })
@@ -291,17 +303,17 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
             actions.setSpacing(true);
             
             // Botón Asignarme solo para pedidos LISTO
-            if ("LISTO".equals(pedido.getEstado())) {
+            if (LISTO.equals(pedido.getEstado())) {
                 Button btnAsignar = new Button("Asignarme", new Icon(VaadinIcon.USER_CHECK));
                 btnAsignar.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
-                btnAsignar.getStyle().set("background-color", "#4CAF50");
+                btnAsignar.getStyle().set(COLOR0, COLOR2);
                 btnAsignar.addClickListener(e -> asignarPedido(pedido));
                 actions.add(btnAsignar);
             }
             
             Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
             btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-            btnCambiarEstado.getStyle().set("background-color", "#2196F3");
+            btnCambiarEstado.getStyle().set(COLOR0, "#2196F3");
             btnCambiarEstado.addClickListener(e -> mostrarDialogoCambioEstado(pedido));
 
             Button btnDetalles = new Button(new Icon(VaadinIcon.INFO_CIRCLE));
@@ -333,8 +345,8 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         
         List<Pedido> pedidos = pedidoRepository.findAllByOrderByFechaAsc().stream()
                 .filter(p -> {
-                    boolean esListo = "LISTO".equals(p.getEstado());
-                    boolean esAsignado = "EN_REPARTO".equals(p.getEstado()) && 
+                    boolean esListo = LISTO.equals(p.getEstado());
+                    boolean esAsignado = EN_REPARTO.equals(p.getEstado()) &&
                                         p.getEmpleado() != null && 
                                         p.getEmpleado().getIdEmpleado().equals(empleado.getIdEmpleado());
                     
@@ -381,7 +393,7 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         dialog.setWidth("400px");
 
         H3 titulo = new H3("Cambiar Estado - Pedido #" + pedido.getIdPedido());
-        titulo.getStyle().set("color", "#D32F2F").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, COLOR1).set("margin-top", "0");
 
         ComboBox<EstadoPedido> estadoCombo = new ComboBox<>("Nuevo Estado");
         estadoCombo.setItems(EstadoPedido.values());
@@ -390,11 +402,11 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         estadoCombo.setWidthFull();
 
         Paragraph infoActual = new Paragraph("Estado actual: " + pedido.getEstadoDescripcion());
-        infoActual.getStyle().set("color", "#666").set("margin", "10px 0");
+        infoActual.getStyle().set(COLOR, "#666").set("margin", "10px 0");
 
         Button btnGuardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#4CAF50");
+        btnGuardar.getStyle().set(COLOR0, COLOR2);
         btnGuardar.addClickListener(e -> {
             EstadoPedido nuevoEstado = estadoCombo.getValue();
             if (nuevoEstado != null) {
@@ -450,7 +462,7 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         dialog.setWidth("500px");
 
         H3 titulo = new H3("Detalles del Pedido #" + pedido.getIdPedido());
-        titulo.getStyle().set("color", "#D32F2F").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, COLOR1).set("margin-top", "0");
 
         VerticalLayout detallesLayout = new VerticalLayout();
         detallesLayout.setPadding(false);
@@ -486,10 +498,10 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
         linea.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         Span labelSpan = new Span(etiqueta);
-        labelSpan.getStyle().set("font-weight", "bold").set("color", "#333");
+        labelSpan.getStyle().set(FONT_WEIGHT, "bold").set(COLOR, "#333");
 
         Span valorSpan = new Span(valor);
-        valorSpan.getStyle().set("color", "#666");
+        valorSpan.getStyle().set(COLOR, "#666");
 
         linea.add(labelSpan, valorSpan);
         return linea;

@@ -37,9 +37,18 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
     private static final String BORDER_RADIUS = "border-radius";
     private static final String DISPLAY = "display";
     private static final String PADDING = "padding";
+    private static final String PADDING1 = "4px 10px";
     private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#e30613";
     private static final String FONTSIZE = "font-size";
+    private static final String FONTSIZE1 = "0.85rem";
+    private static final String FONTSIZE2 = "0.75rem";
     private static final String FONT_WEIGHT = "font-weight";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String BOXSHADOW = "box-shadow";
+    private static final String COLUMN = "column";
+    private static final String FLEXDIR = "flex-direction";
 
     public MenuView(MenuService menuService, SessionService sessionService) {
         this.menuService = menuService;
@@ -91,13 +100,13 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         H1 titulo = new H1("Gestión de Menús");
         titulo.getStyle()
                 .set("margin", "0")
-                .set(COLOR, "#e30613");
+                .set(COLOR, COLOR2);
 
         Button crearButton = new Button("Crear Nuevo Menú", new Icon(VaadinIcon.PLUS));
         crearButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         crearButton.getStyle()
-                .set("background-color", "#e30613")
-                .set(COLOR, "white");
+                .set(BACKGROUNDCOLOR, COLOR2)
+                .set(COLOR, COLOR1);
         crearButton.addClickListener(e -> UI.getCurrent().navigate("crear-menu"));
 
         header.add(titulo, crearButton);
@@ -127,10 +136,10 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         card.getStyle()
                 .set("background", "#ffffff")
                 .set(BORDER_RADIUS, "12px")
-                .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
+                .set(BOXSHADOW, "0 4px 14px rgba(0,0,0,0.10)")
                 .set("overflow", "hidden")
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEXDIR, COLUMN)
                 .set("transition", "all 0.3s ease")
                 .set("cursor", "pointer");
 
@@ -138,12 +147,12 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         card.getElement().addEventListener("mouseenter", e ->
                 card.getStyle()
                         .set("transform", "translateY(-8px)")
-                        .set("box-shadow", "0 12px 24px rgba(0,0,0,0.20)")
+                        .set(BOXSHADOW, "0 12px 24px rgba(0,0,0,0.20)")
         );
         card.getElement().addEventListener("mouseleave", e ->
                 card.getStyle()
                         .set("transform", "translateY(0)")
-                        .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
+                        .set(BOXSHADOW, "0 4px 14px rgba(0,0,0,0.10)")
         );
 
         // Imagen
@@ -166,7 +175,7 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         Div content = new Div();
         content.getStyle()
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEXDIR, COLUMN)
                 .set("gap", "12px")
                 .set(PADDING, "16px")
                 .set("flex", "1");
@@ -187,13 +196,13 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         Div productosDiv = new Div();
         productosDiv.getStyle()
                 .set(DISPLAY, "flex")
-                .set("flex-direction", "column")
+                .set(FLEXDIR, COLUMN)
                 .set("gap", "4px");
         
         Span productosLabel = new Span("Productos incluidos:");
         productosLabel.getStyle()
                 .set(FONT_WEIGHT, "600")
-                .set(FONTSIZE, "0.85rem")
+                .set(FONTSIZE, FONTSIZE1)
                 .set(COLOR, "#333");
         
         productosDiv.add(productosLabel);
@@ -202,14 +211,14 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
             menu.getProductos().forEach(producto -> {
                 Span productoSpan = new Span("• " + producto.getNombre());
                 productoSpan.getStyle()
-                        .set(FONTSIZE, "0.85rem")
+                        .set(FONTSIZE, FONTSIZE1)
                         .set(COLOR, "#666");
                 productosDiv.add(productoSpan);
             });
         } else {
             Span sinProductos = new Span("Sin productos asignados");
             sinProductos.getStyle()
-                    .set(FONTSIZE, "0.85rem")
+                    .set(FONTSIZE, FONTSIZE1)
                     .set(COLOR, "#999")
                     .set("font-style", "italic");
             productosDiv.add(sinProductos);
@@ -227,11 +236,11 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         if (Boolean.TRUE.equals(menu.getEsOferta())) {
             Span ofertaBadge = new Span("OFERTA");
             ofertaBadge.getStyle()
-                    .set("background-color", "#FF9800")
-                    .set(COLOR, "white")
-                    .set(PADDING, "4px 10px")
+                    .set(BACKGROUNDCOLOR, "#FF9800")
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
                     .set(BORDER_RADIUS, "20px")
-                    .set(FONTSIZE, "0.75rem")
+                    .set(FONTSIZE, FONTSIZE2)
                     .set(FONT_WEIGHT, "bold");
             badges.add(ofertaBadge);
         }
@@ -239,11 +248,11 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         if (Boolean.TRUE.equals(menu.getPuntos())) {
             Span puntosBadge = new Span("PUNTOS");
             puntosBadge.getStyle()
-                    .set("background-color", "#9C27B0")
-                    .set(COLOR, "white")
-                    .set(PADDING, "4px 10px")
+                    .set(BACKGROUNDCOLOR, "#9C27B0")
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
                     .set(BORDER_RADIUS, "20px")
-                    .set(FONTSIZE, "0.75rem")
+                    .set(FONTSIZE, FONTSIZE2)
                     .set(FONT_WEIGHT, "bold");
             badges.add(puntosBadge);
         }
@@ -251,11 +260,11 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         if (!Boolean.TRUE.equals(menu.getEstado())) {
             Span inactivoBadge = new Span("INACTIVO");
             inactivoBadge.getStyle()
-                    .set("background-color", "#999")
-                    .set(COLOR, "white")
-                    .set(PADDING, "4px 10px")
+                    .set(BACKGROUNDCOLOR, "#999")
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, PADDING1)
                     .set(BORDER_RADIUS, "20px")
-                    .set(FONTSIZE, "0.75rem")
+                    .set(FONTSIZE, FONTSIZE2)
                     .set(FONT_WEIGHT, "bold");
             badges.add(inactivoBadge);
         }
@@ -268,7 +277,7 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         }
         Span precio = new Span(precioTexto);
         precio.getStyle()
-                .set(COLOR, "#e30613")
+                .set(COLOR, COLOR2)
                 .set(FONT_WEIGHT, "700")
                 .set(FONTSIZE, "1.3rem");
 
@@ -281,7 +290,7 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
 
         Button editarBtn = new Button("Editar", new Icon(VaadinIcon.EDIT));
         editarBtn.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        editarBtn.getStyle().set(COLOR, "#e30613");
+        editarBtn.getStyle().set(COLOR, COLOR2);
         editarBtn.addClickListener(e -> 
             UI.getCurrent().navigate("crear-menu/" + menu.getIdMenu())
         );

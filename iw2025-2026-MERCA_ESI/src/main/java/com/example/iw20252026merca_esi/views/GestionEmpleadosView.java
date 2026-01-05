@@ -45,6 +45,16 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
     private Grid<Empleado> grid;
     private TextField searchField;
 
+    private static final String COLOR2 = "#D32F2F";
+    private static final String BACKGROUND_COLOR = "background-color";
+    private static final String NOMBRE = "Nombre";
+    private static final String USUARIO = "Usuario";
+    private static final String EMAIL = "Email";
+    private static final String TELEFONO = "Teléfono";
+    private static final String ROLES = "Roles";
+    private static final String ERROR = "Error: ";
+    private static final String CANCELAR = "Cancelar";
+
     @Autowired
     public GestionEmpleadosView(EmpleadoService empleadoService, RolService rolService, SessionService sessionService) {
         this.empleadoService = empleadoService;
@@ -57,12 +67,12 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
 
         // Título
         H2 titulo = new H2("Gestión de Empleados");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set("color", COLOR2);
 
         // Botón para crear nuevo empleado
         Button btnNuevo = new Button("Nuevo Empleado", new Icon(VaadinIcon.PLUS));
         btnNuevo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNuevo.getStyle().set("background-color", "#D32F2F");
+        btnNuevo.getStyle().set(BACKGROUND_COLOR, COLOR2);
         btnNuevo.addClickListener(e -> abrirDialogoNuevo());
 
         HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnNuevo);
@@ -102,10 +112,10 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
 
         // Columnas
         grid.addColumn(Empleado::getIdEmpleado).setHeader("ID").setWidth("80px").setFlexGrow(0).setSortProperty("idEmpleado");
-        grid.addColumn(Empleado::getNombre).setHeader("Nombre").setSortable(true).setSortProperty("nombre");
-        grid.addColumn(Empleado::getUsername).setHeader("Usuario").setSortable(true).setSortProperty("username");
-        grid.addColumn(Empleado::getEmail).setHeader("Email").setSortable(true).setSortProperty("email");
-        grid.addColumn(Empleado::getTelefono).setHeader("Teléfono");
+        grid.addColumn(Empleado::getNombre).setHeader(NOMBRE).setSortable(true).setSortProperty(NOMBRE);
+        grid.addColumn(Empleado::getUsername).setHeader(USUARIO).setSortable(true).setSortProperty("username");
+        grid.addColumn(Empleado::getEmail).setHeader(EMAIL).setSortable(true).setSortProperty(EMAIL);
+        grid.addColumn(Empleado::getTelefono).setHeader(TELEFONO);
         grid.addColumn(empleado -> {
             if (empleado.getRoles() != null && !empleado.getRoles().isEmpty()) {
                 return empleado.getRoles().stream()
@@ -113,7 +123,7 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
                         .collect(Collectors.joining(", "));
             }
             return "Sin roles";
-        }).setHeader("Roles").setSortable(false);
+        }).setHeader(ROLES).setSortable(false);
 
         // Columna de acciones
         grid.addComponentColumn(empleado -> {
@@ -204,26 +214,26 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         dialog.setWidth("500px");
 
         // Formulario
-        TextField nombreField = new TextField("Nombre");
+        TextField nombreField = new TextField(NOMBRE);
         nombreField.setWidthFull();
         nombreField.setRequired(true);
 
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setWidthFull();
         usernameField.setRequired(true);
 
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setWidthFull();
         emailField.setRequired(true);
 
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setWidthFull();
 
         PasswordField passwordField = new PasswordField("Contraseña");
         passwordField.setWidthFull();
         passwordField.setRequired(true);
 
-        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>("Roles");
+        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>(ROLES);
         rolesCombo.setWidthFull();
         rolesCombo.setItems(rolService.listarRoles().stream()
                 .map(Rol::getNombre)
@@ -262,13 +272,13 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
                 dialog.close();
                 Notification.show("Empleado creado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
-                Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                Notification.show(ERROR + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#D32F2F");
+        btnGuardar.getStyle().set(BACKGROUND_COLOR, COLOR2);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnGuardar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);
@@ -284,19 +294,19 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         dialog.setWidth("500px");
 
         // Formulario
-        TextField nombreField = new TextField("Nombre");
+        TextField nombreField = new TextField(NOMBRE);
         nombreField.setValue(empleado.getNombre());
         nombreField.setWidthFull();
 
-        TextField usernameField = new TextField("Usuario");
+        TextField usernameField = new TextField(USUARIO);
         usernameField.setValue(empleado.getUsername());
         usernameField.setWidthFull();
 
-        TextField emailField = new TextField("Email");
+        TextField emailField = new TextField(EMAIL);
         emailField.setValue(empleado.getEmail());
         emailField.setWidthFull();
 
-        TextField telefonoField = new TextField("Teléfono");
+        TextField telefonoField = new TextField(TELEFONO);
         telefonoField.setValue(empleado.getTelefono() != null ? empleado.getTelefono() : "");
         telefonoField.setWidthFull();
 
@@ -304,7 +314,7 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
         passwordField.setWidthFull();
         passwordField.setHelperText("Dejar en blanco para mantener la actual");
 
-        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>("Roles");
+        MultiSelectComboBox<String> rolesCombo = new MultiSelectComboBox<>(ROLES);
         rolesCombo.setWidthFull();
         rolesCombo.setItems(rolService.listarRoles().stream()
                 .map(Rol::getNombre)
@@ -346,13 +356,13 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
                 dialog.close();
                 Notification.show("Empleado actualizado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
-                Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                Notification.show(ERROR + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#D32F2F");
+        btnGuardar.getStyle().set(BACKGROUND_COLOR, COLOR2);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnGuardar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);
@@ -377,12 +387,12 @@ public class GestionEmpleadosView extends VerticalLayout implements BeforeEnterO
                 dialog.close();
                 Notification.show("Empleado eliminado exitosamente").addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } catch (Exception ex) {
-                Notification.show("Error: " + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                Notification.show(ERROR + ex.getMessage()).addThemeVariants(NotificationVariant.LUMO_ERROR);
             }
         });
         btnConfirmar.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
 
-        Button btnCancelar = new Button("Cancelar", e -> dialog.close());
+        Button btnCancelar = new Button(CANCELAR, e -> dialog.close());
 
         HorizontalLayout buttonLayout = new HorizontalLayout(btnConfirmar, btnCancelar);
         buttonLayout.setJustifyContentMode(JustifyContentMode.END);

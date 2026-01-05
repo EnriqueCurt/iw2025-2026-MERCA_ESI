@@ -45,6 +45,16 @@ import java.util.List;
 @Menu(title = "crear producto")
 public class CrearProductoView extends VerticalLayout implements BeforeEnterObserver {
 
+    private static final String CANTIDAD = "Cantidad";
+    private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#D32F2F";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String LUMO = "--lumo-primary-color";
+    private static final String FIELDLABEL = "--vaadin-input-field-label-color";
+    private static final String FOCUSEDLABEL = "--vaadin-input-field-focused-label-color";
+    private static final String CHECKBOX = "--vaadin-checkbox-checkmark-color";
+
     private final ProductoService productoService;
     private final SessionService sessionService;
     private final IngredienteService ingredienteService;
@@ -64,7 +74,7 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
     
     // Componentes para ingredientes
     private final ComboBox<Ingrediente> ingredienteComboBox = new ComboBox<>("Seleccionar Ingrediente");
-    private final NumberField cantidadField = new NumberField("Cantidad");
+    private final NumberField cantidadField = new NumberField(CANTIDAD);
     private final Grid<IngredienteProductoDTO> gridIngredientes = new Grid<>(IngredienteProductoDTO.class, false);
     private final List<IngredienteProductoDTO> ingredientesSeleccionados = new ArrayList<>();
 
@@ -97,7 +107,7 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         titulo.getStyle()
                 .set("margin-top", "0")
                 .set("margin-bottom", "20px")
-                .set("color", "#D32F2F");
+                .set(COLOR, COLOR2);
 
         // Contenido principal
         HorizontalLayout mainContent = createMainContent();
@@ -148,7 +158,7 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         seccionImagen.setWidth("100%");
         seccionImagen.setPadding(false);
         H3 tituloImagen = new H3("Imagen del Producto");
-        tituloImagen.getStyle().set("color", "#D32F2F");
+        tituloImagen.getStyle().set(COLOR, COLOR2);
         seccionImagen.add(tituloImagen, uploadImagen, imagenPreview);
 
         // Sección de ingredientes
@@ -159,13 +169,13 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
 
         Button guardarButton = new Button("Guardar", event -> guardarProducto());
         guardarButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        guardarButton.getStyle().set("background-color", "#D32F2F");
-        guardarButton.getStyle().set("color", "white");
+        guardarButton.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+        guardarButton.getStyle().set(COLOR, COLOR1);
         guardarButton.setWidthFull();
 
         Button limpiarButton = new Button("Limpiar", event -> limpiarFormulario());
-        limpiarButton.getStyle().set("background-color", "#D32F2F");
-        limpiarButton.getStyle().set("color", "white");
+        limpiarButton.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+        limpiarButton.getStyle().set(COLOR, COLOR1);
         limpiarButton.setWidthFull();
 
         mainLayout.add(formLayout, seccionImagen, seccionIngredientes, seccionCategorias, guardarButton, limpiarButton);
@@ -186,13 +196,13 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         headerIngredientes.setJustifyContentMode(JustifyContentMode.BETWEEN);
         
         H3 titulo = new H3("Ingredientes del Producto");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR2);
         titulo.getStyle().set("margin", "20px 0 10px 0");
         
         Button crearIngredienteBtn = new Button("Nuevo Ingrediente", new Icon(VaadinIcon.PLUS_CIRCLE));
         crearIngredienteBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         crearIngredienteBtn.getStyle()
-                .set("color", "#D32F2F")
+                .set(COLOR, COLOR2)
                 .set("font-size", "0.9rem");
         crearIngredienteBtn.addClickListener(e -> 
             UI.getCurrent().navigate("crear-ingrediente")
@@ -206,23 +216,23 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         ingredienteComboBox.setPlaceholder("Selecciona un ingrediente");
         ingredienteComboBox.setWidthFull();
         ingredienteComboBox.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
         
         // Configurar campo de cantidad
-        cantidadField.setPlaceholder("Cantidad");
+        cantidadField.setPlaceholder(CANTIDAD);
         cantidadField.setMin(0.01);
         cantidadField.setStep(0.01);
         cantidadField.setWidthFull();
         cantidadField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
         
         Button agregarButton = new Button("Agregar", event -> agregarIngrediente());
-        agregarButton.getStyle().set("background-color", "#D32F2F");
-        agregarButton.getStyle().set("color", "white");
+        agregarButton.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+        agregarButton.getStyle().set(COLOR, COLOR1);
         agregarButton.setWidthFull();
         
         // Configurar Grid
@@ -236,11 +246,11 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
 
     private void configurarGrid() {
         gridIngredientes.addColumn(dto -> dto.ingrediente.getNombre()).setHeader("Ingrediente").setFlexGrow(2);
-        gridIngredientes.addColumn(IngredienteProductoDTO::getCantidad).setHeader("Cantidad").setFlexGrow(1);
+        gridIngredientes.addColumn(IngredienteProductoDTO::getCantidad).setHeader(CANTIDAD).setFlexGrow(1);
         
         gridIngredientes.addComponentColumn(dto -> {
             Button eliminarButton = new Button("Eliminar");
-            eliminarButton.getStyle().set("color", "#D32F2F");
+            eliminarButton.getStyle().set(COLOR, COLOR2);
             eliminarButton.addClickListener(event -> {
                 ingredientesSeleccionados.remove(dto);
                 gridIngredientes.setItems(ingredientesSeleccionados);
@@ -297,13 +307,13 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         headerCategorias.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         H3 titulo = new H3("Categorías del Producto");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR2);
         titulo.getStyle().set("margin", "20px 0 10px 0");
 
         Button crearCategoriaBtn = new Button("Nueva Categoría", new Icon(VaadinIcon.PLUS_CIRCLE));
         crearCategoriaBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         crearCategoriaBtn.getStyle()
-                .set("color", "#D32F2F")
+                .set(COLOR, COLOR2)
                 .set("font-size", "0.9rem");
         crearCategoriaBtn.addClickListener(e ->
             UI.getCurrent().navigate("crear-categoria")
@@ -317,13 +327,13 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         categoriaComboBox.setPlaceholder("Selecciona una categoría");
         categoriaComboBox.setWidthFull();
         categoriaComboBox.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         Button agregarCategoriaButton = new Button("Agregar Categoría", event -> agregarCategoria());
-        agregarCategoriaButton.getStyle().set("background-color", "#D32F2F");
-        agregarCategoriaButton.getStyle().set("color", "white");
+        agregarCategoriaButton.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+        agregarCategoriaButton.getStyle().set(COLOR, COLOR1);
         agregarCategoriaButton.setWidthFull();
 
         // Configurar Grid
@@ -338,7 +348,7 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
 
         gridCategorias.addComponentColumn(categoria -> {
             Button eliminarButton = new Button("Eliminar");
-            eliminarButton.getStyle().set("color", "#D32F2F");
+            eliminarButton.getStyle().set(COLOR, COLOR2);
             eliminarButton.addClickListener(event -> {
                 categoriasSeleccionadas.remove(categoria);
                 gridCategorias.setItems(categoriasSeleccionadas);
@@ -381,40 +391,40 @@ public class CrearProductoView extends VerticalLayout implements BeforeEnterObse
         nombreField.setMaxLength(100);
         nombreField.setPlaceholder("Introduce el nombre del producto");
         nombreField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         descripcionField.setPlaceholder("Introduce una descripción");
         descripcionField.setMaxLength(1000);
         descripcionField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         precioField.setRequired(true);
         precioField.setMin(0);
         precioField.setStep(0.01);
         precioField.setPrefixComponent(new com.vaadin.flow.component.html.Span("€"));
         precioField.getStyle()
-                .set("--lumo-primary-color", "#D32F2F")
-                .set("--vaadin-input-field-label-color", "#D32F2F")
-                .set("--vaadin-input-field-focused-label-color", "#D32F2F");
+                .set(LUMO, COLOR2)
+                .set(FIELDLABEL, COLOR2)
+                .set(FOCUSEDLABEL, COLOR2);
 
         estadoCheckbox.setValue(true);
         estadoCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         esOfertaCheckbox.setValue(false);
         esOfertaCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         puntosCheckbox.setValue(false);
         puntosCheckbox.getStyle()
-                .set("--vaadin-checkbox-checkmark-color", "white")
-                .set("--lumo-primary-color", "#D32F2F");
+                .set(CHECKBOX, COLOR1)
+                .set(LUMO, COLOR2);
 
         // Configurar upload de imagen
         configurarUploadImagen();
