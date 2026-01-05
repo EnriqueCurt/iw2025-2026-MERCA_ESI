@@ -23,6 +23,18 @@ public class MainView extends Div {
 
     private final EstablecimientoService establecimientoService;
 
+    private static final String COLOR1 = "#D32F2F";
+    private static final String BOX_SHADOW = "box-shadow";
+    private static final String BORDER_RADIUS = "border-radius";
+    private static final String TEXT_ALIGN = "text-align";
+    private static final String MARGIN = "margin";
+    private static final String COLOR = "color";
+    private static final String FONT_WEIGHT = "font-weight";
+    private static final String FONT_SIZE = "font-size";
+    private static final String PADDING = "padding";
+    private static final String CENTER = "center";
+
+
     @Autowired
     public MainView(EstablecimientoService establecimientoService) {
         this.establecimientoService = establecimientoService;
@@ -31,13 +43,13 @@ public class MainView extends Div {
         getStyle()
                 .set("background-image", "url('/images/pizita.png')")
                 .set("background-size", "cover")
-                .set("background-position", "center")
+                .set("background-position", CENTER)
                 .set("background-repeat", "no-repeat")
                 .set("min-height", "100%")
                 .set("display", "flex")
                 .set("flex-direction", "column")
-                .set("align-items", "center")
-                .set("padding", "40px 20px")
+                .set("align-items", CENTER)
+                .set(PADDING, "40px 20px")
                 .set("overflow-y", "auto");
 
         // Cargar información del establecimiento
@@ -47,33 +59,33 @@ public class MainView extends Div {
         // Título de bienvenida
         H1 welcomeMessage = new H1("Bienvenido a MercaESI");
         welcomeMessage.getStyle()
-                .set("font-size", "48px")
-                .set("font-weight", "bold")
-                .set("color", "#ffffff")
+                .set(FONT_SIZE, "48px")
+                .set(FONT_WEIGHT, "bold")
+                .set(COLOR, "#ffffff")
                 .set("text-shadow", "0 4px 12px rgba(0,0,0,0.6)")
-                .set("margin", "0")
-                .set("text-align", "center");
+                .set(MARGIN, "0")
+                .set(TEXT_ALIGN, CENTER);
 
         // Contenedor principal con información del establecimiento
         VerticalLayout infoCard = new VerticalLayout();
         infoCard.getStyle()
                 .set("background", "rgba(255, 255, 255, 0.95)")
-                .set("padding", "30px")
-                .set("border-radius", "16px")
-                .set("box-shadow", "0 8px 24px rgba(0,0,0,0.3)")
+                .set(PADDING, "30px")
+                .set(BORDER_RADIUS, "16px")
+                .set(BOX_SHADOW, "0 8px 24px rgba(0,0,0,0.3)")
                 .set("max-width", "700px")
                 .set("width", "100%")
-                .set("margin", "20px 0");
+                .set(MARGIN, "20px 0");
 
         if (establecimiento != null) {
             // Información del establecimiento
             if (establecimiento.getInformacion() != null && !establecimiento.getInformacion().isEmpty()) {
                 Paragraph info = new Paragraph(establecimiento.getInformacion());
                 info.getStyle()
-                        .set("font-size", "18px")
-                        .set("color", "#333")
-                        .set("text-align", "center")
-                        .set("margin", "0 0 20px 0")
+                        .set(FONT_SIZE, "18px")
+                        .set(COLOR, "#333")
+                        .set(TEXT_ALIGN, CENTER)
+                        .set(MARGIN, "0 0 20px 0")
                         .set("line-height", "1.6");
                 infoCard.add(info);
             }
@@ -83,12 +95,12 @@ public class MainView extends Div {
                 HorizontalLayout direccionLayout = new HorizontalLayout();
                 direccionLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon locationIcon = new Icon(VaadinIcon.MAP_MARKER);
-                locationIcon.setColor("#D32F2F");
+                locationIcon.setColor(COLOR1);
                 locationIcon.getStyle().set("margin-right", "8px");
                 Span direccion = new Span(establecimiento.getDireccion());
                 direccion.getStyle()
-                        .set("font-size", "16px")
-                        .set("color", "#555");
+                        .set(FONT_SIZE, "16px")
+                        .set(COLOR, "#555");
                 direccionLayout.add(locationIcon, direccion);
                 infoCard.add(direccionLayout);
             }
@@ -98,12 +110,12 @@ public class MainView extends Div {
                 HorizontalLayout telefonoLayout = new HorizontalLayout();
                 telefonoLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon phoneIcon = new Icon(VaadinIcon.PHONE);
-                phoneIcon.setColor("#D32F2F");
+                phoneIcon.setColor(COLOR1);
                 phoneIcon.getStyle().set("margin-right", "8px");
                 Span telefono = new Span(establecimiento.getTelefono());
                 telefono.getStyle()
-                        .set("font-size", "16px")
-                        .set("color", "#555");
+                        .set(FONT_SIZE, "16px")
+                        .set(COLOR, "#555");
                 telefonoLayout.add(phoneIcon, telefono);
                 infoCard.add(telefonoLayout);
             }
@@ -113,12 +125,12 @@ public class MainView extends Div {
                 HorizontalLayout horarioLayout = new HorizontalLayout();
                 horarioLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
                 Icon clockIcon = new Icon(VaadinIcon.CLOCK);
-                clockIcon.setColor("#D32F2F");
+                clockIcon.setColor(COLOR1);
                 clockIcon.getStyle().set("margin-right", "8px");
                 Span horario = new Span(establecimiento.getHorario());
                 horario.getStyle()
-                        .set("font-size", "16px")
-                        .set("color", "#555");
+                        .set(FONT_SIZE, "16px")
+                        .set(COLOR, "#555");
                 horarioLayout.add(clockIcon, horario);
                 infoCard.add(horarioLayout);
             }
@@ -127,10 +139,10 @@ public class MainView extends Div {
         // Botones de navegación destacados
         H3 navegacionTitle = new H3("Explora nuestro catálogo");
         navegacionTitle.getStyle()
-                .set("color", "#D32F2F")
-                .set("margin", "30px 0 20px 0")
-                .set("text-align", "center")
-                .set("font-size", "24px");
+                .set(COLOR, COLOR1)
+                .set(MARGIN, "30px 0 20px 0")
+                .set(TEXT_ALIGN, CENTER)
+                .set(FONT_SIZE, "24px");
         
         HorizontalLayout botonesLayout = new HorizontalLayout();
         botonesLayout.setSpacing(true);
@@ -144,12 +156,12 @@ public class MainView extends Div {
         btnCarta.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnCarta.getStyle()
                 .set("background-color", "#e30613")
-                .set("color", "white")
-                .set("border-radius", "12px")
-                .set("padding", "20px 40px")
-                .set("font-size", "18px")
-                .set("font-weight", "bold")
-                .set("box-shadow", "0 4px 12px rgba(227, 6, 19, 0.4)")
+                .set(COLOR, "white")
+                .set(BORDER_RADIUS, "12px")
+                .set(PADDING, "20px 40px")
+                .set(FONT_SIZE, "18px")
+                .set(FONT_WEIGHT, "bold")
+                .set(BOX_SHADOW, "0 4px 12px rgba(227, 6, 19, 0.4)")
                 .set("cursor", "pointer")
                 .set("transition", "all 0.3s ease");
         btnCarta.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("carta")));
@@ -159,12 +171,12 @@ public class MainView extends Div {
         btnMenus.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnMenus.getStyle()
                 .set("background-color", "#e30613")
-                .set("color", "white")
-                .set("border-radius", "12px")
-                .set("padding", "20px 40px")
-                .set("font-size", "18px")
-                .set("font-weight", "bold")
-                .set("box-shadow", "0 4px 12px rgba(227, 6, 19, 0.4)")
+                .set(COLOR, "white")
+                .set(BORDER_RADIUS, "12px")
+                .set(PADDING, "20px 40px")
+                .set(FONT_SIZE, "18px")
+                .set(FONT_WEIGHT, "bold")
+                .set(BOX_SHADOW, "0 4px 12px rgba(227, 6, 19, 0.4)")
                 .set("cursor", "pointer")
                 .set("transition", "all 0.3s ease");
         btnMenus.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("menús")));
@@ -174,12 +186,12 @@ public class MainView extends Div {
         btnOfertas.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
         btnOfertas.getStyle()
                 .set("background-color", "#FF9800")
-                .set("color", "white")
-                .set("border-radius", "12px")
-                .set("padding", "20px 40px")
-                .set("font-size", "18px")
-                .set("font-weight", "bold")
-                .set("box-shadow", "0 4px 12px rgba(255, 152, 0, 0.4)")
+                .set(COLOR, "white")
+                .set(BORDER_RADIUS, "12px")
+                .set(PADDING, "20px 40px")
+                .set(FONT_SIZE, "18px")
+                .set(FONT_WEIGHT, "bold")
+                .set(BOX_SHADOW, "0 4px 12px rgba(255, 152, 0, 0.4)")
                 .set("cursor", "pointer")
                 .set("transition", "all 0.3s ease");
         btnOfertas.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("ofertas")));
@@ -192,8 +204,8 @@ public class MainView extends Div {
         overlay.add(welcomeMessage, infoCard);
         overlay.getStyle()
                 .set("background", "rgba(0,0,0,0.3)")
-                .set("padding", "40px")
-                .set("border-radius", "20px")
+                .set(PADDING, "40px")
+                .set(BORDER_RADIUS, "20px")
                 .set("backdrop-filter", "blur(5px)")
                 .set("max-width", "800px")
                 .set("width", "100%");
