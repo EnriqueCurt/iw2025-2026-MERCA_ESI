@@ -241,6 +241,23 @@ public class MainLayout extends VerticalLayout implements RouterLayout {
         cartButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
         cartButton.getElement().setAttribute(ONMOUSEOUT, COLOR2);
 
+        // Botón MIS PEDIDOS (solo visible para clientes logueados)
+        if (sessionService.getCliente() != null) {
+            Button misPedidosButton = new Button("MIS PEDIDOS", new Icon(VaadinIcon.LIST));
+            misPedidosButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            misPedidosButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate("mis-pedidos")));
+            misPedidosButton.getStyle()
+                    .set(COLOR, COLOR1)
+                    .set(BORDER_RADIUS, "50px")
+                    .set(BOX_SHADOW, COLOR5)
+                    .set(TRANSITION, COLOR6)
+                    .set(CURSOR, POINTER);
+            misPedidosButton.getElement().setAttribute(ONMOUSEOVER, COLOR4);
+            misPedidosButton.getElement().setAttribute(ONMOUSEOUT, COLOR2);
+
+            rightSection.add(misPedidosButton);
+        }
+
         // Botón dinámico: ACCESO o PERFIL según el estado de sesión
         boolean isLoggedIn = sessionService.isLoggedIn();
         String buttonText = isLoggedIn ? "PERFIL" : "ACCESO";

@@ -275,4 +275,15 @@ public class PedidoActualService {
             session.setAttribute(PEDIDO_SESSION_KEY, pedido);
         }
     }
+
+    /**
+     * Reemplaza el pedido actual en la sesión por la lista indicada.
+     * Útil para cargar un pedido existente y permitir al cliente modificarlo.
+     */
+    public void setPedidoActual(List<ItemPedido> items) {
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session != null) {
+            session.setAttribute(PEDIDO_SESSION_KEY, items != null ? items : new ArrayList<>());
+        }
+    }
 }

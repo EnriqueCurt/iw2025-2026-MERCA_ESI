@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
@@ -62,4 +63,15 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
     // Buscar pedidos con detalles cargados (fetch join)
     @Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.detallePedidos ORDER BY p.fecha ASC")
     List<Pedido> findAllWithDetails();
+
+    /**
+     * Carga un pedido de un cliente con sus detalles (productos y menús) para edición.
+     */
+    @Query("SELECT DISTINCT p FROM Pedido p " +
+            "LEFT JOIN FETCH p.detalleProductos dp " +
+            "LEFT JOIN FETCH dp.producto " +
+            "LEFT JOIN FETCH p.detalleMenus dm " +
+            "LEFT JOIN FETCH dm.menu " +
+            "WHERE p.idPedido = :idPedido AND p.cliente.idCliente = :idCliente")
+    Optional<Pedido> findByIdAndClienteWithDetalles(Integer idPedido, Integer idCliente);
 }

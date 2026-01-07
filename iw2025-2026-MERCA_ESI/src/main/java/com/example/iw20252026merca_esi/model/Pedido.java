@@ -70,7 +70,10 @@ public class Pedido {
     @Deprecated
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private Set<DetallePedido> detallePedidos;
-    
+
+    @Column(name = "motivo_cancelacion", length = 500)
+    private String motivoCancelacion;
+
     // Constructores
     public Pedido() {
         this.fecha = LocalDateTime.now();
@@ -195,6 +198,14 @@ public class Pedido {
         this.paraLlevar = paraLlevar;
     }
     
+    public String getMotivoCancelacion() {
+        return motivoCancelacion;
+    }
+
+    public void setMotivoCancelacion(String motivoCancelacion) {
+        this.motivoCancelacion = motivoCancelacion;
+    }
+
     // Métodos helper para trabajar con estados
     
     /**
