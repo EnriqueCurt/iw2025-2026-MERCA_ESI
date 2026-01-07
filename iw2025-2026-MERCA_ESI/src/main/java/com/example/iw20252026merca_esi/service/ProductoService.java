@@ -46,7 +46,10 @@ public class ProductoService {
     }
 
     public void eliminarProducto(Integer id) {
-        productoRepository.deleteById(id);
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
+        producto.setEstado(false); // Marcar como inactivo
+        productoRepository.save(producto);
     }
 }
 

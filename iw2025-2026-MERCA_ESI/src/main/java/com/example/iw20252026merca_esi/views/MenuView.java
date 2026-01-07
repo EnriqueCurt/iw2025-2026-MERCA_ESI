@@ -117,6 +117,11 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
         grid.removeAll();
         List<Menu> menus = menuService.listarMenus();
         
+        // Filtrar solo menús activos
+        menus = menus.stream()
+                .filter(Menu::getEstado)
+                .collect(java.util.stream.Collectors.toList());
+
         if (menus.isEmpty()) {
             Div emptyState = new Div();
             emptyState.setText("No hay menús creados. Haz clic en 'Crear Nuevo Menú' para comenzar.");
@@ -310,11 +315,11 @@ public class MenuView extends VerticalLayout implements BeforeEnterObserver {
     private void eliminarMenu(Menu menu) {
         try {
             menuService.eliminarMenu(menu.getIdMenu());
-            Notification notification = Notification.show("Menú eliminado correctamente", 3000, Notification.Position.BOTTOM_START);
+            Notification notification = Notification.show("Menú desactivado correctamente", 3000, Notification.Position.BOTTOM_START);
             notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             cargarMenus();
         } catch (Exception e) {
-            Notification notification = Notification.show("Error al eliminar el menú: " + e.getMessage(), 3000, Notification.Position.BOTTOM_START);
+            Notification notification = Notification.show("Error al desactivar el menú: " + e.getMessage(), 3000, Notification.Position.BOTTOM_START);
             notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

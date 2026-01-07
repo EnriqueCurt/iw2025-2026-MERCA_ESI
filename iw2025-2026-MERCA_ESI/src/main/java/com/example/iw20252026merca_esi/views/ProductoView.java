@@ -266,6 +266,11 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
     private void aplicarFiltros() {
         productosFiltrados = new ArrayList<>(todosLosProductos);
         
+        // Filtrar solo productos activos
+        productosFiltrados = productosFiltrados.stream()
+                .filter(Producto::getEstado)
+                .collect(Collectors.toList());
+
         // Aplicar filtro de categoría
         if (categoriaFilter.getValue() != null) {
             Categoria categoriaSeleccionada = categoriaFilter.getValue();
@@ -469,11 +474,11 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
     private void eliminarProducto(Producto producto) {
         try {
             productoService.eliminarProducto(producto.getIdProducto());
-            Notification.show("Producto eliminado correctamente")
+            Notification.show("Producto desactivado correctamente")
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            aplicarFiltros();
+            cargarProductos(); // Recargar para actualizar la vista
         } catch (Exception e) {
-            Notification.show("Error al eliminar el producto: " + e.getMessage())
+            Notification.show("Error al desactivar el producto: " + e.getMessage())
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }

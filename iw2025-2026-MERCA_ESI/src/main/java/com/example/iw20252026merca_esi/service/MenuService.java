@@ -31,7 +31,10 @@ public class MenuService {
 
     @Transactional
     public void eliminarMenu(Integer id) {
-        menuRepository.deleteById(id);
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Menú no encontrado"));
+        menu.setEstado(false); // Marcar como inactivo
+        menuRepository.save(menu);
     }
 
     @Transactional(readOnly = true)
