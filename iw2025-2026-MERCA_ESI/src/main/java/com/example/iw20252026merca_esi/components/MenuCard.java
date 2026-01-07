@@ -140,12 +140,18 @@ public class MenuCard extends Div {
                 .set(FONTSIZE, "1.1rem")
                 .set(COLOR, COLOR2);
 
+
         Span verMas = new Span("Ver más");
         verMas.getStyle()
                 .set(COLOR, COLOR2)
                 .set("text-decoration", "underline")
                 .set("cursor", "pointer")
                 .set(FONTSIZE, "0.9rem");
+
+        verMas.addClickListener(e -> {
+            DetalleMenuDialog dialog = new DetalleMenuDialog(menu);
+            dialog.open();
+        });
 
         infoExtra.add(precio, verMas);
 
