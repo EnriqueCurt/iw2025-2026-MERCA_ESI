@@ -54,11 +54,13 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     private static final String BACKGROUNDCOLOR = "background-color";
     private static final String BADGE = "badge";
     private static final String PADDING = "padding";
+    private static final String PADDINGLEFT = "padding-left";
     private static final String PADDING1 = "2px 8px";
     private  static final String BORDERRADIUS = "border-radius";
     private static final String FONTSIZE = "font-size";
+    private static final String FONTSTYLE = "font-style";
     private static final String FONTWEIGHT = "font-weight";
-    private static final String MARGINTOP = "margin-top";
+    private static final String ITALIC = "italic";
 
     @Autowired
     public CocinaView(PedidoRepository pedidoRepository, 
@@ -325,11 +327,11 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 if (detalle.getNotas() != null && !detalle.getNotas().isEmpty()) {
                     Div exclusionesDiv = new Div();
                     exclusionesDiv.getStyle()
-                        .set("padding-left", "30px")
+                        .set(PADDINGLEFT, "30px")
                         .set(FONTSIZE, "15px")
                         .set(COLOR, "#d32f2f")
                         .set(FONTWEIGHT, "bold")
-                        .set("font-style", "italic");
+                        .set(FONTSTYLE, ITALIC);
                     exclusionesDiv.setText("⚠ " + detalle.getNotas());
                     detallesLayout.add(exclusionesDiv);
                 }
@@ -371,7 +373,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                         Div productoMenuDiv = new Div();
                         productoMenuDiv.getStyle()
                             .set(PADDING, "3px 0")
-                            .set("padding-left", "30px")
+                            .set(PADDINGLEFT, "30px")
                             .set(FONTSIZE, "16px")
                             .set(COLOR, "#666");
                         
@@ -394,11 +396,11 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                             if (!nombresIngredientes.isEmpty()) {
                                 Div exclusionesDiv = new Div();
                                 exclusionesDiv.getStyle()
-                                    .set("padding-left", "50px")
+                                    .set(PADDINGLEFT, "50px")
                                     .set(FONTSIZE, "14px")
                                     .set(COLOR, "#d32f2f")
                                     .set(FONTWEIGHT, "bold")
-                                    .set("font-style", "italic");
+                                    .set(FONTSTYLE, ITALIC);
                                 exclusionesDiv.setText("⚠ SIN: " + String.join(", ", nombresIngredientes));
                                 detallesLayout.add(exclusionesDiv);
                             }
@@ -542,7 +544,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
             Span sinPedidos = new Span("No hay pedidos en cocina");
             sinPedidos.getStyle()
                     .set(COLOR, "#999")
-                    .set("font-style", "italic")
+                    .set(FONTSTYLE, ITALIC)
                     .set(PADDING, "20px");
             statsLayout.add(sinPedidos);
         } else {
