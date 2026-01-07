@@ -30,6 +30,10 @@ public class SeleccionIngredientesDialog extends Dialog {
     
     private final ItemPedido item;
     private final Consumer<ItemPedido> onConfirmar;
+
+    private static final String COLOR = "color";
+    private static final String MARGIN_BOTTOM = "margin-bottom";
+    private static final String ID_PRODUCTO = "idProducto";
     
     /**
      * Constructor para producto individual.
@@ -76,7 +80,7 @@ public class SeleccionIngredientesDialog extends Dialog {
         if (ingredientes.isEmpty()) {
             Paragraph sinIngredientes = new Paragraph("Este producto no tiene ingredientes personalizables.");
             sinIngredientes.getStyle()
-                .set("color", "#666")
+                .set(COLOR, "#666")
                 .set("font-style", "italic")
                 .set("text-align", "center")
                 .set("padding", "20px");
@@ -84,8 +88,8 @@ public class SeleccionIngredientesDialog extends Dialog {
         } else {
             Paragraph instrucciones = new Paragraph("Desmarca los ingredientes que NO quieres:");
             instrucciones.getStyle()
-                .set("color", "#666")
-                .set("margin-bottom", "10px");
+                .set(COLOR, "#666")
+                .set(MARGIN_BOTTOM, "10px");
             
             layout.add(instrucciones);
             layout.add(crearSeccionIngredientes(ingredientes, producto.getIdProducto()));
@@ -101,8 +105,8 @@ public class SeleccionIngredientesDialog extends Dialog {
         
         Paragraph instrucciones = new Paragraph("Personaliza cada producto del menú:");
         instrucciones.getStyle()
-            .set("color", "#666")
-            .set("margin-bottom", "15px")
+            .set(COLOR, "#666")
+            .set(MARGIN_BOTTOM, "15px")
             .set("font-weight", "600");
         layout.add(instrucciones);
         
@@ -121,12 +125,12 @@ public class SeleccionIngredientesDialog extends Dialog {
                         .set("background", "#f8f9fa")
                         .set("border-radius", "8px")
                         .set("padding", "15px")
-                        .set("margin-bottom", "15px");
+                        .set(MARGIN_BOTTOM, "15px");
                     
                     H4 tituloProducto = new H4(producto.getNombre());
                     tituloProducto.getStyle()
                         .set("margin", "0 0 10px 0")
-                        .set("color", "#e30613");
+                        .set(COLOR, "#e30613");
                     
                     seccionProducto.add(tituloProducto);
                     seccionProducto.add(crearSeccionIngredientes(ingredientes, producto.getIdProducto()));
@@ -156,7 +160,7 @@ public class SeleccionIngredientesDialog extends Dialog {
             .set("gap", "10px");
         
         // Guardar referencia para recuperar después
-        contenedor.getElement().setProperty("idProducto", idProducto.toString());
+        contenedor.getElement().setProperty(ID_PRODUCTO, idProducto.toString());
         contenedor.add(checkboxGroup);
         
         return contenedor;
@@ -192,7 +196,7 @@ public class SeleccionIngredientesDialog extends Dialog {
                     .forEach(component -> {
                         if (component instanceof Div) {
                             Div div = (Div) component;
-                            String idProd = div.getElement().getProperty("idProducto");
+                            String idProd = div.getElement().getProperty(ID_PRODUCTO);
                             
                             // Si este Div tiene idProducto, procesarlo directamente
                             if (idProd != null) {
@@ -202,7 +206,7 @@ public class SeleccionIngredientesDialog extends Dialog {
                                 div.getChildren()
                                     .filter(c -> c instanceof Div)
                                     .forEach(hijo -> {
-                                        String idProdHijo = hijo.getElement().getProperty("idProducto");
+                                        String idProdHijo = hijo.getElement().getProperty(ID_PRODUCTO);
                                         if (idProdHijo != null) {
                                             procesarSeccion((Div) hijo);
                                         }
@@ -214,7 +218,7 @@ public class SeleccionIngredientesDialog extends Dialog {
     }
     
     private void procesarSeccion(Div seccion) {
-        String idProductoStr = seccion.getElement().getProperty("idProducto");
+        String idProductoStr = seccion.getElement().getProperty(ID_PRODUCTO);
         if (idProductoStr == null) return;
         
         Integer idProducto = Integer.parseInt(idProductoStr);
