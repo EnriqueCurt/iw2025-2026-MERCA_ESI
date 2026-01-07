@@ -3,9 +3,11 @@ package com.example.iw20252026merca_esi.views;
 import com.example.iw20252026merca_esi.model.Cliente;
 import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.ItemPedido;
+import com.example.iw20252026merca_esi.model.Pedido;
 import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.example.iw20252026merca_esi.service.PedidoService;
 import com.example.iw20252026merca_esi.service.SessionService;
+import com.example.iw20252026merca_esi.service.TicketPdfService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -24,8 +26,11 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 @PageTitle("Mi Pedido")
@@ -37,14 +42,17 @@ public class CarritoView extends VerticalLayout {
     private final PedidoActualService pedidoActualService;
     private final PedidoService pedidoService;
     private final SessionService sessionService;
+    private final TicketPdfService ticketPdfService;
     private Grid<ItemPedido> grid;
     private Span totalSpan;
     private Div mainContainer;
 
-    public CarritoView(PedidoActualService pedidoActualService, PedidoService pedidoService, SessionService sessionService) {
+    public CarritoView(PedidoActualService pedidoActualService, PedidoService pedidoService,
+                       SessionService sessionService, TicketPdfService ticketPdfService) {
         this.pedidoActualService = pedidoActualService;
         this.pedidoService = pedidoService;
         this.sessionService = sessionService;
+        this.ticketPdfService = ticketPdfService;
 
         setSizeFull();
         setPadding(false);
@@ -389,8 +397,11 @@ public class CarritoView extends VerticalLayout {
                 boolean paraLlevar = "Para llevar".equals(tipoEntrega.getValue());
                 String direccion = aDomicilio ? direccionField.getValue() : null;
                 
+                // Guardar items antes de limpiar
+                List<ItemPedido> itemsParaTicket = new ArrayList<>(pedidoActualService.getPedidoActual());
+
                 // Confirmar pedido
-                pedidoService.confirmarPedido(
+                Pedido pedidoConfirmado = pedidoService.confirmarPedido(
                     pedidoActualService.getPedidoActual(),
                     cliente,
                     aDomicilio,
@@ -413,6 +424,8 @@ public class CarritoView extends VerticalLayout {
                 // Actualizar vista
                 actualizarVista();
                 
+                // Preguntar si desea ticket
+                mostrarDialogoTicket(pedidoConfirmado, cliente, itemsParaTicket);
             } catch (Exception ex) {
                 Notification.show(
                     "Error al confirmar el pedido: " + ex.getMessage(),
@@ -423,21 +436,116 @@ public class CarritoView extends VerticalLayout {
         });
         confirmarBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         confirmarBtn.getStyle().set("background-color", "#e30613");
-        
-        HorizontalLayout buttons = new HorizontalLayout(cancelarBtn, confirmarBtn);
-        buttons.setJustifyContentMode(JustifyContentMode.END);
-        buttons.getStyle().set("margin-top", "20px");
-        
-        layout.add(buttons);
-        
+
+        confirmDialog.getFooter().add(cancelarBtn, confirmarBtn);
         confirmDialog.open();
     }
-    
+
     /**
      * Obtiene el cliente actual de la sesión.
      */
     private Cliente obtenerClienteActual() {
         return sessionService.getCliente();
+    }
+
+    private void mostrarDialogoTicket(Pedido pedido, Cliente cliente, List<ItemPedido> items) {
+        Dialog ticketDialog = new Dialog();
+        ticketDialog.setHeaderTitle("Ticket de Compra");
+        ticketDialog.setWidth("400px");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(true);
+        layout.setSpacing(true);
+
+        Div iconoDiv = new Div();
+        Icon ticketIcon = new Icon(VaadinIcon.INVOICE);
+        ticketIcon.setSize("48px");
+        ticketIcon.setColor("#e30613");
+        iconoDiv.add(ticketIcon);
+        iconoDiv.getStyle()
+            .set("text-align", "center")
+            .set("margin-bottom", "15px");
+
+        Paragraph pregunta = new Paragraph("¿Deseas descargar el ticket de tu compra en PDF?");
+        pregunta.getStyle()
+            .set("text-align", "center")
+            .set("font-size", "1.1rem")
+            .set("margin", "0");
+
+        Paragraph info = new Paragraph("El ticket incluirá todos los detalles de tu pedido.");
+        info.getStyle()
+            .set("text-align", "center")
+            .set("font-size", "0.9rem")
+            .set("color", "#666")
+            .set("margin-top", "5px");
+
+        layout.add(iconoDiv, pregunta, info);
+        ticketDialog.add(layout);
+
+        // Botones
+        Button noBtn = new Button("No, gracias", e -> ticketDialog.close());
+        noBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+        Button siBtn = new Button("Sí, descargar", e -> {
+            try {
+                descargarTicket(pedido, cliente, items);
+                ticketDialog.close();
+                Notification.show(
+                    "✓ Ticket descargado correctamente",
+                    3000,
+                    Notification.Position.BOTTOM_END
+                ).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } catch (Exception ex) {
+                Notification.show(
+                    "Error al generar el ticket: " + ex.getMessage(),
+                    4000,
+                    Notification.Position.MIDDLE
+                ).addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+        siBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        siBtn.getStyle().set("background-color", "#e30613");
+
+        ticketDialog.getFooter().add(noBtn, siBtn);
+        ticketDialog.open();
+    }
+
+    private void descargarTicket(Pedido pedido, Cliente cliente, List<ItemPedido> items) {
+        try {
+            // Generar PDF
+            byte[] pdfBytes = ticketPdfService.generarTicketPdf(pedido, cliente, items);
+
+            // Crear recurso de descarga
+            String nombreArchivo = "ticket_pedido_" + pedido.getIdPedido() + ".pdf";
+            StreamResource resource = new StreamResource(nombreArchivo,
+                () -> new ByteArrayInputStream(pdfBytes));
+            resource.setContentType("application/pdf");
+            resource.setCacheTime(0);
+
+            // Registrar el recurso y obtener la URL
+            com.vaadin.flow.server.VaadinSession session = com.vaadin.flow.server.VaadinSession.getCurrent();
+            com.vaadin.flow.server.StreamResourceRegistry registry = session.getResourceRegistry();
+            com.vaadin.flow.server.StreamRegistration registration = registry.registerResource(resource);
+
+            // Usar JavaScript para forzar la descarga
+            String downloadUrl = registration.getResourceUri().toString();
+            getUI().ifPresent(ui -> {
+                ui.getPage().executeJs(
+                    "const link = document.createElement('a');" +
+                    "link.href = $0;" +
+                    "link.download = $1;" +
+                    "link.target = '_blank';" +
+                    "document.body.appendChild(link);" +
+                    "link.click();" +
+                    "document.body.removeChild(link);",
+                    downloadUrl,
+                    nombreArchivo
+                );
+            });
+        } catch (Exception e) {
+            Notification.show("Error al descargar el ticket: " + e.getMessage(), 4000, Notification.Position.MIDDLE)
+                .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 
     private void actualizarVista() {
@@ -450,3 +558,4 @@ public class CarritoView extends VerticalLayout {
         }
     }
 }
+
