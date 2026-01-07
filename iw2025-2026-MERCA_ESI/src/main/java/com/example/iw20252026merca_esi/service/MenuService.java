@@ -33,4 +33,11 @@ public class MenuService {
     public void eliminarMenu(Integer id) {
         menuRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<Menu> listarMenusOferta() {
+        return menuRepository.findAllWithProductosAndIngredientes().stream()
+                .filter(menu -> Boolean.TRUE.equals(menu.getEsOferta()) && menu.getEstado())
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

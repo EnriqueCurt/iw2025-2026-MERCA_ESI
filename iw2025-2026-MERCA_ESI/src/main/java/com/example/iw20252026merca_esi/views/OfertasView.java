@@ -1,7 +1,9 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.components.SeleccionIngredientesDialog;
+import com.example.iw20252026merca_esi.model.Menu;
 import com.example.iw20252026merca_esi.model.Producto;
+import com.example.iw20252026merca_esi.service.MenuService;
 import com.example.iw20252026merca_esi.service.ProductoService;
 import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.button.Button;
@@ -18,7 +20,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -30,16 +31,18 @@ import java.util.stream.Collectors;
 @PageTitle("Ofertas")
 @AnonymousAllowed
 @Route(value = "ofertas", layout = MainLayout.class)
-@Menu(title = "ofertas")
+@com.vaadin.flow.router.Menu(title = "ofertas")
 public class OfertasView extends VerticalLayout {
 
     private final ProductoService productoService;
+    private final MenuService menuService;
     private final PedidoActualService pedidoActualService;
     private final Div grid;
     private final Checkbox puntosFilter = new Checkbox("Solo Puntos");
     
     private List<Producto> todosLosProductos = new ArrayList<>();
     private List<Producto> productosFiltrados = new ArrayList<>();
+    private List<com.example.iw20252026merca_esi.model.Menu> menusOferta = new ArrayList<>();
     private int paginaActual = 0;
     private static final int PRODUCTOS_POR_PAGINA = 12;
     private HorizontalLayout paginacion;
@@ -64,8 +67,9 @@ public class OfertasView extends VerticalLayout {
     private  static final String WIDTH = "width";
 
 
-    public OfertasView(ProductoService productoService, PedidoActualService pedidoActualService) {
+    public OfertasView(ProductoService productoService, MenuService menuService, PedidoActualService pedidoActualService) {
         this.productoService = productoService;
+        this.menuService = menuService;
         this.pedidoActualService = pedidoActualService;
         
         setSizeFull();
@@ -262,6 +266,13 @@ public class OfertasView extends VerticalLayout {
                 grid.add(seccionPuntos);
             }
             
+            // Cargar y mostrar menús ofertas
+            menusOferta = menuService.listarMenusOferta();
+            if (!menusOferta.isEmpty()) {
+                Div seccionMenus = crearSeccionMenus("🍽️ MENÚS EN OFERTA", menusOferta);
+                grid.add(seccionMenus);
+            }
+
             // Sección de Ofertas DESPUÉS
             if (!ofertas.isEmpty()) {
                 Div seccionOfertas = crearSeccion("🔥 OFERTAS ESPECIALES", ofertas, true);
@@ -456,6 +467,153 @@ public class OfertasView extends VerticalLayout {
         });
 
         content.add(h3, desc, priceAndBadges, pedirBtn);
+        card.add(image, content);
+        return card;
+    }
+
+    private Div crearSeccionMenus(String titulo, List<com.example.iw20252026merca_esi.model.Menu> menus) {
+        Div seccion = new Div();
+        seccion.getStyle()
+                .set(WIDTH, "100%")
+                .set("margin-bottom", "40px");
+
+        // Título de la sección
+        com.vaadin.flow.component.html.H2 tituloSeccion = new com.vaadin.flow.component.html.H2(titulo);
+        tituloSeccion.getStyle()
+                .set(MARGIN, "0 0 20px 0")
+                .set(FONTSIZE, "2rem")
+                .set(FONT_WEIGHT, "700")
+                .set(COLOR, COLOR8)
+                .set(TEXT_ALIGN, "left")
+                .set("border-bottom", "3px solid #FF9800")
+                .set("padding-bottom", "10px");
+
+        // Grid de menús
+        Div gridMenus = new Div();
+        gridMenus.getStyle()
+                .set(DISPLAY, "grid")
+                .set("grid-template-columns", "repeat(auto-fill, minmax(220px, 1fr))")
+                .set("gap", "clamp(10px, 2vw, 15px)")
+                .set(WIDTH, "100%");
+
+        for (com.example.iw20252026merca_esi.model.Menu menu : menus) {
+            gridMenus.add(createMenuCard(menu));
+        }
+
+        seccion.add(tituloSeccion, gridMenus);
+        return seccion;
+    }
+
+    private Div createMenuCard(com.example.iw20252026merca_esi.model.Menu menu) {
+        String colorBorde = COLOR8;
+        String colorSombra = "rgba(255, 152, 0, 0.3)";
+        String colorSombraHover = "rgba(255, 152, 0, 0.5)";
+
+        Div card = new Div();
+        card.getStyle()
+                .set("background", "#ffffff")
+                .set(TEXT_ALIGN, "12px")
+                .set(BOX_SHADOW, "0 8px 24px " + colorSombra)
+                .set("border", "3px solid " + colorBorde)
+                .set("overflow", "hidden")
+                .set(DISPLAY, "flex")
+                .set(FLEX_DIRECTION, COLUMN)
+                .set("height", "100%")
+                .set("max-width", "350px")
+                .set("transition", "all 0.3s ease")
+                .set("cursor", "pointer");
+
+        card.getElement().addEventListener("mouseenter", e ->
+            card.getStyle()
+                .set("transform", "scale(1.05) translateY(-5px)")
+                .set(BOX_SHADOW, "0 12px 32px " + colorSombraHover)
+        );
+        card.getElement().addEventListener("mouseleave", e ->
+            card.getStyle()
+                .set("transform", "scale(1)")
+                .set(BOX_SHADOW, "0 8px 24px " + colorSombra)
+        );
+
+        Image image;
+        if (menu.getImagen() != null && menu.getImagen().length > 0) {
+            image = new Image();
+            String base64 = java.util.Base64.getEncoder().encodeToString(menu.getImagen());
+            image.setSrc("data:image/jpeg;base64," + base64);
+            image.setAlt(menu.getNombre());
+        } else {
+            image = new Image("https://picsum.photos/seed/menu" + menu.getIdMenu() + "/400/250",
+                            menu.getNombre());
+        }
+        image.setWidth("100%");
+        image.setHeight("auto");
+        image.getStyle()
+                .set("object-fit", "cover")
+                .set("aspect-ratio", "16/9");
+
+        Div content = new Div();
+        content.getStyle()
+                .set(DISPLAY, "flex")
+                .set(FLEX_DIRECTION, COLUMN)
+                .set("gap", "8px")
+                .set(PADDING, "12px 14px 14px 14px")
+                .set("flex", "1 1 auto");
+
+        H3 h3 = new H3(menu.getNombre());
+        h3.getStyle()
+                .set(MARGIN, "0")
+                .set(FONTSIZE, "clamp(0.95rem, 2vw, 1.05rem)")
+                .set("line-height", "1.2");
+
+        Span desc = new Span(menu.getDescripcion() != null ? menu.getDescripcion() : "Sin descripción");
+        desc.getStyle()
+                .set(DISPLAY, "block")
+                .set(COLOR, "#555")
+                .set(FONTSIZE, "clamp(0.85rem, 1.8vw, 0.9rem)")
+                .set("line-height", "1.4")
+                .set("overflow", "hidden")
+                .set("text-overflow", "ellipsis")
+                .set(DISPLAY, "-webkit-box")
+                .set("-webkit-line-clamp", "2")
+                .set("-webkit-box-orient", "vertical");
+
+        Span priceTag = new Span(String.format("%.2f €", menu.getPrecio()));
+        priceTag.getStyle()
+                .set(COLOR, COLOR_1_IS)
+                .set(FONT_WEIGHT, "700")
+                .set(FONTSIZE, "clamp(1rem, 2.2vw, 1.05rem)");
+
+        Span ofertaBadge = new Span("OFERTA");
+        ofertaBadge.getStyle()
+                .set(BACKGROUND_COLOR, COLOR8)
+                .set(COLOR, COLOR_2_IS)
+                .set(PADDING, PADDING_IS)
+                .set(TEXT_ALIGN, "4px")
+                .set(FONTSIZE, FONTSIZE_IS)
+                .set(FONT_WEIGHT, "bold")
+                .set("margin-top", "8px");
+
+        Button pedirBtn = new Button("PEDIR MENÚ");
+        pedirBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        pedirBtn.setWidthFull();
+        pedirBtn.getStyle()
+                .set(BACKGROUND_COLOR, COLOR_1_IS)
+                .set(COLOR, COLOR_2_IS)
+                .set("margin-top", "auto");
+        pedirBtn.addClickListener(e -> {
+            // Agregar productos del menú al pedido
+            for (Producto producto : menu.getProductos()) {
+                pedidoActualService.agregarProducto(producto);
+            }
+
+            Notification notification = Notification.show(
+                "✓ Menú " + menu.getNombre() + " añadido al pedido",
+                2000,
+                Notification.Position.BOTTOM_END
+            );
+            notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        });
+
+        content.add(h3, desc, priceTag, ofertaBadge, pedirBtn);
         card.add(image, content);
         return card;
     }

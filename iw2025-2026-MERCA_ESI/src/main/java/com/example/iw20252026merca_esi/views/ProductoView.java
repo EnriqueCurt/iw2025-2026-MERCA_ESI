@@ -345,9 +345,17 @@ public class ProductoView extends VerticalLayout implements BeforeEnterObserver 
                 .set("box-shadow", "0 4px 14px rgba(0,0,0,0.10)")
         );
 
-        // Imagen placeholder (puedes agregar campo imagen en el modelo Producto más adelante)
-        Image image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250", 
-                                producto.getNombre());
+        // Imagen
+        Image image;
+        if (producto.getImagen() != null && producto.getImagen().length > 0) {
+            image = new Image();
+            String base64 = java.util.Base64.getEncoder().encodeToString(producto.getImagen());
+            image.setSrc("data:image/jpeg;base64," + base64);
+            image.setAlt(producto.getNombre());
+        } else {
+            image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250",
+                            producto.getNombre());
+        }
         image.setWidth("100%");
         image.setHeight("auto");
         image.getStyle()
