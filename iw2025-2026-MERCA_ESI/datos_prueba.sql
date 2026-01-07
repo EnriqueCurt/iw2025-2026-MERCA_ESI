@@ -105,7 +105,53 @@ FROM productos p, ingredientes i
 WHERE p.nombre = 'Pizza Cuatro Quesos' 
 AND i.nombre IN ('Mozzarella', 'Gorgonzola', 'Parmesano', 'Provolone');
 
--- 8. CREAR CLIENTES
+-- 8. CREAR MENÚS
+-- ========================================
+INSERT INTO menus (nombre, descripcion, precio, estado) VALUES
+('Menú del Día', 'Pizza + Bebida + Postre', 14.50, 1),
+('Menú Familiar', '2 Pizzas + 2 Bebidas + 2 Postres', 35.00, 1),
+('Menú Romántico', 'Pizza Cuatro Quesos + 2 Cervezas + 2 Tiramisú', 25.00, 1),
+('Menú Pasta', 'Pasta + Ensalada + Bebida', 12.50, 1),
+('Menú Completo', 'Entrante + Pizza + Postre + Bebida', 18.00, 1);
+
+-- 9. RELACIONAR MENÚS CON PRODUCTOS
+-- ========================================
+-- Menú del Día: Pizza Margarita + Coca-Cola + Tiramisú
+INSERT INTO menu_producto (id_menu, id_producto)
+SELECT m.id_menu, p.id_producto
+FROM menus m, productos p
+WHERE m.nombre = 'Menú del Día' 
+AND p.nombre IN ('Pizza Margarita', 'Coca-Cola', 'Tiramisú');
+
+-- Menú Familiar: 2x Pizza Pepperoni + 2x Coca-Cola + 2x Panna Cotta
+INSERT INTO menu_producto (id_menu, id_producto)
+SELECT m.id_menu, p.id_producto
+FROM menus m, productos p
+WHERE m.nombre = 'Menú Familiar' 
+AND p.nombre IN ('Pizza Pepperoni', 'Coca-Cola', 'Panna Cotta');
+
+-- Menú Romántico: Pizza Cuatro Quesos + 2x Cerveza + 2x Tiramisú
+INSERT INTO menu_producto (id_menu, id_producto)
+SELECT m.id_menu, p.id_producto
+FROM menus m, productos p
+WHERE m.nombre = 'Menú Romántico' 
+AND p.nombre IN ('Pizza Cuatro Quesos', 'Cerveza', 'Tiramisú');
+
+-- Menú Pasta: Pasta Carbonara + Ensalada César + Agua Mineral
+INSERT INTO menu_producto (id_menu, id_producto)
+SELECT m.id_menu, p.id_producto
+FROM menus m, productos p
+WHERE m.nombre = 'Menú Pasta' 
+AND p.nombre IN ('Pasta Carbonara', 'Ensalada César', 'Agua Mineral');
+
+-- Menú Completo: Alitas de Pollo + Pizza Hawaiana + Tiramisú + Coca-Cola
+INSERT INTO menu_producto (id_menu, id_producto)
+SELECT m.id_menu, p.id_producto
+FROM menus m, productos p
+WHERE m.nombre = 'Menú Completo' 
+AND p.nombre IN ('Alitas de Pollo', 'Pizza Hawaiana', 'Tiramisú', 'Coca-Cola');
+
+-- 10. CREAR CLIENTES
 -- ========================================
 -- Contraseña: "123456" encriptada con BCrypt
 INSERT INTO clientes (nombre, username, contrasena, email, telefono, puntos) VALUES
@@ -113,14 +159,14 @@ INSERT INTO clientes (nombre, username, contrasena, email, telefono, puntos) VAL
 ('Ana Martínez', 'cliente2', '$2a$10$N9qo8uLOickgx2ZMRZoMy.bIL6ZX5gQ5x8yKwXPQjOJOJ8Zk4LqH2', 'ana.martinez@mail.com', '666555445', 50),
 ('Luis Rodríguez', 'cliente3', '$2a$10$N9qo8uLOickgx2ZMRZoMy.bIL6ZX5gQ5x8yKwXPQjOJOJ8Zk4LqH2', 'luis.rodriguez@mail.com', '666555446', 25);
 
--- 9. CREAR PEDIDOS
+-- 11. CREAR PEDIDOS
 -- ========================================
--- Pedido 1: EN_COCINA (hace 15 minutos)
+-- Pedido 1: EN_COCINA (hace 15 minutos) - Incluye productos y menú
 INSERT INTO pedidos (fecha, estado, total, a_domicilio, para_llevar, direccion, id_cliente, id_empleado, created_at, updated_at) 
 SELECT 
     DATE_SUB(NOW(), INTERVAL 15 MINUTE),
     'EN_COCINA',
-    22.00,
+    36.50,
     0,
     0,
     NULL,
@@ -129,13 +175,14 @@ SELECT
     NOW(),
     NOW()
 FROM clientes c WHERE c.username = 'cliente1';
+SET @pedido1_id = LAST_INSERT_ID();
 
--- Pedido 2: EN_COCINA - A domicilio (hace 10 minutos)
+-- Pedido 2: EN_COCINA - A domicilio (hace 10 minutos) - Solo menú familiar
 INSERT INTO pedidos (fecha, estado, total, a_domicilio, para_llevar, direccion, id_cliente, id_empleado, created_at, updated_at) 
 SELECT 
     DATE_SUB(NOW(), INTERVAL 10 MINUTE),
     'EN_COCINA',
-    15.50,
+    35.00,
     1,
     0,
     'Calle Mayor 123, 3ºB',
@@ -144,13 +191,14 @@ SELECT
     NOW(),
     NOW()
 FROM clientes c WHERE c.username = 'cliente2';
+SET @pedido2_id = LAST_INSERT_ID();
 
--- Pedido 3: LISTO - Para llevar (hace 25 minutos)
+-- Pedido 3: LISTO - Para llevar (hace 25 minutos) - Menú del Día
 INSERT INTO pedidos (fecha, estado, total, a_domicilio, para_llevar, direccion, id_cliente, id_empleado, created_at, updated_at) 
 SELECT 
     DATE_SUB(NOW(), INTERVAL 25 MINUTE),
     'LISTO',
-    15.50,
+    14.50,
     0,
     1,
     NULL,
@@ -159,13 +207,14 @@ SELECT
     NOW(),
     NOW()
 FROM clientes c WHERE c.username = 'cliente3';
+SET @pedido3_id = LAST_INSERT_ID();
 
--- Pedido 4: PENDIENTE_PAGO (hace 5 minutos)
+-- Pedido 4: PENDIENTE_PAGO (hace 5 minutos) - Mix de productos y menú
 INSERT INTO pedidos (fecha, estado, total, a_domicilio, para_llevar, direccion, id_cliente, id_empleado, created_at, updated_at) 
 SELECT 
     DATE_SUB(NOW(), INTERVAL 5 MINUTE),
     'PENDIENTE_PAGO',
-    18.00,
+    30.50,
     0,
     0,
     NULL,
@@ -174,88 +223,76 @@ SELECT
     NOW(),
     NOW()
 FROM clientes c WHERE c.username = 'cliente1';
+SET @pedido4_id = LAST_INSERT_ID();
 
--- 10. CREAR DETALLES DE PEDIDOS
+-- 12. CREAR DETALLES DE PEDIDOS (PRODUCTOS)
 -- ========================================
--- Detalles del Pedido 1 (2 Pizzas Margarita + 2 Coca-Colas)
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+-- Pedido 1: 1 Pizza Margarita con notas especiales
+INSERT INTO detalle_pedido_producto (id_pedido, id_producto, cantidad, precio_unitario, notas)
 SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 15 MINUTE) LIMIT 1),
+    @pedido1_id,
     p.id_producto,
-    2,
-    p.precio
+    1,
+    p.precio,
+    'Sin cebolla, extra de queso'
 FROM productos p WHERE p.nombre = 'Pizza Margarita';
 
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 15 MINUTE) LIMIT 1),
-    p.id_producto,
-    2,
-    p.precio
-FROM productos p WHERE p.nombre = 'Coca-Cola';
+-- Pedido 2: Solo menú, sin productos individuales
 
--- Detalles del Pedido 2 (1 Pizza Pepperoni + 1 Agua)
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+-- Pedido 3: Solo menú del día
+
+-- Pedido 4: 1 Pasta Carbonara
+INSERT INTO detalle_pedido_producto (id_pedido, id_producto, cantidad, precio_unitario, notas)
 SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 10 MINUTE) LIMIT 1),
+    @pedido4_id,
     p.id_producto,
     1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Pizza Pepperoni';
-
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 10 MINUTE) LIMIT 1),
-    p.id_producto,
-    1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Agua Mineral';
-
--- Detalles del Pedido 3 (1 Pizza Cuatro Quesos + 1 Tiramisú)
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 25 MINUTE) LIMIT 1),
-    p.id_producto,
-    1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Pizza Cuatro Quesos';
-
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 25 MINUTE) LIMIT 1),
-    p.id_producto,
-    1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Tiramisú';
-
--- Detalles del Pedido 4 (1 Pasta Carbonara + 1 Ensalada César + 1 Cerveza)
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
-SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 5 MINUTE) LIMIT 1),
-    p.id_producto,
-    1,
-    p.precio
+    p.precio,
+    'Poco hecha'
 FROM productos p WHERE p.nombre = 'Pasta Carbonara';
 
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+-- 13. CREAR DETALLES DE PEDIDOS (MENÚS)
+-- ========================================
+-- Pedido 1: 1x Menú del Día
+INSERT INTO detalle_pedido_menu (id_pedido, id_menu, cantidad, precio_unitario)
 SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 5 MINUTE) LIMIT 1),
-    p.id_producto,
+    @pedido1_id,
+    m.id_menu,
     1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Ensalada César';
+    m.precio
+FROM menus m WHERE m.nombre = 'Menú del Día';
 
-INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario)
+-- Pedido 2: 1x Menú Familiar
+INSERT INTO detalle_pedido_menu (id_pedido, id_menu, cantidad, precio_unitario)
 SELECT 
-    (SELECT id_pedido FROM pedidos WHERE fecha = DATE_SUB(NOW(), INTERVAL 5 MINUTE) LIMIT 1),
-    p.id_producto,
+    @pedido2_id,
+    m.id_menu,
     1,
-    p.precio
-FROM productos p WHERE p.nombre = 'Cerveza';
+    m.precio
+FROM menus m WHERE m.nombre = 'Menú Familiar';
+
+-- Pedido 3: 1x Menú del Día
+INSERT INTO detalle_pedido_menu (id_pedido, id_menu, cantidad, precio_unitario)
+SELECT 
+    @pedido3_id,
+    m.id_menu,
+    1,
+    m.precio
+FROM menus m WHERE m.nombre = 'Menú del Día';
+
+-- Pedido 4: 1x Menú Pasta
+INSERT INTO detalle_pedido_menu (id_pedido, id_menu, cantidad, precio_unitario)
+SELECT 
+    @pedido4_id,
+    m.id_menu,
+    1,
+    m.precio
+FROM menus m WHERE m.nombre = 'Menú Pasta';
 
 -- ========================================
--- NUEVOS USUARIOS DE PRUEBA CREADOS:
+-- RESUMEN DE DATOS CREADOS
 -- ========================================
+-- USUARIOS DE PRUEBA:
 -- Empleados:
 --   Propietario:  propietario / 123456
 --   Manager:      manager / 123456
@@ -267,5 +304,11 @@ FROM productos p WHERE p.nombre = 'Cerveza';
 --   cliente2 / 123456
 --   cliente3 / 123456
 --
--- NOTA: Los roles y el usuario admin ya existían
+-- PEDIDOS CREADOS:
+-- Pedido 1: EN_COCINA - 1 Pizza Margarita + 1 Menú del Día
+-- Pedido 2: EN_COCINA (a domicilio) - 1 Menú Familiar
+-- Pedido 3: LISTO (para llevar) - 1 Menú del Día
+-- Pedido 4: PENDIENTE_PAGO - 1 Pasta Carbonara + 1 Menú Pasta
+--
+-- NOTA: Los roles y el usuario admin deben existir previamente
 -- ========================================

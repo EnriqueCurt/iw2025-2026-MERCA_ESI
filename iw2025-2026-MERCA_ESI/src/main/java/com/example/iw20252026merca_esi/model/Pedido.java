@@ -59,6 +59,15 @@ public class Pedido {
     @JoinColumn(name = "id_empleado")
     private Empleado empleado;
     
+    // Relaciones con detalles (nueva estructura)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<DetallePedidoProducto> detalleProductos;
+    
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<DetallePedidoMenu> detalleMenus;
+    
+    // DEPRECADO: Mantener temporalmente para compatibilidad con código existente
+    @Deprecated
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private Set<DetallePedido> detallePedidos;
     
@@ -144,6 +153,22 @@ public class Pedido {
     
     public void setDetallePedidos(Set<DetallePedido> detallePedidos) {
         this.detallePedidos = detallePedidos;
+    }
+    
+    public Set<DetallePedidoProducto> getDetalleProductos() {
+        return detalleProductos;
+    }
+    
+    public void setDetalleProductos(Set<DetallePedidoProducto> detalleProductos) {
+        this.detalleProductos = detalleProductos;
+    }
+    
+    public Set<DetallePedidoMenu> getDetalleMenus() {
+        return detalleMenus;
+    }
+    
+    public void setDetalleMenus(Set<DetallePedidoMenu> detalleMenus) {
+        this.detalleMenus = detalleMenus;
     }
     
     public String getDireccion() {

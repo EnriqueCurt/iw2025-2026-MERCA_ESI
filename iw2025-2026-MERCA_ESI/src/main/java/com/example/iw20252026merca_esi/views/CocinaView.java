@@ -1,9 +1,8 @@
 package com.example.iw20252026merca_esi.views;
 
-import com.example.iw20252026merca_esi.model.DetallePedido;
-import com.example.iw20252026merca_esi.model.Empleado;
-import com.example.iw20252026merca_esi.model.EstadoPedido;
-import com.example.iw20252026merca_esi.model.Pedido;
+import com.example.iw20252026merca_esi.model.*;
+import com.example.iw20252026merca_esi.repository.DetallePedidoMenuRepository;
+import com.example.iw20252026merca_esi.repository.DetallePedidoProductoRepository;
 import com.example.iw20252026merca_esi.repository.PedidoRepository;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.Component;
@@ -39,6 +38,8 @@ import java.util.stream.Collectors;
 public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     
     private final PedidoRepository pedidoRepository;
+    private final DetallePedidoProductoRepository detallePedidoProductoRepository;
+    private final DetallePedidoMenuRepository detallePedidoMenuRepository;
     private final SessionService sessionService;
     private Grid<Pedido> pedidosGrid;
     private MultiSelectComboBox<String> filtroEstados;
@@ -60,8 +61,13 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     private static final String MARGINTOP = "margin-top";
 
     @Autowired
-    public CocinaView(PedidoRepository pedidoRepository, SessionService sessionService) {
+    public CocinaView(PedidoRepository pedidoRepository, 
+                      DetallePedidoProductoRepository detallePedidoProductoRepository,
+                      DetallePedidoMenuRepository detallePedidoMenuRepository,
+                      SessionService sessionService) {
         this.pedidoRepository = pedidoRepository;
+        this.detallePedidoProductoRepository = detallePedidoProductoRepository;
+        this.detallePedidoMenuRepository = detallePedidoMenuRepository;
         this.sessionService = sessionService;
 
         setSizeFull();
@@ -76,10 +82,25 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         btnActualizar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
         btnActualizar.addClickListener(e -> cargarPedidos());
 
-        HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnActualizar);
+        Button btnExpandirTodos = new Button("Expandir Todos", new Icon(VaadinIcon.EXPAND_FULL));
+        btnExpandirTodos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnExpandirTodos.addClickListener(e -> {
+            if ("Expandir Todos".equals(btnExpandirTodos.getText())) {
+                expandirTodos();
+                btnExpandirTodos.setText("Colapsar Todos");
+                btnExpandirTodos.setIcon(new Icon(VaadinIcon.COMPRESS));
+            } else {
+                colapsarTodos();
+                btnExpandirTodos.setText("Expandir Todos");
+                btnExpandirTodos.setIcon(new Icon(VaadinIcon.EXPAND_FULL));
+            }
+        });
+
+        HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnExpandirTodos, btnActualizar);
         headerLayout.setWidthFull();
         headerLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         headerLayout.setAlignItems(Alignment.CENTER);
+        headerLayout.setSpacing(true);
 
         // Panel de estadísticas
         statsPanel = createStatsPanel();
@@ -89,6 +110,16 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
 
         add(headerLayout, statsPanel, filtrosLayout, pedidosGrid);
         cargarPedidos();
+    }
+
+    private void expandirTodos() {
+        pedidosGrid.getDataProvider().fetch(new com.vaadin.flow.data.provider.Query<>())
+            .forEach(pedido -> pedidosGrid.setDetailsVisible(pedido, true));
+    }
+
+    private void colapsarTodos() {
+        pedidosGrid.getDataProvider().fetch(new com.vaadin.flow.data.provider.Query<>())
+            .forEach(pedido -> pedidosGrid.setDetailsVisible(pedido, false));
     }
 
     @Override
@@ -118,7 +149,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
 
     private void configurarGrid() {
         pedidosGrid = new Grid<>(Pedido.class, false);
-        pedidosGrid.setHeight("600px");
+        pedidosGrid.setHeight("calc(100vh - 220px)");
         pedidosGrid.setWidthFull();
 
         // Columna de tiempo transcurrido
@@ -261,95 +292,74 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         .setHeader("Acciones")
         .setFlexGrow(1);
 
-        // Detalles del pedido (productos)
+        // Detalles del pedido - Lista ultra simple
         pedidosGrid.setItemDetailsRenderer(new ComponentRenderer<>(pedido -> {
             VerticalLayout detallesLayout = new VerticalLayout();
-            detallesLayout.setSpacing(true);
-            detallesLayout.setPadding(true);
+            detallesLayout.setSpacing(false);
+            detallesLayout.setPadding(false);
             detallesLayout.getStyle()
-                .set(BACKGROUNDCOLOR, "#f5f5f5")
-                .set(BORDERRADIUS, "8px");
+                .set(BACKGROUNDCOLOR, "#fff")
+                .set(PADDING, "15px");
 
-            H4 tituloProductos = new H4("📋 Productos del Pedido #" + pedido.getIdPedido());
-            tituloProductos.getStyle().set(COLOR, COLOR2).set(MARGINTOP, "0");
-            detallesLayout.add(tituloProductos);
+            // Cargar productos individuales
+            List<DetallePedidoProducto> productosIndividuales = 
+                detallePedidoProductoRepository.findByPedidoIdPedido(pedido.getIdPedido());
+            
+            // Cargar menús
+            List<DetallePedidoMenu> menus = 
+                detallePedidoMenuRepository.findByPedidoIdPedido(pedido.getIdPedido());
 
-            if (pedido.getDetallePedidos() != null && !pedido.getDetallePedidos().isEmpty()) {
-                for (DetallePedido detalle : pedido.getDetallePedidos()) {
-                    HorizontalLayout productoLayout = new HorizontalLayout();
-                    productoLayout.setWidthFull();
-                    productoLayout.setAlignItems(Alignment.CENTER);
-                    productoLayout.getStyle()
-                        .set(BACKGROUNDCOLOR, COLOR1)
-                        .set(PADDING, "10px")
-                        .set(BORDERRADIUS, "4px")
-                        .set("margin-bottom", "5px");
+            // Mostrar productos individuales
+            for (DetallePedidoProducto detalle : productosIndividuales) {
+                Div itemDiv = new Div();
+                itemDiv.getStyle()
+                    .set(PADDING, "5px 0")
+                    .set(FONTSIZE, "18px")
+                    .set(FONTWEIGHT, "600")
+                    .set(COLOR, "#333");
+                
+                itemDiv.setText("- " + detalle.getCantidad() + "x " + detalle.getProducto().getNombre());
+                detallesLayout.add(itemDiv);
+            }
 
-                    // Cantidad
-                    Span cantidad = new Span(String.valueOf(detalle.getCantidad()) + "x");
-                    cantidad.getStyle()
-                        .set(FONTWEIGHT, "bold")
-                        .set(FONTSIZE, "18px")
-                        .set(COLOR, COLOR2)
-                        .set("min-width", "40px");
-
-                    // Nombre del producto
-                    VerticalLayout infoProducto = new VerticalLayout();
-                    infoProducto.setSpacing(false);
-                    infoProducto.setPadding(false);
-                    
-                    Span nombreProducto = new Span(detalle.getProducto().getNombre());
-                    nombreProducto.getStyle()
-                        .set(FONTWEIGHT, "bold")
-                        .set(FONTSIZE, "16px");
-                    
-                    infoProducto.add(nombreProducto);
-                    
-                    // Mostrar descripción si existe
-                    if (detalle.getProducto().getDescripcion() != null && !detalle.getProducto().getDescripcion().isEmpty()) {
-                        Span descripcion = new Span(detalle.getProducto().getDescripcion());
-                        descripcion.getStyle()
-                            .set(FONTSIZE, "12px")
+            // Mostrar menús y sus productos
+            for (DetallePedidoMenu detalleMenu : menus) {
+                // Nombre del menú
+                Div menuDiv = new Div();
+                menuDiv.getStyle()
+                    .set(PADDING, "5px 0")
+                    .set(FONTSIZE, "18px")
+                    .set(FONTWEIGHT, "600")
+                    .set(COLOR, "#333");
+                
+                menuDiv.setText("- " + detalleMenu.getCantidad() + "x " + detalleMenu.getMenu().getNombre());
+                detallesLayout.add(menuDiv);
+                
+                // Productos del menú (indentados)
+                if (detalleMenu.getMenu().getProductos() != null && 
+                    !detalleMenu.getMenu().getProductos().isEmpty()) {
+                    for (Producto producto : detalleMenu.getMenu().getProductos()) {
+                        Div productoMenuDiv = new Div();
+                        productoMenuDiv.getStyle()
+                            .set(PADDING, "3px 0")
+                            .set("padding-left", "30px")
+                            .set(FONTSIZE, "16px")
                             .set(COLOR, "#666");
-                        infoProducto.add(descripcion);
+                        
+                        productoMenuDiv.setText("→ " + producto.getNombre());
+                        detallesLayout.add(productoMenuDiv);
                     }
-
-                    // Precio
-                    Span precio = new Span(String.format("%.2f €", detalle.calcularSubtotal()));
-                    precio.getStyle()
-                        .set(FONTWEIGHT, "bold")
-                        .set(COLOR, COLOR4);
-
-                    productoLayout.add(cantidad, infoProducto, precio);
-                    productoLayout.setFlexGrow(1, infoProducto);
-                    detallesLayout.add(productoLayout);
                 }
+            }
 
-                // Total del pedido
-                HorizontalLayout totalLayout = new HorizontalLayout();
-                totalLayout.setWidthFull();
-                totalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
-                totalLayout.getStyle()
-                    .set("border-top", "2px solid #D32F2F")
-                    .set("padding-top", "10px")
-                    .set(MARGINTOP, "10px");
-                
-                Span totalLabel = new Span("TOTAL: ");
-                totalLabel.getStyle()
-                    .set(FONTWEIGHT, "bold")
-                    .set(FONTSIZE, "18px");
-                
-                Span totalValor = new Span(String.format("%.2f €", pedido.getTotal()));
-                totalValor.getStyle()
-                    .set(FONTWEIGHT, "bold")
-                    .set(FONTSIZE, "20px")
-                    .set(COLOR, COLOR2);
-                
-                totalLayout.add(totalLabel, totalValor);
-                detallesLayout.add(totalLayout);
-            } else {
-                Paragraph sinProductos = new Paragraph("No hay productos en este pedido");
-                sinProductos.getStyle().set(COLOR, "#999");
+            // Si no hay productos ni menús
+            if (productosIndividuales.isEmpty() && menus.isEmpty()) {
+                Div sinProductos = new Div();
+                sinProductos.setText("No hay productos en este pedido");
+                sinProductos.getStyle()
+                    .set(COLOR, "#999")
+                    .set(PADDING, "20px")
+                    .set("text-align", "center");
                 detallesLayout.add(sinProductos);
             }
 
@@ -416,18 +426,35 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         statsLayout.setJustifyContentMode(JustifyContentMode.AROUND);
         statsLayout.setAlignItems(Alignment.CENTER);
 
-        // Obtener todos los pedidos EN_COCINA con detalles cargados
+        // Obtener todos los pedidos EN_COCINA
         List<Pedido> pedidosEnCocina = pedidoRepository.findAllWithDetails().stream()
                 .filter(p -> "EN_COCINA".equals(p.getEstado()))
                 .collect(Collectors.toList());
         
-        // Contar productos
+        // Contar productos de todas las fuentes
         Map<String, Integer> productosCantidad = new HashMap<>();
+        
         for (Pedido pedido : pedidosEnCocina) {
-            if (pedido.getDetallePedidos() != null) {
-                for (DetallePedido detalle : pedido.getDetallePedidos()) {
-                    String nombreProducto = detalle.getProducto().getNombre();
-                    productosCantidad.merge(nombreProducto, detalle.getCantidad(), (a, b) -> a + b);
+            // 1. Contar productos individuales
+            List<DetallePedidoProducto> productosIndividuales = 
+                detallePedidoProductoRepository.findByPedidoIdPedido(pedido.getIdPedido());
+            
+            for (DetallePedidoProducto detalle : productosIndividuales) {
+                String nombreProducto = detalle.getProducto().getNombre();
+                productosCantidad.merge(nombreProducto, detalle.getCantidad(), Integer::sum);
+            }
+            
+            // 2. Contar productos dentro de menús
+            List<DetallePedidoMenu> menus = 
+                detallePedidoMenuRepository.findByPedidoIdPedido(pedido.getIdPedido());
+            
+            for (DetallePedidoMenu detalleMenu : menus) {
+                if (detalleMenu.getMenu().getProductos() != null) {
+                    for (Producto producto : detalleMenu.getMenu().getProductos()) {
+                        String nombreProducto = producto.getNombre();
+                        // La cantidad del menú multiplica la cantidad de cada producto
+                        productosCantidad.merge(nombreProducto, detalleMenu.getCantidad(), Integer::sum);
+                    }
                 }
             }
         }
@@ -438,28 +465,21 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 .limit(4)
                 .collect(Collectors.toList());
         
-        // Título del panel
-        VerticalLayout tituloLayout = new VerticalLayout();
+        // Título del panel más compacto
+        HorizontalLayout tituloLayout = new HorizontalLayout();
         tituloLayout.setAlignItems(Alignment.CENTER);
-        tituloLayout.setSpacing(false);
-        tituloLayout.setPadding(false);
-        tituloLayout.getStyle().set("margin-right", "20px");
+        tituloLayout.setSpacing(true);
         
         Span icono = new Span("🍕");
-        icono.getStyle().set(FONTSIZE, "32px");
+        icono.getStyle().set(FONTSIZE, "20px");
         
-        Span titulo = new Span("Productos");
+        Span titulo = new Span("Productos a preparar");
         titulo.getStyle()
-                .set(FONTSIZE, "14px")
+                .set(FONTSIZE, "13px")
                 .set(COLOR, "#666")
-                .set(FONTWEIGHT, "500");
+                .set(FONTWEIGHT, "600");
         
-        Span subtitulo = new Span("a preparar");
-        subtitulo.getStyle()
-                .set(FONTSIZE, "12px")
-                .set(COLOR, "#999");
-        
-        tituloLayout.add(icono, titulo, subtitulo);
+        tituloLayout.add(icono, titulo);
         statsLayout.add(tituloLayout);
         
         // Mostrar productos o mensaje si no hay
@@ -483,32 +503,31 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     private Component createProductoCard(String nombreProducto, String cantidad, String color) {
-        VerticalLayout card = new VerticalLayout();
+        HorizontalLayout card = new HorizontalLayout();
         card.setAlignItems(Alignment.CENTER);
-        card.setPadding(true);
-        card.setSpacing(false);
+        card.setPadding(false);
+        card.setSpacing(true);
         card.getStyle()
-                .set("border-left", "4px solid " + color)
+                .set("border-left", "3px solid " + color)
                 .set(BACKGROUNDCOLOR, "#f9f9f9")
-                .set(BORDERRADIUS, "8px")
-                .set("min-width", "140px")
-                .set(PADDING, "15px");
+                .set(BORDERRADIUS, "4px")
+                .set("min-width", "110px")
+                .set(PADDING, "6px 10px");
 
         Span cantidadSpan = new Span(cantidad);
         cantidadSpan.getStyle()
                 .set(COLOR, color)
-                .set(FONTSIZE, "42px")
+                .set(FONTSIZE, "24px")
                 .set(FONTWEIGHT, "bold")
-                .set("line-height", "1");
+                .set("min-width", "30px")
+                .set("text-align", "center");
 
         Span nombreSpan = new Span(nombreProducto);
         nombreSpan.getStyle()
                 .set(COLOR, "#333")
-                .set(FONTSIZE, "13px")
+                .set(FONTSIZE, "11px")
                 .set(FONTWEIGHT, "500")
-                .set(MARGINTOP, "8px")
-                .set("text-align", "center")
-                .set("max-width", "120px")
+                .set("max-width", "100px")
                 .set("overflow", "hidden")
                 .set("text-overflow", "ellipsis")
                 .set("white-space", "nowrap");
