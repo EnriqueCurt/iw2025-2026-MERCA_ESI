@@ -8,6 +8,7 @@ import com.example.iw20252026merca_esi.service.ProductoService;
 import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -18,6 +19,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,6 +48,10 @@ public class CartaView extends VerticalLayout {
     private final CategoriaService categoriaService;
     private final PedidoActualService pedidoActualService;
 
+    private ComboBox<Categoria> categoriaComboBox;
+    private ComboBox<String> ordenComboBox;
+    private Div mainContainer;
+
     public CartaView(ProductoService productoService, CategoriaService categoriaService, PedidoActualService pedidoActualService) {
         this.productoService = productoService;
         this.categoriaService = categoriaService;
@@ -62,37 +68,102 @@ public class CartaView extends VerticalLayout {
     }
 
     private void crearContenido() {
-        // Header minimalista - estilo igual a PizzaView
+        // Header con título y filtros
         HorizontalLayout header = new HorizontalLayout();
         header.setWidthFull();
         header.setAlignItems(Alignment.CENTER);
-        header.setJustifyContentMode(JustifyContentMode.CENTER);
+        header.setJustifyContentMode(JustifyContentMode.BETWEEN);
         header.getStyle()
                 .set(PADDING, "clamp(16px, 3vw, 24px)")
-                .set("flex-wrap", "wrap");
+                .set("flex-wrap", "wrap")
+                .set("gap", "20px");
 
+        // Título
         H1 titulo = new H1("Carta");
         titulo.getStyle()
                 .set(MARGIN, "0")
                 .set(COLOR, COLOR2)
-                .set("text-align", "center");
+                .set("text-align", "left")
+                .set("flex", "1 1 auto");
 
-        header.add(titulo);
+        // Contenedor de filtros (derecha)
+        HorizontalLayout filtrosContainer = new HorizontalLayout();
+        filtrosContainer.setAlignItems(Alignment.CENTER);
+        filtrosContainer.getStyle()
+                .set("gap", "12px")
+                .set("flex-wrap", "wrap");
+
+        // ComboBox de categoría
+        categoriaComboBox = new ComboBox<>();
+        categoriaComboBox.setPlaceholder("Categoría");
+        categoriaComboBox.setItems(categoriaService.listarCategorias());
+        categoriaComboBox.setItemLabelGenerator(Categoria::getNombre);
+        categoriaComboBox.setClearButtonVisible(true);
+        categoriaComboBox.setAllowCustomValue(false);
+        categoriaComboBox.setWidth("200px");
+        categoriaComboBox.getStyle()
+                .set(BORDER_RADIUS, "8px");
+        categoriaComboBox.addValueChangeListener(event -> actualizarProductos());
+
+        // Bloquear escritura pero permitir clic en desplegable
+        categoriaComboBox.getElement().executeJs(
+            "this.inputElement.addEventListener('keydown', function(e) { e.preventDefault(); });"
+        );
+
+        // ComboBox de ordenación
+        ordenComboBox = new ComboBox<>();
+        ordenComboBox.setPlaceholder("Ordenar por");
+        ordenComboBox.setItems("Nombre (A-Z)", "Nombre (Z-A)", "Precio (menor)", "Precio (mayor)");
+        ordenComboBox.setValue("Nombre (A-Z)");
+        ordenComboBox.setAllowCustomValue(false);
+        ordenComboBox.setWidth("180px");
+        ordenComboBox.getStyle()
+                .set(BORDER_RADIUS, "8px");
+        ordenComboBox.addValueChangeListener(event -> actualizarProductos());
+
+        // Bloquear escritura pero permitir clic en desplegable
+        ordenComboBox.getElement().executeJs(
+            "this.inputElement.addEventListener('keydown', function(e) { e.preventDefault(); });"
+        );
+
+        filtrosContainer.add(categoriaComboBox, ordenComboBox);
+
+        header.add(titulo, filtrosContainer);
         add(header);
 
         // Contenedor principal
-        Div mainContainer = new Div();
+        mainContainer = new Div();
         mainContainer.getStyle()
                 .set("max-width", "1400px")
                 .set(MARGIN, "0 auto")
                 .set(PADDING, "30px 20px")
                 .set("width", "100%");
 
-        // Obtener productos activos agrupados por categoría (excluyendo ofertas y puntos)
+        add(mainContainer);
+
+        // Cargar productos inicialmente
+        actualizarProductos();
+    }
+
+    private void actualizarProductos() {
+        mainContainer.removeAll();
+
+        // Obtener productos activos (excluyendo ofertas y puntos)
         List<Producto> productosActivos = productoService.listarProductosConCategoriasEIngredientes().stream()
                 .filter(Producto::getEstado)
                 .filter(p -> !p.getEsOferta() && !p.getPuntos())
                 .collect(Collectors.toList());
+
+        // Filtrar por categoría seleccionada si existe
+        Categoria categoriaSeleccionada = categoriaComboBox.getValue();
+        if (categoriaSeleccionada != null) {
+            productosActivos = productosActivos.stream()
+                    .filter(p -> p.getCategorias().stream()
+                            .anyMatch(c -> c.getIdCategoria().equals(categoriaSeleccionada.getIdCategoria())))
+                    .collect(Collectors.toList());
+        }
+
+        // Agrupar por categoría
         Map<String, List<Producto>> productosPorCategoria = productosActivos.stream()
                 .flatMap(p -> p.getCategorias().stream()
                         .map(c -> Map.entry(c.getNombre(), p)))
@@ -101,16 +172,42 @@ public class CartaView extends VerticalLayout {
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())
                 ));
 
-        // Mostrar cada categoría
-        List<Categoria> categorias = categoriaService.listarCategorias();
+        // Aplicar ordenación a cada categoría
+        String ordenSeleccionado = ordenComboBox.getValue();
+        productosPorCategoria.forEach((categoria, productos) ->
+            ordenarProductos(productos, ordenSeleccionado)
+        );
+
+        // Mostrar categorías
+        List<Categoria> categorias = categoriaSeleccionada != null
+                ? List.of(categoriaSeleccionada)
+                : categoriaService.listarCategorias();
+
         for (Categoria categoria : categorias) {
             List<Producto> productosCategoria = productosPorCategoria.get(categoria.getNombre());
             if (productosCategoria != null && !productosCategoria.isEmpty()) {
                 mainContainer.add(crearSeccionCategoria(categoria.getNombre(), productosCategoria, false));
             }
         }
+    }
 
-        add(mainContainer);
+    private void ordenarProductos(List<Producto> productos, String criterio) {
+        if (criterio == null) return;
+
+        switch (criterio) {
+            case "Nombre (A-Z)":
+                productos.sort(Comparator.comparing(Producto::getNombre));
+                break;
+            case "Nombre (Z-A)":
+                productos.sort(Comparator.comparing(Producto::getNombre).reversed());
+                break;
+            case "Precio (menor)":
+                productos.sort(Comparator.comparing(Producto::getPrecio));
+                break;
+            case "Precio (mayor)":
+                productos.sort(Comparator.comparing(Producto::getPrecio).reversed());
+                break;
+        }
     }
 
     private Div crearSeccionCategoria(String nombreCategoria, List<Producto> productos, boolean esOferta) {
@@ -192,8 +289,16 @@ public class CartaView extends VerticalLayout {
         }
 
         // Imagen
-        Image image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250",
-                producto.getNombre());
+        Image image;
+        if (producto.getImagen() != null && producto.getImagen().length > 0) {
+            image = new Image();
+            String base64 = java.util.Base64.getEncoder().encodeToString(producto.getImagen());
+            image.setSrc("data:image/jpeg;base64," + base64);
+            image.setAlt(producto.getNombre());
+        } else {
+            image = new Image("https://picsum.photos/seed/" + producto.getIdProducto() + "/400/250",
+                    producto.getNombre());
+        }
         image.setWidth("100%");
         image.setHeight("auto");
         image.getStyle()
