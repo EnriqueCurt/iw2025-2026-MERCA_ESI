@@ -55,6 +55,8 @@ public class OfertasView extends VerticalLayout {
     private static final String COLOR9 = "#9C27B0";
     private static final String COLOR8 = "#FF9800";
     private static final String BOX_SHADOW = "box-shadow";
+    private static final String MARGIN = "margin";
+    private  static final String WIDTH = "width";
 
 
     public OfertasView(ProductoService productoService) {
@@ -76,7 +78,7 @@ public class OfertasView extends VerticalLayout {
                 .set(DISPLAY, "grid")
                 .set("grid-template-columns", "repeat(auto-fill, minmax(220px, 1fr))")
                 .set("gap", "clamp(10px, 2vw, 15px)")
-                .set("width", "100%")
+                .set(WIDTH, "100%")
                 .set("align-content", "start")
                 .set("max-width", "100%")
                 .set(PADDING, "0 clamp(8px, 2vw, 12px) clamp(16px, 3vw, 30px)");
@@ -100,9 +102,9 @@ public class OfertasView extends VerticalLayout {
 
         H1 titulo = new H1("Ofertas y Puntos");
         titulo.getStyle()
-                .set("margin", "0")
+                .set(MARGIN, "0")
                 .set(COLOR, COLOR_1_IS)
-                .set("text-align", "center");
+                .set(TEXT_ALIGN, "center");
 
         header.add(titulo);
         return header;
@@ -120,7 +122,7 @@ public class OfertasView extends VerticalLayout {
                 .set("gap", "15px")
                 .set(BACKGROUND_COLOR, "#f5f5f5")
                 .set(TEXT_ALIGN, "8px")
-                .set("margin", "0 clamp(8px, 2vw, 12px)");
+                .set(MARGIN, "0 clamp(8px, 2vw, 12px)");
         
         puntosFilter.getStyle()
                 .set("--vaadin-checkbox-checkmark-color", COLOR_2_IS)
@@ -227,7 +229,7 @@ public class OfertasView extends VerticalLayout {
             Div emptyState = new Div();
             emptyState.setText("No hay ofertas ni productos por puntos disponibles.");
             emptyState.getStyle()
-                    .set("text-align", "center")
+                    .set(TEXT_ALIGN, "center")
                     .set(COLOR, "#666")
                     .set(PADDING, "40px")
                     .set(FONTSIZE, "1.1rem");
@@ -267,17 +269,17 @@ public class OfertasView extends VerticalLayout {
     private Div crearSeccion(String titulo, List<Producto> productos, boolean esOferta) {
         Div seccion = new Div();
         seccion.getStyle()
-                .set("width", "100%")
+                .set(WIDTH, "100%")
                 .set("margin-bottom", "40px");
         
         // Título de la sección
         com.vaadin.flow.component.html.H2 tituloSeccion = new com.vaadin.flow.component.html.H2(titulo);
         tituloSeccion.getStyle()
-                .set("margin", "0 0 20px 0")
+                .set(MARGIN, "0 0 20px 0")
                 .set(FONTSIZE, "2rem")
                 .set(FONT_WEIGHT, "700")
                 .set(COLOR, esOferta ? COLOR8 : COLOR9)
-                .set("text-align", "left")
+                .set(TEXT_ALIGN, "left")
                 .set("border-bottom", esOferta ? "3px solid #FF9800" : "3px solid #9C27B0")
                 .set("padding-bottom", "10px");
         
@@ -287,7 +289,7 @@ public class OfertasView extends VerticalLayout {
                 .set(DISPLAY, "grid")
                 .set("grid-template-columns", "repeat(auto-fill, minmax(220px, 1fr))")
                 .set("gap", "clamp(10px, 2vw, 15px)")
-                .set("width", "100%");
+                .set(WIDTH, "100%");
         
         for (Producto producto : productos) {
             gridProductos.add(createProductCard(producto, esOferta));
@@ -354,7 +356,7 @@ public class OfertasView extends VerticalLayout {
 
         H3 h3 = new H3(producto.getNombre());
         h3.getStyle()
-                .set("margin", "0")
+                .set(MARGIN, "0")
                 .set(FONTSIZE, "clamp(0.95rem, 2vw, 1.05rem)")
                 .set("line-height", "1.2");
 
@@ -366,7 +368,7 @@ public class OfertasView extends VerticalLayout {
                 .set("line-height", "1.4")
                 .set("overflow", "hidden")
                 .set("text-overflow", "ellipsis")
-                .set("display", "-webkit-box")
+                .set(DISPLAY, "-webkit-box")
                 .set("-webkit-line-clamp", "2")
                 .set("-webkit-box-orient", "vertical");
 

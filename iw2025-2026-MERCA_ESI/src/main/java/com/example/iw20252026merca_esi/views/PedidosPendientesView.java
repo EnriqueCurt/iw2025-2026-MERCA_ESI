@@ -40,7 +40,15 @@ import java.util.stream.Collectors;
 @PageTitle("Gestión de Pedidos - MercaESI")
 @RolesAllowed({"ADMINISTRADOR", "PROPIETARIO", "MANAGER", "REPARTIDOR"})
 public class PedidosPendientesView extends VerticalLayout implements BeforeEnterObserver {
-    
+
+    private static final String FONTSIZE = "font-size";
+    private static final String BORDERRADIUS = "border-radius";
+    private static final String COLOR = "color";
+    private static final String COLOR2 = "#4CAF50";
+    private static final String COLOR3 = "#2196F3";
+    private static final String COLOR4 = "#D32F2F";
+    private static final String BACKGROUNDCOLOR = "background-color";
+
     private final PedidoRepository pedidoRepository;
     private final SessionService sessionService;
     private Grid<Pedido> pedidosGrid;
@@ -57,11 +65,11 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         setSpacing(true);
 
         H2 titulo = new H2("Gestión de Pedidos");
-        titulo.getStyle().set("color", "#D32F2F");
+        titulo.getStyle().set(COLOR, COLOR4);
 
         Button btnActualizar = new Button("Actualizar", new Icon(VaadinIcon.REFRESH));
         btnActualizar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnActualizar.getStyle().set("background-color", "#D32F2F");
+        btnActualizar.getStyle().set(BACKGROUNDCOLOR, COLOR4);
         btnActualizar.addClickListener(e -> cargarPedidos());
 
         HorizontalLayout headerLayout = new HorizontalLayout(titulo, btnActualizar);
@@ -150,19 +158,19 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
             
             String colorFondo = switch(pedido.getEstado()) {
                 case "PENDIENTE_PAGO" -> "#FF9800";
-                case "EN_COCINA" -> "#2196F3";
+                case "EN_COCINA" -> COLOR3;
                 case "EN_REPARTO" -> "#9C27B0";
-                case "LISTO" -> "#4CAF50";
-                case "FINALIZADO" -> "#4CAF50";
+                case "LISTO" -> COLOR2;
+                case "FINALIZADO" -> COLOR2;
                 default -> "#757575";
             };
             
             badge.getStyle()
-                    .set("background-color", colorFondo)
-                    .set("color", "white")
+                    .set(BACKGROUNDCOLOR, colorFondo)
+                    .set(COLOR, "white")
                     .set("padding", "4px 12px")
-                    .set("border-radius", "12px")
-                    .set("font-size", "12px")
+                    .set(BORDERRADIUS, "12px")
+                    .set(FONTSIZE, "12px")
                     .set("font-weight", "500");
             
             return badge;
@@ -175,7 +183,7 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         pedidosGrid.addComponentColumn(pedido -> {
             Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
             btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-            btnCambiarEstado.getStyle().set("background-color", "#2196F3");
+            btnCambiarEstado.getStyle().set(BACKGROUNDCOLOR, COLOR3);
             btnCambiarEstado.addClickListener(e -> mostrarDialogoCambioEstado(pedido));
             
             if ("FINALIZADO".equals(pedido.getEstado())) {
@@ -212,7 +220,7 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         dialog.setWidth("400px");
 
         H3 titulo = new H3("Cambiar Estado - Pedido #" + pedido.getIdPedido());
-        titulo.getStyle().set("color", "#D32F2F").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, COLOR4).set("margin-top", "0");
 
         ComboBox<EstadoPedido> estadoCombo = new ComboBox<>("Nuevo Estado");
         estadoCombo.setItems(EstadoPedido.values());
@@ -222,7 +230,7 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
 
         Button btnGuardar = new Button("Guardar", new Icon(VaadinIcon.CHECK));
         btnGuardar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnGuardar.getStyle().set("background-color", "#4CAF50");
+        btnGuardar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
         btnGuardar.addClickListener(e -> {
             EstadoPedido nuevoEstado = estadoCombo.getValue();
             if (nuevoEstado != null) {
@@ -270,8 +278,8 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
     private Div createStatsPanel() {
         Div panel = new Div();
         panel.getStyle()
-                .set("background-color", "white")
-                .set("border-radius", "8px")
+                .set(BACKGROUNDCOLOR, "white")
+                .set(BORDERRADIUS, "8px")
                 .set("padding", "20px")
                 .set("box-shadow", "0 2px 8px rgba(0,0,0,0.1)")
                 .set("margin-bottom", "20px");
@@ -298,8 +306,8 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         
         statsLayout.add(
             createStatCard("Pendiente de Pago", String.valueOf(pendientesPago), "#FF9800"),
-            createStatCard("En Cocina", String.valueOf(enCocina), "#2196F3"),
-            createStatCard("Listos", String.valueOf(listos), "#4CAF50"),
+            createStatCard("En Cocina", String.valueOf(enCocina), COLOR3),
+            createStatCard("Listos", String.valueOf(listos), COLOR2),
             createStatCard("En Reparto", String.valueOf(enReparto), "#9C27B0")
         );
 
@@ -313,18 +321,18 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
         card.setPadding(true);
         card.getStyle()
                 .set("border-left", "4px solid " + color)
-                .set("background-color", "#f9f9f9")
-                .set("border-radius", "4px");
+                .set(BACKGROUNDCOLOR, "#f9f9f9")
+                .set(BORDERRADIUS, "4px");
 
         Span tituloSpan = new Span(titulo);
         tituloSpan.getStyle()
-                .set("color", "#666")
-                .set("font-size", "14px");
+                .set(COLOR, "#666")
+                .set(FONTSIZE, "14px");
 
         Span valorSpan = new Span(valor);
         valorSpan.getStyle()
-                .set("color", color)
-                .set("font-size", "32px")
+                .set(COLOR, color)
+                .set(FONTSIZE, "32px")
                 .set("font-weight", "bold");
 
         card.add(valorSpan, tituloSpan);

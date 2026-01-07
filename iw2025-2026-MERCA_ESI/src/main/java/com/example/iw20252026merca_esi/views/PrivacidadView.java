@@ -26,6 +26,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 @PageTitle("Privacidad y Protección de Datos")
 public class PrivacidadView extends VerticalLayout {
 
+    private static final String BACKGROUND = "background";
+    private static final String BACKGROUNDCOLOR = "background-color";
+    private static final String COLOR = "color";
+    private static final String COLOR1 = "white";
+    private static final String COLOR2 = "#1976D2";
+    private static final String MARGIN = "margin";
+    private static final String MARGINTOP = "margin-top";
+    private static final String MARGINBOTTOM = "margin-bottom";
+    private static final String PERFIL = "perfil";
+    private static final String FONTSIZE = "font-size";
+    private static final String PADDING = "padding";
+    private static final String BORDERRADIUS = "border-radius";
+
     private final SessionService sessionService;
     private final ClienteService clienteService;
     private final EmpleadoService empleadoService;
@@ -56,8 +69,8 @@ public class PrivacidadView extends VerticalLayout {
         container.setPadding(true);
         container.setSpacing(true);
         container.getStyle()
-                .set("background", "white")
-                .set("border-radius", "16px")
+                .set(BACKGROUND, COLOR1)
+                .set(BORDERRADIUS, "16px")
                 .set("box-shadow", "0 8px 32px rgba(0,0,0,0.1)");
 
         // Verificar usuario logueado
@@ -71,11 +84,11 @@ public class PrivacidadView extends VerticalLayout {
             header.setAlignItems(Alignment.CENTER);
             header.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
             header.getStyle()
-                    .set("background", "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)")
-                    .set("color", "white")
-                    .set("padding", "30px")
-                    .set("border-radius", "12px")
-                    .set("margin-bottom", "20px");
+                    .set(BACKGROUND, "linear-gradient(135deg, #1976D2 0%, #1565C0 100%)")
+                    .set(COLOR, COLOR1)
+                    .set(PADDING, "30px")
+                    .set(BORDERRADIUS, "12px")
+                    .set(MARGINBOTTOM, "20px");
 
             Icon shieldIcon = new Icon(VaadinIcon.SHIELD);
             shieldIcon.setSize("48px");
@@ -86,13 +99,13 @@ public class PrivacidadView extends VerticalLayout {
 
             H2 titulo = new H2("Privacidad y Protección de Datos");
             titulo.getStyle()
-                    .set("margin", "0")
-                    .set("color", "white")
-                    .set("font-size", "28px");
+                    .set(MARGIN, "0")
+                    .set(COLOR, COLOR1)
+                    .set(FONTSIZE, "28px");
 
             Span subtitulo = new Span("Gestiona tus datos personales según RGPD");
             subtitulo.getStyle()
-                    .set("font-size", "14px")
+                    .set(FONTSIZE, "14px")
                     .set("opacity", "0.9");
 
             headerText.add(titulo, subtitulo);
@@ -100,9 +113,9 @@ public class PrivacidadView extends VerticalLayout {
             Button btnVolver = new Button("Volver al Perfil", new Icon(VaadinIcon.ARROW_LEFT));
             btnVolver.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
             btnVolver.getStyle()
-                    .set("color", "white")
-                    .set("border-color", "white");
-            btnVolver.addClickListener(e -> UI.getCurrent().navigate("perfil"));
+                    .set(COLOR, COLOR1)
+                    .set("border-color", COLOR1);
+            btnVolver.addClickListener(e -> UI.getCurrent().navigate(PERFIL));
 
             HorizontalLayout headerLeft = new HorizontalLayout(shieldIcon, headerText);
             headerLeft.setAlignItems(Alignment.CENTER);
@@ -134,21 +147,21 @@ public class PrivacidadView extends VerticalLayout {
         seccion.setPadding(true);
         seccion.setSpacing(true);
         seccion.getStyle()
-                .set("background", "#f8f9fa")
-                .set("border-radius", "8px")
-                .set("margin-bottom", "20px");
+                .set(BACKGROUND, "#f8f9fa")
+                .set(BORDERRADIUS, "8px")
+                .set(MARGINBOTTOM, "20px");
 
         H3 titulo = new H3("Información sobre el uso de tus datos");
-        titulo.getStyle().set("color", "#333").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, "#333").set(MARGINTOP, "0");
 
         Paragraph intro = new Paragraph(
                 "En MercaESI valoramos tu privacidad y nos comprometemos a proteger tus datos personales " +
                 "de acuerdo con el Reglamento General de Protección de Datos (RGPD)."
         );
-        intro.getStyle().set("color", "#666");
+        intro.getStyle().set(COLOR, "#666");
 
         H4 subtitulo1 = new H4("¿Qué datos recopilamos?");
-        subtitulo1.getStyle().set("color", "#1976D2").set("margin-bottom", "10px");
+        subtitulo1.getStyle().set(COLOR, COLOR2).set(MARGINBOTTOM, "10px");
 
         UnorderedList listaDatos = new UnorderedList();
         listaDatos.add(new ListItem("Nombre completo"));
@@ -157,10 +170,10 @@ public class PrivacidadView extends VerticalLayout {
         listaDatos.add(new ListItem("Número de teléfono (opcional)"));
         listaDatos.add(new ListItem("Información de pedidos y transacciones"));
         listaDatos.add(new ListItem("Puntos de fidelización (solo clientes)"));
-        listaDatos.getStyle().set("color", "#555");
+        listaDatos.getStyle().set(COLOR, "#555");
 
         H4 subtitulo2 = new H4("¿Cómo usamos tus datos?");
-        subtitulo2.getStyle().set("color", "#1976D2").set("margin-bottom", "10px");
+        subtitulo2.getStyle().set(COLOR, COLOR2).set(MARGINBOTTOM, "10px");
 
         UnorderedList listaUso = new UnorderedList();
         listaUso.add(new ListItem("Procesar y gestionar tus pedidos"));
@@ -168,16 +181,16 @@ public class PrivacidadView extends VerticalLayout {
         listaUso.add(new ListItem("Mejorar nuestros servicios"));
         listaUso.add(new ListItem("Gestionar tu programa de puntos de fidelización"));
         listaUso.add(new ListItem("Cumplir con obligaciones legales"));
-        listaUso.getStyle().set("color", "#555");
+        listaUso.getStyle().set(COLOR, "#555");
 
         H4 subtitulo3 = new H4("Seguridad de tus datos");
-        subtitulo3.getStyle().set("color", "#1976D2").set("margin-bottom", "10px");
+        subtitulo3.getStyle().set(COLOR, COLOR2).set(MARGINBOTTOM, "10px");
 
         Paragraph seguridad = new Paragraph(
                 "Utilizamos cifrado y medidas de seguridad técnicas y organizativas apropiadas " +
                 "para proteger tus datos personales contra acceso no autorizado, pérdida o alteración."
         );
-        seguridad.getStyle().set("color", "#555");
+        seguridad.getStyle().set(COLOR, "#555");
 
         seccion.add(titulo, intro, subtitulo1, listaDatos, subtitulo2, listaUso, subtitulo3, seguridad);
         return seccion;
@@ -188,12 +201,12 @@ public class PrivacidadView extends VerticalLayout {
         seccion.setPadding(true);
         seccion.setSpacing(true);
         seccion.getStyle()
-                .set("background", "#e3f2fd")
-                .set("border-radius", "8px")
-                .set("margin-bottom", "20px");
+                .set(BACKGROUND, "#e3f2fd")
+                .set(BORDERRADIUS, "8px")
+                .set(MARGINBOTTOM, "20px");
 
         H3 titulo = new H3("Tus Derechos bajo el RGPD");
-        titulo.getStyle().set("color", "#1565C0").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, "#1565C0").set(MARGINTOP, "0");
 
         // Crear tarjetas de derechos
         HorizontalLayout cardsLayout = new HorizontalLayout();
@@ -217,30 +230,30 @@ public class PrivacidadView extends VerticalLayout {
     private Div crearTarjetaDerecho(VaadinIcon icono, String titulo, String descripcion) {
         Div tarjeta = new Div();
         tarjeta.getStyle()
-                .set("background", "white")
-                .set("padding", "20px")
-                .set("border-radius", "8px")
+                .set(BACKGROUND, COLOR1)
+                .set(PADDING, "20px")
+                .set(BORDERRADIUS, "8px")
                 .set("box-shadow", "0 2px 8px rgba(0,0,0,0.1)")
                 .set("flex", "1 1 280px")
                 .set("min-width", "280px")
-                .set("margin-bottom", "15px");
+                .set(MARGINBOTTOM, "15px");
 
         Icon icon = new Icon(icono);
         icon.setSize("32px");
-        icon.setColor("#1976D2");
-        icon.getStyle().set("margin-bottom", "10px");
+        icon.setColor(COLOR2);
+        icon.getStyle().set(MARGINBOTTOM, "10px");
 
         H4 tituloH4 = new H4(titulo);
         tituloH4.getStyle()
-                .set("margin", "10px 0")
-                .set("color", "#333")
-                .set("font-size", "18px");
+                .set(MARGIN, "10px 0")
+                .set(COLOR, "#333")
+                .set(FONTSIZE, "18px");
 
         Paragraph desc = new Paragraph(descripcion);
         desc.getStyle()
-                .set("color", "#666")
-                .set("font-size", "14px")
-                .set("margin", "0");
+                .set(COLOR, "#666")
+                .set(FONTSIZE, "14px")
+                .set(MARGIN, "0");
 
         tarjeta.add(icon, tituloH4, desc);
         return tarjeta;
@@ -251,16 +264,16 @@ public class PrivacidadView extends VerticalLayout {
         seccion.setPadding(true);
         seccion.setSpacing(true);
         seccion.getStyle()
-                .set("background", "#fff3e0")
-                .set("border-radius", "8px");
+                .set(BACKGROUND, "#fff3e0")
+                .set(BORDERRADIUS, "8px");
 
         H3 titulo = new H3("Gestiona tus Datos");
-        titulo.getStyle().set("color", "#E65100").set("margin-top", "0");
+        titulo.getStyle().set(COLOR, "#E65100").set(MARGINTOP, "0");
 
         Paragraph info = new Paragraph(
                 "Puedes ejercer tus derechos en cualquier momento. Algunas acciones requieren confirmación adicional por seguridad."
         );
-        info.getStyle().set("color", "#666");
+        info.getStyle().set(COLOR, "#666");
 
         HorizontalLayout botonesLayout = new HorizontalLayout();
         botonesLayout.setWidthFull();
@@ -271,17 +284,17 @@ public class PrivacidadView extends VerticalLayout {
         Button btnVerDatos = new Button("Ver Mis Datos", new Icon(VaadinIcon.EYE));
         btnVerDatos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnVerDatos.getStyle()
-                .set("background-color", "#1976D2")
+                .set(BACKGROUNDCOLOR, COLOR2)
                 .set("flex", "1 1 200px");
-        btnVerDatos.addClickListener(e -> UI.getCurrent().navigate("perfil"));
+        btnVerDatos.addClickListener(e -> UI.getCurrent().navigate(PERFIL));
 
         // Botón Editar datos
         Button btnEditarDatos = new Button("Editar Mis Datos", new Icon(VaadinIcon.EDIT));
         btnEditarDatos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnEditarDatos.getStyle()
-                .set("background-color", "#4CAF50")
+                .set(BACKGROUNDCOLOR, "#4CAF50")
                 .set("flex", "1 1 200px");
-        btnEditarDatos.addClickListener(e -> UI.getCurrent().navigate("perfil"));
+        btnEditarDatos.addClickListener(e -> UI.getCurrent().navigate(PERFIL));
 
         // Botón Eliminar cuenta
         Button btnEliminarCuenta = new Button("Eliminar Mi Cuenta", new Icon(VaadinIcon.TRASH));
@@ -309,16 +322,16 @@ public class PrivacidadView extends VerticalLayout {
 
         Div advertencia = new Div();
         advertencia.getStyle()
-                .set("background", "#ffebee")
-                .set("padding", "20px")
-                .set("border-radius", "8px")
+                .set(BACKGROUND, "#ffebee")
+                .set(PADDING, "20px")
+                .set(BORDERRADIUS, "8px")
                 .set("border-left", "4px solid #D32F2F")
-                .set("margin-bottom", "15px");
+                .set(MARGINBOTTOM, "15px");
 
         H4 tituloAdvertencia = new H4("¡ATENCIÓN! Esta acción es irreversible");
         tituloAdvertencia.getStyle()
-                .set("color", "#D32F2F")
-                .set("margin", "0 0 10px 0");
+                .set(COLOR, "#D32F2F")
+                .set(MARGIN, "0 0 10px 0");
 
         Paragraph textoAdvertencia = new Paragraph(
                 "Al eliminar tu cuenta, se eliminarán permanentemente:\n" +
@@ -329,14 +342,14 @@ public class PrivacidadView extends VerticalLayout {
                 "Esta acción NO se puede deshacer."
         );
         textoAdvertencia.getStyle()
-                .set("color", "#666")
+                .set(COLOR, "#666")
                 .set("white-space", "pre-line")
-                .set("margin", "0");
+                .set(MARGIN, "0");
 
         advertencia.add(tituloAdvertencia, textoAdvertencia);
 
         Paragraph confirmacion = new Paragraph("Para confirmar, ingresa tu contraseña:");
-        confirmacion.getStyle().set("font-weight", "bold").set("color", "#333");
+        confirmacion.getStyle().set("font-weight", "bold").set(COLOR, "#333");
 
         PasswordField passwordField = new PasswordField("Contraseña");
         passwordField.setWidthFull();
@@ -411,19 +424,19 @@ public class PrivacidadView extends VerticalLayout {
 
         Icon lockIcon = new Icon(VaadinIcon.LOCK);
         lockIcon.setSize("64px");
-        lockIcon.setColor("#1976D2");
+        lockIcon.setColor(COLOR2);
 
         H2 titulo = new H2("Acceso Restringido");
-        titulo.getStyle().set("color", "#333");
+        titulo.getStyle().set(COLOR, "#333");
 
         Paragraph mensaje = new Paragraph(
                 "Debes iniciar sesión para acceder a la configuración de privacidad y protección de datos."
         );
-        mensaje.getStyle().set("color", "#666").set("text-align", "center");
+        mensaje.getStyle().set(COLOR, "#666").set("text-align", "center");
 
         Button btnLogin = new Button("Iniciar Sesión", new Icon(VaadinIcon.SIGN_IN));
         btnLogin.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnLogin.getStyle().set("background-color", "#1976D2");
+        btnLogin.getStyle().set(BACKGROUNDCOLOR, COLOR2);
         btnLogin.addClickListener(e -> UI.getCurrent().navigate("acceso"));
 
         layout.add(lockIcon, titulo, mensaje, btnLogin);

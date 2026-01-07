@@ -44,6 +44,7 @@ public class PerfilView extends VerticalLayout {
     private static final String EDITAR_PERFIL = "Editar Perfil";
     private static final String B_COLOR = "background-color";
     private static final String COLOR1 = "#D32F2F";
+    private static final String COLOR3 = "white";
     private static final String PIXEL_TAM = "12px 24px";
     private static final String PADDING = "padding";
     private static final String COLOR = "color";
@@ -213,7 +214,7 @@ public class PerfilView extends VerticalLayout {
         header.setPadding(false);
         header.getStyle()
                 .set(BACKGROUND, "linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%)")
-                .set(COLOR, "white")
+                .set(COLOR, COLOR3)
                 .set(BORDER_RADIUS, "12px")
                 .set(PADDING, "30px")
                 .set(MARGIN_BOTTOM, "20px")
@@ -237,7 +238,7 @@ public class PerfilView extends VerticalLayout {
         H2 nombreTitle = new H2(nombre);
         nombreTitle.getStyle()
                 .set(MARGIN, "0")
-                .set(COLOR, "white")
+                .set(COLOR, COLOR3)
                 .set(FONT_SIZE, "28px");
         
         Span tipoSpan = new Span(tipo);
@@ -318,7 +319,7 @@ public class PerfilView extends VerticalLayout {
         campo.setAlignItems(Alignment.CENTER);
         campo.setSpacing(true);
         campo.getStyle()
-                .set(BACKGROUND, "white")
+                .set(BACKGROUND, COLOR3)
                 .set(PADDING, "15px 20px")
                 .set(BORDER_RADIUS, "8px")
                 .set(MARGIN_BOTTOM, "10px")
