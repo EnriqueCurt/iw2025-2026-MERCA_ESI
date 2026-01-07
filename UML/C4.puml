@@ -1,0 +1,75 @@
+@startuml C4_SystemContext
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(user, "Usuario (Cliente/Administrador)", "Usuario del sistema via navegador")
+System(merca, "MERCA_ESI", "Aplicación web para gestión de pedidos y productos (Vaadin + Spring Boot)")
+System_Ext(db, "Base de datos", "MySQL / MariaDB")
+
+Rel(user, merca, "Usa (navegador web)")
+Rel(merca, db, "Lee / Escribe (JDBC / JPA)")
+left to right direction
+@enduml
+
+@startuml C4_Container
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Usuario", "Usa la interfaz web")
+
+System_Boundary(system, "MERCA_ESI") {
+  Container(frontend, "Frontend (Vaadin)", "TypeScript / JavaScript", "Interfaz web ejecutada en el navegador")
+  Container(backend, "Backend (Spring Boot)", "Java, Spring Boot", "API REST / Lógica de negocio / JPA")
+  ContainerDb(database, "Base de datos", "MySQL", "Persistencia de datos: pedidos, productos, usuarios, ...")
+}
+
+Rel(user, frontend, "Interacción (HTTP / WebSocket)")
+Rel(frontend, backend, "Llama API / endpoints", "HTTP / REST")
+Rel(backend, database, "Lee / Escribe", "JPA / JDBC")
+left to right direction
+@enduml
+
+@startuml C4_Component_Backend
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(backend, "Backend (Spring Boot)", "Java, Spring Boot", "API REST / Lógica de negocio / JPA")
+
+Component(ctrl, "Controllers", "Spring MVC Controllers", "Paquete: `controller`")
+Component(svc, "Services", "Servicios de negocio", "Paquete: `service`")
+Component(repo, "Repositories", "Spring Data JPA Repositories", "Paquete: `repository`")
+Component(model, "Domain Models", "Entidades JPA", "Paquete: `model`")
+Component(util, "Util / Config", "Clases utilitarias y configuración", "Paquete: `config` / `util`")
+
+Rel(frontend, ctrl, "HTTP / llamadas a endpoints")
+Rel(ctrl, svc, "Invoca")
+Rel(svc, repo, "Usa")
+Rel(svc, model, "Manipula / valida")
+Rel(repo, database, "Persistencia")
+left to right direction
+@enduml
+
+@startuml C4_Component_PedidoDomain
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Backend(backend, "Backend (Spring Boot)", "Java, Spring Boot")
+
+Component(pedidoCtrl, "PedidoController", "Expone endpoints para pedidos", "Paquete: `controller`")
+Component(pedidoSvc, "PedidoService", "Lógica de negocio de pedidos", "Paquete: `service`")
+Component(pedidoRepo, "PedidoRepository", "Acceso a datos de pedidos", "Paquete: `repository`")
+Component(detalleModel, "DetallePedido (Entidad)", "Entidad que representa línea de pedido\n`src/main/java/com/example/iw20252026merca_esi/model/DetallePedido.java`", "Paquete: `model`")
+Component(productoModel, "Producto (Entidad)", "Entidad producto", "Paquete: `model`")
+Component(menuModel, "Menu (Entidad)", "Entidad menú", "Paquete: `model`")
+
+Rel(pedidoCtrl, pedidoSvc, "Llama")
+Rel(pedidoSvc, pedidoRepo, "Usa")
+Rel(pedidoSvc, detalleModel, "Crea / Actualiza / Valida")
+Rel(detalleModel, productoModel, "Referencia (ManyToOne)", "producto")
+Rel(detalleModel, menuModel, "Referencia (ManyToOne)", "menu")
+Rel(pedidoRepo, database, "Persistencia")
+
+' DetallePedido: método relevante
+note right of detalleModel
+- Atributos: id, pedido, producto, menu, cantidad, precioUnitario
+- Método: calcularSubtotal() = cantidad * precioUnitario
+- Helper: tieneProductoOmenuValido()
+end note
+
+@enduml

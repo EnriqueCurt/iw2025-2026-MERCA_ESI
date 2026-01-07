@@ -1,0 +1,60 @@
+@startuml UseCases_System
+left to right direction
+title Diagrama de Casos de Uso - Sistema de Pedidos
+
+actor Cliente as C
+actor Empleado as E
+actor Administrador as A
+
+rectangle "Sistema de Pedidos" {
+  usecase UC_VerCatalogo as "Ver catálogo / Menú"
+  usecase UC_BuscarProductos as "Buscar productos"
+  usecase UC_Registrar as "Registrar cuenta"
+  usecase UC_Login as "Iniciar sesión"
+  usecase UC_CrearPedido as "Crear pedido"
+  usecase UC_ModificarPedido as "Agregar / Quitar ítems"
+  usecase UC_Pagar as "Pagar pedido"
+  usecase UC_ConsultarEstado as "Consultar estado / Historial"
+  usecase UC_AplicarPuntos as "Aplicar puntos / Descuentos"
+  usecase UC_Notificar as "Notificar cliente"
+  usecase UC_AsignarPedido as "Asignar pedido a empleado"
+  usecase UC_Preparar as "Preparar pedido"
+  usecase UC_Entregar as "Marcar como entregado"
+  usecase UC_GestionProductos as "Gestionar productos (alta/baja/edición)"
+  usecase UC_GestionMenu as "Gestionar menú"
+  usecase UC_GestionIngredientes as "Gestionar ingredientes"
+  usecase UC_GestionUsuarios as "Gestionar usuarios y roles"
+}
+
+' Relaciones actor -> casos de uso
+C --> UC_VerCatalogo
+C --> UC_BuscarProductos
+C --> UC_Registrar
+C --> UC_Login
+C --> UC_CrearPedido
+C --> UC_ModificarPedido
+C --> UC_Pagar
+C --> UC_ConsultarEstado
+C --> UC_AplicarPuntos
+
+E --> UC_AsignarPedido
+E --> UC_Preparar
+E --> UC_Entregar
+E --> UC_ConsultarEstado
+
+A --> UC_GestionProductos
+A --> UC_GestionMenu
+A --> UC_GestionIngredientes
+A --> UC_GestionUsuarios
+A --> UC_AsignarPedido
+A --> UC_ConsultarEstado
+
+' Relaciones entre casos de uso
+UC_CrearPedido .> UC_Notificar : <<include>>
+UC_AsignarPedido .> UC_Notificar : <<include>>
+UC_Entregar .> UC_Notificar : <<include>>
+UC_ModificarPedido .> UC_CrearPedido : <<include>>
+UC_Pagar .> UC_CrearPedido : <<include>>
+UC_Preparar .> UC_AsignarPedido : <<include>>
+
+@enduml
