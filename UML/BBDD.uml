@@ -1,92 +1,188 @@
 @startuml
 
+' ============ ENTIDADES PRINCIPALES ============
+
 class Producto {
-    - id_producto : int
-    - nombre : string
-    - descripcion : string
+    - id_producto : int <<PK>>
+    - nombre : varchar(100)
+    - descripcion : text
     - precio : float
-    - es_oferta : bool
-    - estado : bool
-    - puntos : bool
+    - es_oferta : bit(1)
+    - estado : bit(1)
+    - puntos : bit(1)
+    - imagen : binary(255)
+    - created_at : datetime
+    - updated_at : datetime
 }
 
 class Categoria {
-    - id_categoria : int
-    - nombre : string
+    - id_categoria : int <<PK>>
+    - nombre : varchar(100)
 }
 
 class Menu {
-    - id_menu : int
-    - nombre : string
-    - descripcion : string
+    - id_menu : int <<PK>>
+    - nombre : varchar(100)
+    - descripcion : text
     - precio : float
-    - es_oferta : bool
-    - estado : bool
-    - puntos : bool
-    + calcularPrecio() : float
-}
-
-class Empleado {
-    - id_empleado : int
-    - nombre : string
-    - email : string
-    - telefono : string
-    - username : string
-    - contrasena : string
-}
-
-class Rol {
-    - id_rol : int
-    - nombre : string
-}
-
-class Cliente {
-    - id_cliente : int
-    - nombre : string
-    - username : string
-    - contrasena : string
-    - email : string
-    - telefono : string
-    - puntos : int
-}
-
-class Pedido {
-    - id_pedido : int
-    - fecha : datetime
-    - total : float
-    - estado : string
-}
-
-class DetallePedido {
-    - id_pedido : int {not null}
-    - id_producto : int {not null}
-    - cantidad : int
-    - precio_unitario : float
-    + calcularSubtotal() : float
+    - es_oferta : bit(1)
+    - estado : bit(1)
+    - puntos : bit(1)
+    - imagen : binary(255)
+    - created_at : datetime
+    - updated_at : datetime
 }
 
 class Ingrediente {
-    - id_ingrediente : int
-    - nombre : string
-    - descripcion : string
-    - unidad : string
-    - estado : bool
+    - id_ingrediente : int <<PK>>
+    - nombre : varchar(100)
+    - descripcion : text
+    - estado : bit(1)
+}
+
+' ============ USUARIOS ============
+
+class Cliente {
+    - id_cliente : int <<PK>>
+    - nombre : varchar(100)
+    - username : varchar(50) <<unique>>
+    - contrasena : varchar(60)
+    - email : varchar(100) <<unique>>
+    - telefono : varchar(20)
+    - puntos : int
+    - created_at : datetime
+    - updated_at : datetime
+}
+
+class Empleado {
+    - id_empleado : int <<PK>>
+    - nombre : varchar(100)
+    - username : varchar(50) <<unique>>
+    - contrasena : varchar(60)
+    - email : varchar(100) <<unique>>
+    - telefono : varchar(20)
+    - created_at : datetime
+    - updated_at : datetime
+}
+
+class Rol {
+    - id_rol : int <<PK>>
+    - nombre : varchar(50) <<unique>>
+}
+
+' ============ PEDIDOS ============
+
+class Pedido {
+    - id_pedido : int <<PK>>
+    - fecha : datetime
+    - fecha_cierre : datetime
+    - total : float
+    - estado : varchar(50)
+    - a_domicilio : bit(1)
+    - para_llevar : bit(1)
+    - direccion : varchar(255)
+    - id_cliente : int <<FK nullable>>
+    - id_empleado : int <<FK nullable>>
+    - created_at : datetime
+    - updated_at : datetime
+}
+
+class DetallePedidoProducto {
+    - id_detalle : int <<PK>>
+    - id_pedido : int <<FK>>
+    - id_producto : int <<FK>>
+    - cantidad : int
+    - precio_unitario : float
+    - subtotal : float
+    - notas : varchar(500)
+    - ingredientes_excluidos : text
+}
+
+class DetallePedidoMenu {
+    - id_detalle : int <<PK>>
+    - id_pedido : int <<FK>>
+    - id_menu : int <<FK>>
+    - cantidad : int
+    - precio_unitario : float
+    - subtotal : float
+    - ingredientes_excluidos : text
+}
+
+' ============ TABLAS DE RELACIÓN ============
+
+class ProductoCategoria {
+    - id_producto : int <<FK, PK>>
+    - id_categoria : int <<FK, PK>>
 }
 
 class ProductoIngrediente {
-    - id_producto : int {not null}
-    - id_ingrediente : int {not null}
+    - id_producto : int <<FK, PK>>
+    - id_ingrediente : int <<FK, PK>>
     - cantidad : float
 }
 
-Producto "1" *-- "1..*" Categoria : pertenece
-Menu "1" *-- "1..*" Producto : contiene
-Empleado "1" *-- "1..*" Rol : tiene
-Cliente "1" *-- "0..*" Pedido : realiza
-Pedido "1" *-- "1..*" DetallePedido : contiene
-DetallePedido "1" *-- "1" Producto : incluye
-Empleado "1" *-- "0..*" Pedido : asignado_a
-Producto "1" *-- "0..*" ProductoIngrediente : compuesto_por
-ProductoIngrediente "1" *-- "1" Ingrediente : referencia
+class MenuProducto {
+    - id_menu : int <<FK, PK>>
+    - id_producto : int <<FK, PK>>
+}
+
+class EmpleadoRol {
+    - id_empleado : int <<FK, PK>>
+    - id_rol : int <<FK, PK>>
+}
+
+' ============ OTROS ============
+
+class Establecimiento {
+    - id_establecimiento : int <<PK>>
+    - telefono : varchar(20)
+    - horario : varchar(100)
+    - direccion : varchar(200)
+    - informacion : text
+}
+
+class PushSubscription {
+    - id : bigint <<PK>>
+    - endpoint : text <<unique>>
+    - p256dh : text
+    - auth : text
+    - user_id : varchar(255)
+}
+
+' ============ RELACIONES ============
+
+' Producto - Categoria (N:M)
+Producto "0..*" -- "0..*" Categoria
+(Producto, Categoria) .. ProductoCategoria
+
+' Producto - Ingrediente (N:M)
+Producto "0..*" -- "0..*" Ingrediente
+(Producto, Ingrediente) .. ProductoIngrediente
+
+' Menu - Producto (N:M)
+Menu "0..*" -- "0..*" Producto
+(Menu, Producto) .. MenuProducto
+
+' Empleado - Rol (N:M)
+Empleado "0..*" -- "0..*" Rol
+(Empleado, Rol) .. EmpleadoRol
+
+' Cliente - Pedido (1:N)
+Cliente "0..1" -- "0..*" Pedido : realiza >
+
+' Empleado - Pedido (1:N)
+Empleado "0..1" -- "0..*" Pedido : gestiona >
+
+' Pedido - DetallePedidoProducto (1:N)
+Pedido "1" -- "0..*" DetallePedidoProducto : contiene >
+
+' Pedido - DetallePedidoMenu (1:N)
+Pedido "1" -- "0..*" DetallePedidoMenu : contiene >
+
+' Producto - DetallePedidoProducto (1:N)
+Producto "1" -- "0..*" DetallePedidoProducto : referenciado en >
+
+' Menu - DetallePedidoMenu (1:N)
+Menu "1" -- "0..*" DetallePedidoMenu : referenciado en >
 
 @enduml
