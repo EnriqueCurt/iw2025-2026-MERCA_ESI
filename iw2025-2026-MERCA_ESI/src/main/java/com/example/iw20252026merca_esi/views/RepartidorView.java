@@ -311,16 +311,24 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
                 actions.add(btnAsignar);
             }
             
-            Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
-            btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-            btnCambiarEstado.getStyle().set(COLOR0, "#2196F3");
-            btnCambiarEstado.addClickListener(e -> mostrarDialogoCambioEstado(pedido));
+            // Botón Entregar solo para pedidos EN_REPARTO asignados al repartidor
+            if (EN_REPARTO.equals(pedido.getEstado())) {
+                Empleado empleado = sessionService.getEmpleado();
+                if (empleado != null && pedido.getEmpleado() != null &&
+                    pedido.getEmpleado().getIdEmpleado().equals(empleado.getIdEmpleado())) {
+                    Button btnEntregar = new Button("Entregar", new Icon(VaadinIcon.CHECK_CIRCLE));
+                    btnEntregar.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                    btnEntregar.getStyle().set(COLOR0, COLOR2);
+                    btnEntregar.addClickListener(e -> marcarComoEntregado(pedido));
+                    actions.add(btnEntregar);
+                }
+            }
 
             Button btnDetalles = new Button(new Icon(VaadinIcon.INFO_CIRCLE));
             btnDetalles.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
             btnDetalles.addClickListener(e -> mostrarDetallesPedido(pedido));
 
-            actions.add(btnCambiarEstado, btnDetalles);
+            actions.add(btnDetalles);
             return actions;
         })
                 .setHeader("Acciones")
@@ -455,6 +463,22 @@ public class RepartidorView extends VerticalLayout implements BeforeEnterObserve
                 .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         
         cargarPedidos();
+    }
+
+    private void marcarComoEntregado(Pedido pedido) {
+        try {
+            // Cambiar estado a FINALIZADO (entregado)
+            pedido.setEstadoPedido(EstadoPedido.FINALIZADO);
+            pedido.setFechaCierre(LocalDateTime.now());
+            pedidoRepository.save(pedido);
+
+            Notification.show("Pedido #" + pedido.getIdPedido() + " marcado como entregado")
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            cargarPedidos();
+        } catch (Exception e) {
+            Notification.show("Error al marcar como entregado: " + e.getMessage())
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 
     private void mostrarDetallesPedido(Pedido pedido) {

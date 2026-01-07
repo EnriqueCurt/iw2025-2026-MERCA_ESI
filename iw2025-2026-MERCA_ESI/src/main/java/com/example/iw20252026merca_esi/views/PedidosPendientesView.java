@@ -56,12 +56,14 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
     private Grid<Pedido> pedidosGrid;
     private MultiSelectComboBox<String> filtroEstados;
     private Div statsPanel;
+    private Empleado empleadoActual;
 
     @Autowired
     public PedidosPendientesView(PedidoRepository pedidoRepository, PedidoService pedidoService, SessionService sessionService) {
         this.pedidoRepository = pedidoRepository;
         this.pedidoService = pedidoService;
         this.sessionService = sessionService;
+        this.empleadoActual = sessionService.getEmpleado();
 
         setSizeFull();
         setPadding(true);
@@ -98,6 +100,14 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
             Notification.show("Acceso denegado.")
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
+    }
+
+    private boolean esRepartidor() {
+        if (empleadoActual == null || empleadoActual.getRoles() == null) {
+            return false;
+        }
+        return empleadoActual.getRoles().stream()
+                .anyMatch(rol -> "REPARTIDOR".equals(rol.getNombre()));
     }
 
     private HorizontalLayout createFiltros() {
@@ -187,26 +197,48 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
             HorizontalLayout actionsLayout = new HorizontalLayout();
             actionsLayout.setSpacing(true);
             
-            // Botón "Pagado" solo para pedidos pendientes de pago
-            if ("PENDIENTE_PAGO".equals(pedido.getEstado())) {
-                Button btnPagado = new Button("Pagado", new Icon(VaadinIcon.CASH));
-                btnPagado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
-                btnPagado.getStyle().set(BACKGROUNDCOLOR, COLOR2);
-                btnPagado.addClickListener(e -> marcarComoPagado(pedido));
-                actionsLayout.add(btnPagado);
+            // Comportamiento específico para repartidores
+            if (esRepartidor()) {
+                // Repartidores solo ven botón "Entregar" para pedidos EN_REPARTO
+                if ("EN_REPARTO".equals(pedido.getEstado())) {
+                    Button btnEntregar = new Button("Entregar", new Icon(VaadinIcon.CHECK_CIRCLE));
+                    btnEntregar.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                    btnEntregar.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+                    btnEntregar.addClickListener(e -> marcarComoEntregado(pedido));
+                    actionsLayout.add(btnEntregar);
+                } else {
+                    // Para otros estados, mostrar info
+                    Span infoSpan = new Span("No disponible");
+                    infoSpan.getStyle()
+                            .set("color", "#999")
+                            .set(FONTSIZE, "12px");
+                    actionsLayout.add(infoSpan);
+                }
+            } else {
+                // Comportamiento para otros roles (ADMINISTRADOR, PROPIETARIO, MANAGER)
+
+                // Botón "Pagado" solo para pedidos pendientes de pago
+                if ("PENDIENTE_PAGO".equals(pedido.getEstado())) {
+                    Button btnPagado = new Button("Pagado", new Icon(VaadinIcon.CASH));
+                    btnPagado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                    btnPagado.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+                    btnPagado.addClickListener(e -> marcarComoPagado(pedido));
+                    actionsLayout.add(btnPagado);
+                }
+
+                // Botón "Cambiar Estado"
+                Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
+                btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
+                btnCambiarEstado.getStyle().set(BACKGROUNDCOLOR, COLOR3);
+                btnCambiarEstado.addClickListener(e -> mostrarDialogoCambioEstado(pedido));
+
+                if ("FINALIZADO".equals(pedido.getEstado())) {
+                    btnCambiarEstado.setEnabled(false);
+                }
+
+                actionsLayout.add(btnCambiarEstado);
             }
-            
-            // Botón "Cambiar Estado" (ya existente)
-            Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
-            btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-            btnCambiarEstado.getStyle().set(BACKGROUNDCOLOR, COLOR3);
-            btnCambiarEstado.addClickListener(e -> mostrarDialogoCambioEstado(pedido));
-            
-            if ("FINALIZADO".equals(pedido.getEstado())) {
-                btnCambiarEstado.setEnabled(false);
-            }
-            
-            actionsLayout.add(btnCambiarEstado);
+
             return actionsLayout;
         })
                 .setHeader("Acciones")
@@ -300,6 +332,24 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
             cargarPedidos();
         } catch (IllegalStateException e) {
             Notification.show("Error: " + e.getMessage())
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+    }
+
+    private void marcarComoEntregado(Pedido pedido) {
+        // Lógica para marcar un pedido como entregado
+        // Esto puede incluir cambiar el estado del pedido, actualizar la base de datos, etc.
+        try {
+            // Por ejemplo, cambiar el estado a "FINALIZADO"
+            pedido.setEstadoPedido(EstadoPedido.FINALIZADO);
+            pedido.setFechaCierre(LocalDateTime.now()); // Registrar la fecha y hora de entrega
+            pedidoRepository.save(pedido);
+
+            Notification.show("Pedido #" + pedido.getIdPedido() + " marcado como entregado")
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            cargarPedidos();
+        } catch (Exception e) {
+            Notification.show("Error al marcar como entregado: " + e.getMessage())
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
