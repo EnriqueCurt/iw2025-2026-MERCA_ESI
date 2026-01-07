@@ -55,14 +55,6 @@ public class PedidoActualService {
     public void agregarItem(ItemPedido nuevoItem) {
         List<ItemPedido> pedido = getPedidoActual();
         
-        // DEBUG TEMPORAL
-        System.out.println("=== AGREGANDO: " + nuevoItem.getNombre() + " ===");
-        if (nuevoItem.getExclusiones() != null) {
-            for (ItemPedido.ExclusionIngredientes exc : nuevoItem.getExclusiones()) {
-                System.out.println("  Producto " + exc.getIdProducto() + ": " + exc.getIngredientesExcluidos());
-            }
-        }
-        
         // Buscar si ya existe un item idéntico (mismo id Y mismas exclusiones)
         Optional<ItemPedido> itemExistente = pedido.stream()
             .filter(item -> item.getTipo() == nuevoItem.getTipo() 
@@ -72,11 +64,9 @@ public class PedidoActualService {
         
         if (itemExistente.isPresent()) {
             // Incrementar cantidad si son idénticos
-            System.out.println(">>> ENCONTRADO IDENTICO - Incrementando");
             itemExistente.get().setCantidad(itemExistente.get().getCantidad() + 1);
         } else {
             // Agregar como nuevo item si tiene diferentes exclusiones
-            System.out.println(">>> AGREGANDO NUEVO ITEM");
             pedido.add(nuevoItem);
         }
         

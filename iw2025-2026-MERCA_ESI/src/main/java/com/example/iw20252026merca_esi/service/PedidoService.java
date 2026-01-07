@@ -37,8 +37,7 @@ public class PedidoService {
     /**
      * Confirma un pedido guardándolo en la base de datos.
      * @param items Lista de items del pedido actual (de la sesión)
-     * @param cliente Cliente que realiza el pedido (puede ser null si es empleado)
-     * @param empleado Empleado que realiza el pedido (puede ser null si es cliente)
+     * @param cliente Cliente que realiza el pedido (obligatorio)
      * @param aDomicilio Si es pedido a domicilio
      * @param paraLlevar Si es pedido para llevar
      * @param direccion Dirección de entrega (si es a domicilio)
@@ -48,7 +47,6 @@ public class PedidoService {
     public Pedido confirmarPedido(
             List<ItemPedido> items,
             Cliente cliente,
-            Empleado empleado,
             Boolean aDomicilio,
             Boolean paraLlevar,
             String direccion) {
@@ -57,9 +55,8 @@ public class PedidoService {
             throw new IllegalArgumentException("El pedido no puede estar vacío");
         }
         
-        // Validar que haya al menos un usuario (cliente o empleado)
-        if (cliente == null && empleado == null) {
-            throw new IllegalArgumentException("Debe haber un cliente o empleado asociado al pedido");
+        if (cliente == null) {
+            throw new IllegalArgumentException("El pedido debe estar asociado a un cliente");
         }
         
         // Calcular total
@@ -72,14 +69,7 @@ public class PedidoService {
         pedido.setFecha(LocalDateTime.now());
         pedido.setEstado("PENDIENTE_PAGO"); // Estado inicial
         pedido.setTotal(total);
-        if (cliente != null) {
-            pedido.setCliente(cliente);
-        } else {
-            // Si es empleado, crear un cliente temporal o manejar de otra forma
-            // Por ahora asumimos que empleados usan su cuenta de cliente si existe
-            pedido.setCliente(cliente); // Esto requerirá ajuste en el modelo
-        }
-        pedido.setEmpleado(empleado);
+        pedido.setCliente(cliente);
         pedido.setADomicilio(aDomicilio != null ? aDomicilio : false);
         pedido.setParaLlevar(paraLlevar != null ? paraLlevar : false);
         pedido.setDireccion(direccion);

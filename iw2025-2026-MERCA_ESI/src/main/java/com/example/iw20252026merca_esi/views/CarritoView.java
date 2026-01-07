@@ -371,13 +371,12 @@ public class CarritoView extends VerticalLayout {
                     }
                 }
                 
-                // Obtener usuario actual (cliente o empleado)
+                // Obtener cliente actual
                 Cliente cliente = sessionService.getCliente();
-                Empleado empleado = sessionService.getEmpleado();
                 
-                if (cliente == null && empleado == null) {
+                if (cliente == null) {
                     Notification.show(
-                        "⚠ Debes iniciar sesión para confirmar el pedido",
+                        "⚠ Debes iniciar sesión como cliente para confirmar el pedido",
                         4000,
                         Notification.Position.MIDDLE
                     ).addThemeVariants(NotificationVariant.LUMO_WARNING);
@@ -394,7 +393,6 @@ public class CarritoView extends VerticalLayout {
                 pedidoService.confirmarPedido(
                     pedidoActualService.getPedidoActual(),
                     cliente,
-                    empleado,
                     aDomicilio,
                     paraLlevar,
                     direccion

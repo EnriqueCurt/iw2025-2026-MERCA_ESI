@@ -183,41 +183,31 @@ public class SeleccionIngredientesDialog extends Dialog {
     }
     
     private void procesarExclusiones() {
-        System.out.println("=== PROCESANDO EXCLUSIONES ===");
         // Obtener todos los contenedores de ingredientes
         getChildren()
             .filter(c -> c instanceof VerticalLayout)
             .findFirst()
             .ifPresent(layout -> {
-                System.out.println("Layout encontrado");
                 layout.getChildren()
                     .forEach(component -> {
-                        System.out.println("Componente: " + component.getClass().getSimpleName());
                         if (component instanceof Div) {
                             Div div = (Div) component;
                             String idProd = div.getElement().getProperty("idProducto");
-                            System.out.println("  Es Div, idProducto=" + idProd);
                             
                             // Si este Div tiene idProducto, procesarlo directamente
                             if (idProd != null) {
-                                System.out.println("  ¡Encontrado contenedor de producto! Procesando...");
                                 procesarSeccion(div);
                             } else {
                                 // Para menús: buscar contenedores con idProducto en hijos
-                                System.out.println("  No tiene idProducto, buscando en hijos...");
                                 div.getChildren()
                                     .filter(c -> c instanceof Div)
                                     .forEach(hijo -> {
                                         String idProdHijo = hijo.getElement().getProperty("idProducto");
-                                        System.out.println("    Div hijo, idProducto=" + idProdHijo);
                                         if (idProdHijo != null) {
                                             procesarSeccion((Div) hijo);
                                         }
                                     });
                             }
-                        } else if (component instanceof Paragraph) {
-                            // Ignorar instrucciones
-                            System.out.println("  Es Paragraph, ignorando");
                         }
                     });
             });
@@ -228,7 +218,6 @@ public class SeleccionIngredientesDialog extends Dialog {
         if (idProductoStr == null) return;
         
         Integer idProducto = Integer.parseInt(idProductoStr);
-        System.out.println(">>> Procesando seccion idProducto=" + idProducto);
         
         seccion.getChildren()
             .filter(c -> c instanceof CheckboxGroup)
@@ -240,18 +229,10 @@ public class SeleccionIngredientesDialog extends Dialog {
                 Set<Ingrediente> seleccionados = checkboxGroup.getValue();
                 List<Ingrediente> todosIngredientes = new ArrayList<>(checkboxGroup.getListDataView().getItems().toList());
                 
-                System.out.println("  Total ingredientes: " + todosIngredientes.size());
-                System.out.println("  Seleccionados: " + seleccionados.size());
-                
                 // Los ingredientes EXCLUIDOS son los que NO están seleccionados
                 List<Ingrediente> excluidos = todosIngredientes.stream()
                     .filter(ing -> !seleccionados.contains(ing))
                     .toList();
-                
-                System.out.println("  Excluidos: " + excluidos.size());
-                if (!excluidos.isEmpty()) {
-                    excluidos.forEach(ing -> System.out.println("    - " + ing.getNombre()));
-                }
                 
                 item.actualizarExclusiones(idProducto, excluidos);
             });

@@ -52,7 +52,7 @@ public class Pedido {
     private LocalDateTime updatedAt;
     
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "id_cliente", nullable = false)
     private Cliente cliente;
     
     @ManyToOne
