@@ -1,11 +1,14 @@
 package com.example.iw20252026merca_esi.components;
 
 import com.example.iw20252026merca_esi.model.Menu;
+import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 
 public class MenuCard extends Div {
 
@@ -22,7 +25,7 @@ public class MenuCard extends Div {
     private static final String COLUMN = "column";
     private static final String BACKGROUNDCOLOR = "background-color";
 
-    public MenuCard(Menu menu) {
+    public MenuCard(Menu menu, PedidoActualService pedidoActualService) {
         // Estilos del contenedor principal (Tarjeta)
         getStyle()
                 .set("background", COLOR1)
@@ -160,7 +163,26 @@ public class MenuCard extends Div {
         btnPedir.addThemeName("primary");
 
         btnPedir.addClickListener(e -> {
-            System.out.println("Añadido al carrito: " + menu.getNombre());
+            SeleccionIngredientesDialog dialog = new SeleccionIngredientesDialog(
+                menu,
+                itemPedido -> {
+                    // Agregar el item completo con sus exclusiones
+                    pedidoActualService.agregarItem(itemPedido);
+                    
+                    String mensaje = "✓ Menú " + menu.getNombre() + " añadido al pedido";
+                    if (itemPedido.tieneExclusiones()) {
+                        mensaje += " (personalizado)";
+                    }
+                    
+                    Notification notification = Notification.show(
+                        mensaje,
+                        2000,
+                        Notification.Position.BOTTOM_END
+                    );
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                }
+            );
+            dialog.open();
         });
 
         contenido.add(nombre, descripcion, infoExtra, btnPedir);

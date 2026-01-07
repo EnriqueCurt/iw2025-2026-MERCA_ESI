@@ -1,7 +1,9 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.components.SeleccionIngredientesDialog;
 import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.ProductoService;
+import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -12,6 +14,8 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 public class OfertasView extends VerticalLayout {
 
     private final ProductoService productoService;
+    private final PedidoActualService pedidoActualService;
     private final Div grid;
     private final Checkbox puntosFilter = new Checkbox("Solo Puntos");
     
@@ -59,8 +64,9 @@ public class OfertasView extends VerticalLayout {
     private  static final String WIDTH = "width";
 
 
-    public OfertasView(ProductoService productoService) {
+    public OfertasView(ProductoService productoService, PedidoActualService pedidoActualService) {
         this.productoService = productoService;
+        this.pedidoActualService = pedidoActualService;
         
         setSizeFull();
         setSpacing(false);
@@ -202,7 +208,7 @@ public class OfertasView extends VerticalLayout {
     }
 
     private void cargarProductos() {
-        todosLosProductos = productoService.listarProductosActivos().stream()
+        todosLosProductos = productoService.listarProductosConCategoriasEIngredientes().stream()
                 .filter(p -> p.getEsOferta() || p.getPuntos())
                 .collect(Collectors.toList());
         paginaActual = 0;
@@ -427,7 +433,26 @@ public class OfertasView extends VerticalLayout {
                 .set(COLOR, COLOR_2_IS)
                 .set("margin-top", "auto");
         pedirBtn.addClickListener(e -> {
-            System.out.println("Añadido al carrito: " + producto.getNombre());
+            SeleccionIngredientesDialog dialog = new SeleccionIngredientesDialog(
+                producto,
+                itemPedido -> {
+                    // Agregar el item completo con sus exclusiones
+                    pedidoActualService.agregarItem(itemPedido);
+                    
+                    String mensaje = "✓ " + producto.getNombre() + " añadido al pedido";
+                    if (itemPedido.tieneExclusiones()) {
+                        mensaje += " (personalizado)";
+                    }
+                    
+                    Notification notification = Notification.show(
+                        mensaje,
+                        2000,
+                        Notification.Position.BOTTOM_END
+                    );
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                }
+            );
+            dialog.open();
         });
 
         content.add(h3, desc, priceAndBadges, pedirBtn);

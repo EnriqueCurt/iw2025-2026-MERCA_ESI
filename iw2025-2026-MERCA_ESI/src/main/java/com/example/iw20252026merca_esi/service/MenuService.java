@@ -24,6 +24,11 @@ public class MenuService {
         return menuRepository.findAllWithProductos();
     }
 
+    @Transactional(readOnly = true)
+    public List<Menu> listarMenusConIngredientes() {
+        return menuRepository.findAllWithProductosAndIngredientes();
+    }
+
     @Transactional
     public void eliminarMenu(Integer id) {
         menuRepository.deleteById(id);

@@ -30,4 +30,7 @@ public interface MenuRepository extends JpaRepository<Menu, Integer> {
 
     @Query("SELECT DISTINCT m FROM Menu m LEFT JOIN FETCH m.productos")
     List<Menu> findAllWithProductos();
+
+    @Query("SELECT DISTINCT m FROM Menu m LEFT JOIN FETCH m.productos p LEFT JOIN FETCH p.productoIngredientes pi LEFT JOIN FETCH pi.ingrediente WHERE m.estado = true")
+    List<Menu> findAllWithProductosAndIngredientes();
 }

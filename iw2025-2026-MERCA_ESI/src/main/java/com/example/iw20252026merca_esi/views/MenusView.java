@@ -1,7 +1,9 @@
 package com.example.iw20252026merca_esi.views;
 
 import com.example.iw20252026merca_esi.components.MenuCard;
+import com.example.iw20252026merca_esi.components.SeleccionIngredientesDialog;
 import com.example.iw20252026merca_esi.service.MenuService;
+import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -16,9 +18,11 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 public class MenusView extends VerticalLayout {
 
     private final MenuService menuService;
+    private final PedidoActualService pedidoActualService;
 
-    public MenusView(MenuService menuService) {
+    public MenusView(MenuService menuService, PedidoActualService pedidoActualService) {
         this.menuService = menuService;
+        this.pedidoActualService = pedidoActualService;
 
         setAlignItems(Alignment.CENTER);
         setWidthFull();
@@ -36,8 +40,8 @@ public class MenusView extends VerticalLayout {
         menusLayout.getStyle().set("flex-wrap", "wrap");
 
         // Reutilizamos el componente MenuCard
-        menuService.listarMenus().forEach(menu -> {
-            menusLayout.add(new MenuCard(menu));
+        menuService.listarMenusConIngredientes().forEach(menu -> {
+            menusLayout.add(new MenuCard(menu, pedidoActualService));
         });
 
         add(menusLayout);

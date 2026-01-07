@@ -29,6 +29,9 @@ public class ProductoService {
         return productoRepository.findAllWithCategorias();
     }
 
+    public List<Producto> listarProductosConCategoriasEIngredientes() {
+        return productoRepository.findAllWithCategoriasAndIngredientes();
+    }
 
     public List<Producto> listarProductosActivos() {
         return productoRepository.findByEstadoTrue();

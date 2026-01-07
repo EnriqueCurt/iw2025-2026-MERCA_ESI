@@ -1,12 +1,16 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.components.SeleccionIngredientesDialog;
 import com.example.iw20252026merca_esi.model.Categoria;
 import com.example.iw20252026merca_esi.model.Producto;
 import com.example.iw20252026merca_esi.service.CategoriaService;
 import com.example.iw20252026merca_esi.service.ProductoService;
+import com.example.iw20252026merca_esi.service.PedidoActualService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Menu;
@@ -40,10 +44,12 @@ public class CartaView extends VerticalLayout {
     
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
+    private final PedidoActualService pedidoActualService;
 
-    public CartaView(ProductoService productoService, CategoriaService categoriaService) {
+    public CartaView(ProductoService productoService, CategoriaService categoriaService, PedidoActualService pedidoActualService) {
         this.productoService = productoService;
         this.categoriaService = categoriaService;
+        this.pedidoActualService = pedidoActualService;
         
         setSizeFull();
         setPadding(false);
@@ -83,7 +89,7 @@ public class CartaView extends VerticalLayout {
                 .set("width", "100%");
 
         // Obtener productos activos agrupados por categoría (excluyendo ofertas y puntos)
-        List<Producto> productosActivos = productoService.listarProductosConCategorias().stream()
+        List<Producto> productosActivos = productoService.listarProductosConCategoriasEIngredientes().stream()
                 .filter(Producto::getEstado)
                 .filter(p -> !p.getEsOferta() && !p.getPuntos())
                 .collect(Collectors.toList());
@@ -281,8 +287,26 @@ public class CartaView extends VerticalLayout {
                 .set(BORDER_RADIUS, "8px")
                 .set(FONTWEIGHT, "600");
         pedirBtn.addClickListener(e -> {
-            // Aquí iría la lógica para añadir al carrito
-            System.out.println("Añadido al carrito: " + producto.getNombre());
+            SeleccionIngredientesDialog dialog = new SeleccionIngredientesDialog(
+                producto,
+                itemPedido -> {
+                    // Agregar el item completo con sus exclusiones
+                    pedidoActualService.agregarItem(itemPedido);
+                    
+                    String mensaje = "✓ " + producto.getNombre() + " añadido al pedido";
+                    if (itemPedido.tieneExclusiones()) {
+                        mensaje += " (personalizado)";
+                    }
+                    
+                    Notification notification = Notification.show(
+                        mensaje,
+                        2000,
+                        Notification.Position.BOTTOM_END
+                    );
+                    notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                }
+            );
+            dialog.open();
         });
 
         content.add(h3, desc, badges, precio, pedirBtn);

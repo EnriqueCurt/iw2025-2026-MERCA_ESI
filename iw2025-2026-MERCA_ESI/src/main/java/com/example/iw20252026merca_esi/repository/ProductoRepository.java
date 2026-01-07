@@ -37,5 +37,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
     @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.categorias ORDER BY p.nombre ASC")
     List<Producto> findAllWithCategorias();
+
+    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.productoIngredientes pi LEFT JOIN FETCH pi.ingrediente WHERE p.estado = true ORDER BY p.nombre ASC")
+    List<Producto> findAllWithIngredientes();
+
+    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.categorias LEFT JOIN FETCH p.productoIngredientes pi LEFT JOIN FETCH pi.ingrediente WHERE p.estado = true ORDER BY p.nombre ASC")
+    List<Producto> findAllWithCategoriasAndIngredientes();
 }
 

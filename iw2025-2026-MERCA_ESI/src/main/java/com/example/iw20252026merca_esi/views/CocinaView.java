@@ -320,6 +320,19 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 
                 itemDiv.setText("- " + detalle.getCantidad() + "x " + detalle.getProducto().getNombre());
                 detallesLayout.add(itemDiv);
+                
+                // Mostrar exclusiones de ingredientes si las hay (desde notas temporalmente)
+                if (detalle.getNotas() != null && !detalle.getNotas().isEmpty()) {
+                    Div exclusionesDiv = new Div();
+                    exclusionesDiv.getStyle()
+                        .set("padding-left", "30px")
+                        .set(FONTSIZE, "15px")
+                        .set(COLOR, "#d32f2f")
+                        .set(FONTWEIGHT, "bold")
+                        .set("font-style", "italic");
+                    exclusionesDiv.setText("⚠ " + detalle.getNotas());
+                    detallesLayout.add(exclusionesDiv);
+                }
             }
 
             // Mostrar menús y sus productos
@@ -348,6 +361,9 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                         
                         productoMenuDiv.setText("→ " + producto.getNombre());
                         detallesLayout.add(productoMenuDiv);
+                        
+                        // TODO: Mostrar exclusiones específicas por producto del menú
+                        // Esto requerirá actualizar la estructura de DetallePedidoMenu
                     }
                 }
             }
