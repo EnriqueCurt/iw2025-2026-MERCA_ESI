@@ -1,7 +1,6 @@
 package com.example.iw20252026merca_esi.repository;
 
 import com.example.iw20252026merca_esi.model.DetallePedidoMenu;
-import com.example.iw20252026merca_esi.model.DetallePedidoMenuId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,12 +9,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DetallePedidoMenuRepository extends JpaRepository<DetallePedidoMenu, DetallePedidoMenuId> {
+public interface DetallePedidoMenuRepository extends JpaRepository<DetallePedidoMenu, Integer> {
     
-    // Buscar todos los detalles de menús de un pedido específico con productos cargados
-    @Query("SELECT dm FROM DetallePedidoMenu dm " +
+    // Buscar todos los detalles de menús de un pedido específico con productos e ingredientes cargados
+    @Query("SELECT DISTINCT dm FROM DetallePedidoMenu dm " +
            "JOIN FETCH dm.menu m " +
-           "LEFT JOIN FETCH m.productos " +
+           "LEFT JOIN FETCH m.productos p " +
+           "LEFT JOIN FETCH p.productoIngredientes pi " +
+           "LEFT JOIN FETCH pi.ingrediente " +
            "WHERE dm.pedido.idPedido = :idPedido")
     List<DetallePedidoMenu> findByPedidoIdPedido(@Param("idPedido") Integer idPedido);
     

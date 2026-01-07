@@ -5,15 +5,17 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "detalle_pedido_producto")
-@IdClass(DetallePedidoProductoId.class)
 public class DetallePedidoProducto implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_detalle")
+    private Integer idDetalle;
+
     @ManyToOne
     @JoinColumn(name = "id_pedido", nullable = false)
     private Pedido pedido;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "id_producto", nullable = false)
     private Producto producto;
@@ -29,6 +31,9 @@ public class DetallePedidoProducto implements Serializable {
 
     @Column(length = 500)
     private String notas; // Ej: "Sin cebolla", "Extra queso"
+    
+    @Column(name = "ingredientes_excluidos", columnDefinition = "TEXT")
+    private String ingredientesExcluidos; // IDs de ingredientes separados por comas
 
     // Constructores
     public DetallePedidoProducto() {
@@ -91,6 +96,22 @@ public class DetallePedidoProducto implements Serializable {
 
     public void setNotas(String notas) {
         this.notas = notas;
+    }
+
+    public Integer getIdDetalle() {
+        return idDetalle;
+    }
+
+    public void setIdDetalle(Integer idDetalle) {
+        this.idDetalle = idDetalle;
+    }
+
+    public String getIngredientesExcluidos() {
+        return ingredientesExcluidos;
+    }
+
+    public void setIngredientesExcluidos(String ingredientesExcluidos) {
+        this.ingredientesExcluidos = ingredientesExcluidos;
     }
 
     // Métodos auxiliares

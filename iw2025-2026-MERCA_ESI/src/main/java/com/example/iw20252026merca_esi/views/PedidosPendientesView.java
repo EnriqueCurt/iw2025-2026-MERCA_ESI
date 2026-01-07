@@ -4,6 +4,7 @@ import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.EstadoPedido;
 import com.example.iw20252026merca_esi.model.Pedido;
 import com.example.iw20252026merca_esi.repository.PedidoRepository;
+import com.example.iw20252026merca_esi.service.PedidoService;
 import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -50,14 +51,16 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
     private static final String BACKGROUNDCOLOR = "background-color";
 
     private final PedidoRepository pedidoRepository;
+    private final PedidoService pedidoService;
     private final SessionService sessionService;
     private Grid<Pedido> pedidosGrid;
     private MultiSelectComboBox<String> filtroEstados;
     private Div statsPanel;
 
     @Autowired
-    public PedidosPendientesView(PedidoRepository pedidoRepository, SessionService sessionService) {
+    public PedidosPendientesView(PedidoRepository pedidoRepository, PedidoService pedidoService, SessionService sessionService) {
         this.pedidoRepository = pedidoRepository;
+        this.pedidoService = pedidoService;
         this.sessionService = sessionService;
 
         setSizeFull();
@@ -181,6 +184,19 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
                 .setWidth("150px");
 
         pedidosGrid.addComponentColumn(pedido -> {
+            HorizontalLayout actionsLayout = new HorizontalLayout();
+            actionsLayout.setSpacing(true);
+            
+            // Botón "Pagado" solo para pedidos pendientes de pago
+            if ("PENDIENTE_PAGO".equals(pedido.getEstado())) {
+                Button btnPagado = new Button("Pagado", new Icon(VaadinIcon.CASH));
+                btnPagado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+                btnPagado.getStyle().set(BACKGROUNDCOLOR, COLOR2);
+                btnPagado.addClickListener(e -> marcarComoPagado(pedido));
+                actionsLayout.add(btnPagado);
+            }
+            
+            // Botón "Cambiar Estado" (ya existente)
             Button btnCambiarEstado = new Button("Cambiar Estado", new Icon(VaadinIcon.EDIT));
             btnCambiarEstado.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
             btnCambiarEstado.getStyle().set(BACKGROUNDCOLOR, COLOR3);
@@ -189,8 +205,9 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
             if ("FINALIZADO".equals(pedido.getEstado())) {
                 btnCambiarEstado.setEnabled(false);
             }
-
-            return btnCambiarEstado;
+            
+            actionsLayout.add(btnCambiarEstado);
+            return actionsLayout;
         })
                 .setHeader("Acciones")
                 .setFlexGrow(1);
@@ -273,6 +290,18 @@ public class PedidosPendientesView extends VerticalLayout implements BeforeEnter
                 .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
         
         cargarPedidos();
+    }
+
+    private void marcarComoPagado(Pedido pedido) {
+        try {
+            pedidoService.marcarComoPagado(pedido.getIdPedido());
+            Notification.show("Pedido #" + pedido.getIdPedido() + " marcado como pagado")
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            cargarPedidos();
+        } catch (IllegalStateException e) {
+            Notification.show("Error: " + e.getMessage())
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
     }
 
     private Div createStatsPanel() {

@@ -55,6 +55,14 @@ public class PedidoActualService {
     public void agregarItem(ItemPedido nuevoItem) {
         List<ItemPedido> pedido = getPedidoActual();
         
+        // DEBUG TEMPORAL
+        System.out.println("=== AGREGANDO: " + nuevoItem.getNombre() + " ===");
+        if (nuevoItem.getExclusiones() != null) {
+            for (ItemPedido.ExclusionIngredientes exc : nuevoItem.getExclusiones()) {
+                System.out.println("  Producto " + exc.getIdProducto() + ": " + exc.getIngredientesExcluidos());
+            }
+        }
+        
         // Buscar si ya existe un item idéntico (mismo id Y mismas exclusiones)
         Optional<ItemPedido> itemExistente = pedido.stream()
             .filter(item -> item.getTipo() == nuevoItem.getTipo() 
@@ -64,9 +72,11 @@ public class PedidoActualService {
         
         if (itemExistente.isPresent()) {
             // Incrementar cantidad si son idénticos
+            System.out.println(">>> ENCONTRADO IDENTICO - Incrementando");
             itemExistente.get().setCantidad(itemExistente.get().getCantidad() + 1);
         } else {
             // Agregar como nuevo item si tiene diferentes exclusiones
+            System.out.println(">>> AGREGANDO NUEVO ITEM");
             pedido.add(nuevoItem);
         }
         
@@ -95,29 +105,33 @@ public class PedidoActualService {
             return false;
         }
         
-        // Comparar cada exclusión
-        for (int i = 0; i < exc1.size(); i++) {
-            ItemPedido.ExclusionIngredientes e1 = exc1.get(i);
-            ItemPedido.ExclusionIngredientes e2 = exc2.get(i);
+        // Para cada exclusión en item1, buscar la correspondiente en item2 por idProducto
+        for (ItemPedido.ExclusionIngredientes e1 : exc1) {
+            ItemPedido.ExclusionIngredientes e2 = exc2.stream()
+                .filter(e -> e.getIdProducto().equals(e1.getIdProducto()))
+                .findFirst()
+                .orElse(null);
             
-            // Comparar id de producto y ingredientes excluidos
-            if (!e1.getIdProducto().equals(e2.getIdProducto())) {
+            if (e2 == null) {
+                // No encontró el mismo producto en item2
                 return false;
             }
             
             List<Integer> ing1 = e1.getIngredientesExcluidos();
             List<Integer> ing2 = e2.getIngredientesExcluidos();
             
+            // Ambas listas vacías o null = sin exclusiones = iguales para este producto
             if ((ing1 == null || ing1.isEmpty()) && (ing2 == null || ing2.isEmpty())) {
                 continue;
             }
             
+            // Una tiene exclusiones y la otra no = diferentes
             if ((ing1 == null || ing1.isEmpty()) || (ing2 == null || ing2.isEmpty())) {
                 return false;
             }
             
             // Comparar listas de ingredientes (sin importar orden)
-            if (ing1.size() != ing2.size() || !ing1.containsAll(ing2)) {
+            if (ing1.size() != ing2.size() || !ing1.containsAll(ing2) || !ing2.containsAll(ing1)) {
                 return false;
             }
         }

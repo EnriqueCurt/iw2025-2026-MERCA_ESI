@@ -1,7 +1,11 @@
 package com.example.iw20252026merca_esi.views;
 
+import com.example.iw20252026merca_esi.model.Cliente;
+import com.example.iw20252026merca_esi.model.Empleado;
 import com.example.iw20252026merca_esi.model.ItemPedido;
 import com.example.iw20252026merca_esi.service.PedidoActualService;
+import com.example.iw20252026merca_esi.service.PedidoService;
+import com.example.iw20252026merca_esi.service.SessionService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -13,7 +17,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
@@ -29,12 +35,16 @@ import java.util.List;
 public class CarritoView extends VerticalLayout {
 
     private final PedidoActualService pedidoActualService;
+    private final PedidoService pedidoService;
+    private final SessionService sessionService;
     private Grid<ItemPedido> grid;
     private Span totalSpan;
     private Div mainContainer;
 
-    public CarritoView(PedidoActualService pedidoActualService) {
+    public CarritoView(PedidoActualService pedidoActualService, PedidoService pedidoService, SessionService sessionService) {
         this.pedidoActualService = pedidoActualService;
+        this.pedidoService = pedidoService;
+        this.sessionService = sessionService;
 
         setSizeFull();
         setPadding(false);
@@ -294,13 +304,142 @@ public class CarritoView extends VerticalLayout {
     }
 
     private void confirmarPedido() {
-        // TODO: Implementar cuando tengamos PedidoService
-        Notification notification = Notification.show(
-                "Funcionalidad de confirmación en desarrollo. Por ahora, tu pedido se mantiene en la sesión.",
-                3000,
-                Notification.Position.MIDDLE
-        );
-        notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
+        Dialog confirmDialog = new Dialog();
+        confirmDialog.setHeaderTitle("Confirmar Pedido");
+        confirmDialog.setWidth("500px");
+        
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+        layout.setSpacing(true);
+        
+        // Selecci\u00f3n de tipo de entrega
+        H4 tipoEntregaLabel = new H4("Tipo de entrega:");
+        tipoEntregaLabel.getStyle().set("margin", "0 0 10px 0");
+        
+        RadioButtonGroup<String> tipoEntrega = new RadioButtonGroup<>();
+        tipoEntrega.setItems("Local", "Para llevar", "A domicilio");
+        tipoEntrega.setValue("Local");
+        
+        // Campo de direcci\u00f3n (solo visible si es a domicilio)
+        TextField direccionField = new TextField("Direcci\u00f3n de entrega");
+        direccionField.setWidthFull();
+        direccionField.setPlaceholder("Calle, n\u00famero, piso...");
+        direccionField.setVisible(false);
+        
+        tipoEntrega.addValueChangeListener(e -> {
+            direccionField.setVisible("A domicilio".equals(e.getValue()));
+        });
+        
+        layout.add(tipoEntregaLabel, tipoEntrega, direccionField);
+        
+        // Resumen del pedido
+        Div resumen = new Div();
+        resumen.getStyle()
+            .set("background", "#f5f5f5")
+            .set("padding", "15px")
+            .set("border-radius", "8px")
+            .set("margin-top", "15px");
+        
+        int totalItems = pedidoActualService.getCantidadItems();
+        Span itemsText = new Span("Items: " + totalItems);
+        itemsText.getStyle().set("display", "block");
+        
+        Span totalText = new Span("Total: " + String.format("%.2f\u20ac", pedidoActualService.getTotal()));
+        totalText.getStyle()
+            .set("display", "block")
+            .set("font-weight", "bold")
+            .set("font-size", "1.2rem")
+            .set("color", "#e30613")
+            .set("margin-top", "5px");
+        
+        resumen.add(itemsText, totalText);
+        layout.add(resumen);
+        
+        confirmDialog.add(layout);
+        
+        // Botones
+        Button cancelarBtn = new Button("Cancelar", e -> confirmDialog.close());
+        
+        Button confirmarBtn = new Button("Confirmar Pedido", e -> {
+            try {
+                // Validar direcci\u00f3n si es a domicilio
+                if ("A domicilio".equals(tipoEntrega.getValue())) {
+                    if (direccionField.getValue() == null || direccionField.getValue().trim().isEmpty()) {
+                        Notification.show("Por favor, ingresa una direcci\u00f3n de entrega", 3000, Notification.Position.MIDDLE)
+                            .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                        return;
+                    }
+                }
+                
+                // Obtener usuario actual (cliente o empleado)
+                Cliente cliente = sessionService.getCliente();
+                Empleado empleado = sessionService.getEmpleado();
+                
+                if (cliente == null && empleado == null) {
+                    Notification.show(
+                        "⚠ Debes iniciar sesión para confirmar el pedido",
+                        4000,
+                        Notification.Position.MIDDLE
+                    ).addThemeVariants(NotificationVariant.LUMO_WARNING);
+                    confirmDialog.close();
+                    return;
+                }
+                
+                // Determinar tipo de entrega
+                boolean aDomicilio = "A domicilio".equals(tipoEntrega.getValue());
+                boolean paraLlevar = "Para llevar".equals(tipoEntrega.getValue());
+                String direccion = aDomicilio ? direccionField.getValue() : null;
+                
+                // Confirmar pedido
+                pedidoService.confirmarPedido(
+                    pedidoActualService.getPedidoActual(),
+                    cliente,
+                    empleado,
+                    aDomicilio,
+                    paraLlevar,
+                    direccion
+                );
+                
+                // Limpiar pedido actual
+                pedidoActualService.limpiarPedido();
+                
+                confirmDialog.close();
+                
+                // Mostrar confirmaci\u00f3n
+                Notification.show(
+                    "\u2713 Pedido confirmado exitosamente. \u00a1Gracias por tu compra!",
+                    4000,
+                    Notification.Position.MIDDLE
+                ).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                
+                // Actualizar vista
+                actualizarVista();
+                
+            } catch (Exception ex) {
+                Notification.show(
+                    "Error al confirmar el pedido: " + ex.getMessage(),
+                    4000,
+                    Notification.Position.MIDDLE
+                ).addThemeVariants(NotificationVariant.LUMO_ERROR);
+            }
+        });
+        confirmarBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        confirmarBtn.getStyle().set("background-color", "#e30613");
+        
+        HorizontalLayout buttons = new HorizontalLayout(cancelarBtn, confirmarBtn);
+        buttons.setJustifyContentMode(JustifyContentMode.END);
+        buttons.getStyle().set("margin-top", "20px");
+        
+        layout.add(buttons);
+        
+        confirmDialog.open();
+    }
+    
+    /**
+     * Obtiene el cliente actual de la sesión.
+     */
+    private Cliente obtenerClienteActual() {
+        return sessionService.getCliente();
     }
 
     private void actualizarVista() {

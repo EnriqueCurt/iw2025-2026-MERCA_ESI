@@ -271,7 +271,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
         .setFlexGrow(0)
         .setWidth("150px");
 
-        // Columna de acciones con botón para marcar como listo
+        // Columna de acciones con botones
         pedidosGrid.addComponentColumn(pedido -> {
             HorizontalLayout actions = new HorizontalLayout();
             actions.setSpacing(true);
@@ -321,7 +321,7 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 itemDiv.setText("- " + detalle.getCantidad() + "x " + detalle.getProducto().getNombre());
                 detallesLayout.add(itemDiv);
                 
-                // Mostrar exclusiones de ingredientes si las hay (desde notas temporalmente)
+                // Mostrar exclusiones de ingredientes
                 if (detalle.getNotas() != null && !detalle.getNotas().isEmpty()) {
                     Div exclusionesDiv = new Div();
                     exclusionesDiv.getStyle()
@@ -348,6 +348,22 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                 menuDiv.setText("- " + detalleMenu.getCantidad() + "x " + detalleMenu.getMenu().getNombre());
                 detallesLayout.add(menuDiv);
                 
+                // Parsear exclusiones del menú (formato: "idProducto:id1,id2;idProducto2:id3,id4")
+                Map<Integer, List<Integer>> exclusionesPorProducto = new HashMap<>();
+                if (detalleMenu.getIngredientesExcluidos() != null && !detalleMenu.getIngredientesExcluidos().isEmpty()) {
+                    String[] productos = detalleMenu.getIngredientesExcluidos().split(";");
+                    for (String productoExcl : productos) {
+                        String[] partes = productoExcl.split(":");
+                        if (partes.length == 2) {
+                            Integer idProducto = Integer.parseInt(partes[0]);
+                            List<Integer> idsIngredientes = Arrays.stream(partes[1].split(","))
+                                .map(Integer::parseInt)
+                                .collect(Collectors.toList());
+                            exclusionesPorProducto.put(idProducto, idsIngredientes);
+                        }
+                    }
+                }
+                
                 // Productos del menú (indentados)
                 if (detalleMenu.getMenu().getProductos() != null && 
                     !detalleMenu.getMenu().getProductos().isEmpty()) {
@@ -362,8 +378,31 @@ public class CocinaView extends VerticalLayout implements BeforeEnterObserver {
                         productoMenuDiv.setText("→ " + producto.getNombre());
                         detallesLayout.add(productoMenuDiv);
                         
-                        // TODO: Mostrar exclusiones específicas por producto del menú
-                        // Esto requerirá actualizar la estructura de DetallePedidoMenu
+                        // Mostrar exclusiones específicas de este producto
+                        List<Integer> exclusiones = exclusionesPorProducto.get(producto.getIdProducto());
+                        if (exclusiones != null && !exclusiones.isEmpty()) {
+                            // Obtener nombres de ingredientes excluidos
+                            List<String> nombresIngredientes = new ArrayList<>();
+                            if (producto.getProductoIngredientes() != null) {
+                                for (ProductoIngrediente pi : producto.getProductoIngredientes()) {
+                                    if (exclusiones.contains(pi.getIngrediente().getIdIngrediente())) {
+                                        nombresIngredientes.add(pi.getIngrediente().getNombre());
+                                    }
+                                }
+                            }
+                            
+                            if (!nombresIngredientes.isEmpty()) {
+                                Div exclusionesDiv = new Div();
+                                exclusionesDiv.getStyle()
+                                    .set("padding-left", "50px")
+                                    .set(FONTSIZE, "14px")
+                                    .set(COLOR, "#d32f2f")
+                                    .set(FONTWEIGHT, "bold")
+                                    .set("font-style", "italic");
+                                exclusionesDiv.setText("⚠ SIN: " + String.join(", ", nombresIngredientes));
+                                detallesLayout.add(exclusionesDiv);
+                            }
+                        }
                     }
                 }
             }
